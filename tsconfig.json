@@ -12,5 +12,5 @@
     "sourceMap": true,
     "declaration": true
   },
-  "exclude": ["node_modules", "lib", "examples", "**/*.spec.ts", "**/*.d.ts"]
+  "exclude": ["node_modules", "lib", "**/*.spec.ts", "**/*.d.ts"]
 }
