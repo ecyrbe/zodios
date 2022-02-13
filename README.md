@@ -2,21 +2,21 @@
 
 │ <p align="center">
    <a href="https://github.com/ecyrbe/zodios">
-     <img align="center" src="https://raw.githubusercontent.com/ecyrbe/zodios/main/docs/logo.svg" width="512px" alt="Zodios logo">
+     <img align="center" src="https://raw.githubusercontent.com/ecyrbe/zodios/main/docs/logo.svg" width="128px" alt="Zodios logo">
    </a>
  </p>
  
  <p align="center">
-    APIX is a typescript api client with auto-completion features backed by zod and typescript
+    Zodios is a typescript api client with auto-completion features backed by zod and typescript
  </p>
  
  <p align="center">
    <img src="https://img.shields.io/npm/v/zodios.svg" alt="langue typescript">
+   <img alt="npm" src="https://img.shields.io/npm/dw/zodios">
    <a href="https://github.com/ecyrbe/zodios/blob/main/LICENSE">
-     <img src="https://img.shields.io/github/license/ecyrbe/zodios?color=ed333b" alt="MIT license">
+    <img alt="GitHub" src="https://img.shields.io/github/license/ecyrbe/zodios">   
    </a>
  </p>
- 
 
 # What is it ?
 
