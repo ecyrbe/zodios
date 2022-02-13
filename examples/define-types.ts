@@ -17,45 +17,39 @@ type Users = z.infer<typeof usersSchema>;
 
 // and then use them in your API
 async function bootstrap() {
-  const apiClient = new Zodios(
-    "https://jsonplaceholder.typicode.com",
+  const apiClient = new Zodios("https://jsonplaceholder.typicode.com", [
     {
-      getToken: () => Promise.resolve("token"),
+      method: "get",
+      path: "/users",
+      description: "Get all users",
+      parameters: [
+        {
+          name: "q",
+          type: "Query",
+          schema: z.string(),
+        },
+        {
+          name: "page",
+          type: "Query",
+          schema: z.string().optional(),
+        },
+      ],
+      response: usersSchema,
     },
-    [
-      {
-        method: "get",
-        path: "/users",
-        description: "Get all users",
-        parameters: [
-          {
-            name: "q",
-            type: "Query",
-            schema: z.string(),
-          },
-          {
-            name: "page",
-            type: "Query",
-            schema: z.string().optional(),
-          },
-        ],
-        response: usersSchema,
-      },
-      {
-        method: "get",
-        path: "/users/:id",
-        description: "Get a user",
-        parameters: [
-          {
-            type: "Path",
-            name: "id",
-            schema: z.number(),
-          },
-        ],
-        response: userSchema,
-      },
-    ] as const
-  );
+    {
+      method: "get",
+      path: "/users/:id",
+      description: "Get a user",
+      parameters: [
+        {
+          type: "Path",
+          name: "id",
+          schema: z.number(),
+        },
+      ],
+      response: userSchema,
+    },
+  ] as const);
 
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
   console.log(users);
