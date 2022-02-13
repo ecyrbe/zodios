@@ -1,5 +1,4 @@
-# ZODIOS
-
+  <h1 align="center">Zodios</h1>
 │ <p align="center">
    <a href="https://github.com/ecyrbe/zodios">
      <img align="center" src="https://raw.githubusercontent.com/ecyrbe/zodios/main/docs/logo.svg" width="128px" alt="Zodios logo">
