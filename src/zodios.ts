@@ -111,11 +111,10 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
   ) {
     const validation = endpoint.response.safeParse(response);
     if (!validation.success) {
-      throw new Error(
-        `Invalid response from endpoint ${endpoint.method} ${
-          endpoint.path
-        }\n${JSON.stringify(validation.error.issues)}`
+      console.error(
+        `Invalid response for ${endpoint.method} ${endpoint.path}: ${validation.error.message}`
       );
+      throw validation.error;
     }
     return validation.data as z.infer<Response<Api, "get", Path>>;
   }
