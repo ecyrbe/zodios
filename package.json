@@ -11,10 +11,10 @@
     "name": "ecyrbe",
     "email": "ecyrbe@gmail.com"
   },
-  "homepage": "https://gihub.com/ecyrbe/zodios",
+  "homepage": "https://github.com/ecyrbe/zodios",
   "repository": {
     "type": "git",
-    "url": "https://gihub.com/ecyrbe/zodios.git"
+    "url": "https://github.com/ecyrbe/zodios.git"
   },
   "license": "MIT",
   "scripts": {
