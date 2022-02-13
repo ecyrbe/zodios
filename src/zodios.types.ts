@@ -83,7 +83,7 @@ export type HeaderParams<Api, M extends Method, Path> = NotEmpty<
   >
 >;
 
-export type AnyApiClientRequestOptions = {
+export type AnyZodiosRequestOptions = {
   params?: Record<string, unknown>;
   queries?: Record<string, unknown>;
   headers?: Record<string, string>;
@@ -92,7 +92,7 @@ export type AnyApiClientRequestOptions = {
   "params" | "headers" | "baseURL" | "data" | "method"
 >;
 
-export type ApiClientRequestOptions<Api, M extends Method, Path> = PickDefined<{
+export type ZodiosRequestOptions<Api, M extends Method, Path> = PickDefined<{
   params: PathParams<Api, M, Path>;
   queries: QueryParams<Api, M, Path>;
   headers: HeaderParams<Api, M, Path>;
@@ -117,7 +117,7 @@ export interface TokenProvider {
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
-export type AnyEndpointDescription<R> = {
+export type ZodiosEndpointDescription<R> = {
   method: Method;
   path: string;
   description?: string;
