@@ -2,40 +2,19 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { z } from "zod";
 import {
   AnyApiClientRequestOptions,
+  AnyEndpointDescription,
   ApiClientRequestOptions,
   AxiosRetryRequestConfig,
   Body,
   Method,
   Paths,
   Response,
+  TokenProvider,
 } from "./zodios.types";
 import { ReadonlyDeep } from "./utils.types";
 import { omit } from "./utils";
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
-
-/**
- * Token interface to allow zodios to inject a token into the request or renew it
- */
-export interface TokenProvider {
-  getToken: () => Promise<string>;
-  renewToken?: () => Promise<string>;
-}
-
-/**
- * Zodios enpoint definition that should be used to create a new instance of Zodios
- */
-export type AnyEndpointDescription<R> = {
-  method: Method;
-  path: string;
-  description?: string;
-  parameters?: Array<{
-    name: string;
-    type: "Query" | "Body" | "Path" | "Header";
-    schema: z.ZodType<unknown>;
-  }>;
-  response: z.ZodType<R>;
-};
 
 /**
  * zodios api client based on axios
@@ -59,44 +38,12 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
     });
 
     this.axiosInstance.interceptors.request.use(
-      async (config) => {
-        config.withCredentials = true;
-        if (!config.headers) {
-          config.headers = {};
-        }
-        const token = await this.provider.getToken();
-        if (token && config.method !== "get") {
-          config.headers = {
-            ...config.headers,
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          };
-        } else if (token) {
-          config.headers = {
-            ...config.headers,
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          };
-        }
-        return config;
-      },
-      (error) => Promise.reject(error)
+      this.createRequestInterceptor()
     );
     if (this.provider.renewToken) {
       this.axiosInstance.interceptors.response.use(
-        (response) => response,
-        (error) => {
-          if (axios.isAxiosError(error)) {
-            const retryConfig = error.config as AxiosRetryRequestConfig;
-            if (error.response?.status === 401 && !retryConfig.retried) {
-              retryConfig.retried = true;
-              this.provider.renewToken!();
-              return axios(retryConfig);
-            }
-          }
-          throw error;
-        }
+        undefined,
+        this.createResponseInterceptor()
       );
     }
   }
@@ -106,6 +53,45 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
    */
   get axios() {
     return this.axiosInstance;
+  }
+
+  private createRequestInterceptor() {
+    return async (config: AxiosRequestConfig) => {
+      config.withCredentials = true;
+      if (!config.headers) {
+        config.headers = {};
+      }
+      const token = await this.provider.getToken();
+      if (token && config.method !== "get") {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        };
+      } else if (token) {
+        config.headers = {
+          ...config.headers,
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        };
+      }
+      return config;
+    };
+  }
+
+  private createResponseInterceptor() {
+    return async (error: Error) => {
+      if (axios.isAxiosError(error) && this.provider.renewToken) {
+        const retryConfig = error.config as AxiosRetryRequestConfig;
+        if (error.response?.status === 401 && !retryConfig.retried) {
+          retryConfig.retried = true;
+          this.provider.renewToken();
+          return this.axiosInstance.request(retryConfig);
+        }
+      }
+      throw error;
+    };
   }
 
   private findEndpoint<M extends Method, Path extends Paths<Api, M>>(
