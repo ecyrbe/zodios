@@ -62,7 +62,9 @@ const apiClient = new Zodios(
     },
   ] as const
 );
-
+//                               auto-complete url  auto-complete params
+//                                    ▼                   ▼
 const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);
+// Output: { id: 7, name: 'Kurtis Weissnat' }
 ```
