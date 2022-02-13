@@ -39,9 +39,7 @@ import { z } from "zod";
 
 const apiClient = new Zodios(
   "https://jsonplaceholder.typicode.com",
-  {
-    getToken: () => Promise.resolve("token"),
-  },
+  // API definition
   [
     {
       method: "get",
@@ -59,9 +57,13 @@ const apiClient = new Zodios(
         name: z.string(),
       }),
     },
-  ] as const
+  ] as const,
+  // Optional Token provider
+  {
+    getToken: () => Promise.resolve("token"),
+  },
 );
-//                               auto-complete url  auto-complete params
+//                             auto-complete url  auto-complete params
 //                                    ▼                   ▼
 const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);

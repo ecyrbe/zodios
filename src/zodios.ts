@@ -30,21 +30,23 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
    */
   constructor(
     baseURL: string,
-    private provider: TokenProvider,
-    private api: Api
+    private api: Api,
+    private provider?: TokenProvider
   ) {
     this.axiosInstance = axios.create({
       baseURL,
     });
 
-    this.axiosInstance.interceptors.request.use(
-      this.createRequestInterceptor()
-    );
-    if (this.provider.renewToken) {
-      this.axiosInstance.interceptors.response.use(
-        undefined,
-        this.createResponseInterceptor()
+    if (this.provider) {
+      this.axiosInstance.interceptors.request.use(
+        this.createRequestInterceptor()
       );
+      if (this.provider?.renewToken) {
+        this.axiosInstance.interceptors.response.use(
+          undefined,
+          this.createResponseInterceptor()
+        );
+      }
     }
   }
 
@@ -61,7 +63,7 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
       if (!config.headers) {
         config.headers = {};
       }
-      const token = await this.provider.getToken();
+      const token = await this.provider?.getToken();
       if (token && config.method !== "get") {
         config.headers = {
           ...config.headers,
@@ -82,7 +84,7 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
 
   private createResponseInterceptor() {
     return async (error: Error) => {
-      if (axios.isAxiosError(error) && this.provider.renewToken) {
+      if (axios.isAxiosError(error) && this.provider?.renewToken) {
         const retryConfig = error.config as AxiosRetryRequestConfig;
         if (error.response?.status === 401 && !retryConfig.retried) {
           retryConfig.retried = true;
