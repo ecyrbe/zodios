@@ -2,6 +2,7 @@
 !/lib
 /node_modules
 /src
+/examples
 
 # Logs
 logs
