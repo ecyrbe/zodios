@@ -14,11 +14,17 @@ import { omit } from "./utils";
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
-interface TokenProvider {
+/**
+ * Token interface to allow zodios to inject a token into the request or renew it
+ */
+export interface TokenProvider {
   getToken: () => Promise<string>;
   renewToken?: () => Promise<string>;
 }
 
+/**
+ * Zodios enpoint definition that should be used to create a new instance of Zodios
+ */
 export type AnyEndpointDescription<R> = {
   method: Method;
   path: string;
@@ -31,9 +37,18 @@ export type AnyEndpointDescription<R> = {
   response: z.ZodType<R>;
 };
 
+/**
+ * zodios api client based on axios
+ */
 export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
   axiosInstance: AxiosInstance;
 
+  /**
+   * constructor
+   * @param baseURL - the base url to use
+   * @param provider - the token provider to use
+   * @param api - the description of all the api endpoints
+   */
   constructor(
     baseURL: string,
     private provider: TokenProvider,
@@ -84,6 +99,13 @@ export class Zodios<Api extends ReadonlyDeep<AnyEndpointDescription<any>[]>> {
         }
       );
     }
+  }
+
+  /**
+   * get the underlying axios instance
+   */
+  get axios() {
+    return this.axiosInstance;
   }
 
   private findEndpoint<M extends Method, Path extends Paths<Api, M>>(
