@@ -105,3 +105,26 @@ export type ApiClientRequestOptions<Api, M extends Method, Path> = PickDefined<{
 export type AxiosRetryRequestConfig = AxiosRequestConfig & {
   retried?: boolean;
 };
+
+/**
+ * Token interface to allow zodios to inject a token into the request or renew it
+ */
+export interface TokenProvider {
+  getToken: () => Promise<string>;
+  renewToken?: () => Promise<void>;
+}
+
+/**
+ * Zodios enpoint definition that should be used to create a new instance of Zodios
+ */
+export type AnyEndpointDescription<R> = {
+  method: Method;
+  path: string;
+  description?: string;
+  parameters?: Array<{
+    name: string;
+    type: "Query" | "Body" | "Path" | "Header";
+    schema: z.ZodType<unknown>;
+  }>;
+  response: z.ZodType<R>;
+};

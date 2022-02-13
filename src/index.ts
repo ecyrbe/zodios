@@ -1,1 +1,2 @@
-export { Zodios, AnyEndpointDescription } from "./zodios";
+export { Zodios } from "./zodios";
+export type { AnyEndpointDescription } from "./zodios.types";
