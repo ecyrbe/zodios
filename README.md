@@ -35,7 +35,7 @@ or
 # Declare your API with zodios
 
 ```typescript
-import { Zodios } from "../src/index";
+import { Zodios } from "zodios";
 import { z } from "zod";
 
 const apiClient = new Zodios(
