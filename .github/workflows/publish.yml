@@ -1,0 +1,27 @@
+# publish on npm when there is a new version tag
+
+name: publish
+on:
+  push:
+    tags: [v*]
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    steps:
+      - uses: actions/checkout
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node
+        with:
+          registry-url: "https://registry.npmjs.org"
+          node-version: ${{ matrix.node-version }}
+          cache: "yarn"
+      - run: yarn install
+      - run: yarn build
+      - run: yarn test
+      - run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
