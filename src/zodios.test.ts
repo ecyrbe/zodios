@@ -276,7 +276,7 @@ describe("Zodios", () => {
     try {
       await zodios.get("/error401");
     } catch (e) {
-      expect((e as AxiosError).response!.status).toBe(401);
+      expect((e as AxiosError).response?.status).toBe(401);
     }
   });
   it("should not validate bad formatted responses", async () => {
