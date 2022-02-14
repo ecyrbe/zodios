@@ -1,5 +1,5 @@
-  <h1 align="center">Zodios</h1>
-│ <p align="center">
+ <h1 align="center">Zodios</h1>
+ <p align="center">
    <a href="https://github.com/ecyrbe/zodios">
      <img align="center" src="https://raw.githubusercontent.com/ecyrbe/zodios/main/docs/logo.svg" width="128px" alt="Zodios logo">
    </a>
@@ -26,7 +26,9 @@ It's an API client, made with axios, zod and typescript to allow easy client API
 ```bash
 > npm install zodios
 ```
-or 
+
+or
+
 ```bash
 > yarn add zodios
 ```
@@ -61,7 +63,7 @@ const apiClient = new Zodios(
   // Optional Token provider
   {
     getToken: () => Promise.resolve("token"),
-  },
+  }
 );
 //  typed                      auto-complete url  auto-complete params
 //     ▼                               ▼                   ▼
