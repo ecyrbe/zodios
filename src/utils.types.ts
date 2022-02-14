@@ -126,3 +126,49 @@ export type MapSchemaParameters<T> = T extends readonly [infer F, ...infer R]
       : never
     : never
   : never;
+
+/**
+ * split template type string with '/' separator into a tuple of strings
+ * @param T - template type string
+ * @param S - separator
+ */
+export type SplitTemplateType<
+  T,
+  C extends string = "/"
+> = T extends `${infer F}${C}${infer R}`
+  ? [F, ...SplitTemplateType<R, C>]
+  : [T];
+
+/**
+ * Trim away a type string from each element of an array of template type string
+ * @param T - type string
+ * @param C - type string
+ */
+export type TrimLeftArray<T, C extends string> = T extends readonly [
+  infer F,
+  ...infer R
+]
+  ? F extends `${C}${infer U}`
+    ? [U, ...TrimLeftArray<R, C>]
+    : [F, ...TrimLeftArray<R, C>]
+  : [];
+
+/**
+ * Extract params prefixed with ':' from a type string URL
+ * @param T - type string URL
+ */
+export type Params<T extends string> = TrimLeftArray<
+  FilterArray<SplitTemplateType<T>, `:${string}`>,
+  ":"
+>;
+
+export type ParamsToObject<T> = T extends [infer F, ...infer R]
+  ? F extends string
+    ? MergeSimplify<
+        {
+          [Key in F]: string | number;
+        },
+        ParamsToObject<R>
+      >
+    : ParamsToObject<R>
+  : {};

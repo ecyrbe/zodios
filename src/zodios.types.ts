@@ -6,6 +6,8 @@ import type {
   PickDefined,
   NotEmpty,
   UndefinedToOptional,
+  Params,
+  ParamsToObject,
 } from "./utils.types";
 import { z } from "zod";
 
@@ -57,17 +59,8 @@ export type QueryParams<Api, M extends Method, Path> = NotEmpty<
   >
 >;
 
-export type PathParams<Api, M extends Method, Path> = NotEmpty<
-  UndefinedToOptional<
-    MergeUnion<
-      MapSchemaParameters<
-        FilterArray<
-          EndpointApiDescription<Api, M, Path>[number]["parameters"],
-          { type: "Path" }
-        >
-      >
-    >
-  >
+export type PathParams<Path extends string> = NotEmpty<
+  ParamsToObject<Params<Path>>
 >;
 
 export type HeaderParams<Api, M extends Method, Path> = NotEmpty<
@@ -92,8 +85,12 @@ export type AnyZodiosRequestOptions = {
   "params" | "headers" | "baseURL" | "data" | "method"
 >;
 
-export type ZodiosRequestOptions<Api, M extends Method, Path> = PickDefined<{
-  params: PathParams<Api, M, Path>;
+export type ZodiosRequestOptions<
+  Api,
+  M extends Method,
+  Path extends string
+> = PickDefined<{
+  params: PathParams<Path>;
   queries: QueryParams<Api, M, Path>;
   headers: HeaderParams<Api, M, Path>;
 }> &
@@ -123,7 +120,7 @@ export type ZodiosEndpointDescription<R> = {
   description?: string;
   parameters?: Array<{
     name: string;
-    type: "Query" | "Body" | "Path" | "Header";
+    type: "Query" | "Body" | "Header";
     schema: z.ZodType<unknown>;
   }>;
   response: z.ZodType<R>;
