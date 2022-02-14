@@ -18,6 +18,7 @@
     "examples",
     "**/*.config.ts",
     "**/*.spec.ts",
+    "**/*.test.ts",
     "**/*.d.ts"
   ]
 }
