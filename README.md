@@ -56,13 +56,6 @@ const apiClient = new Zodios(
       method: "get",
       path: "/users/:id",
       description: "Get a user",
-      parameters: [
-        {
-          type: "Path",
-          name: "id",
-          schema: z.number(),
-        },
-      ],
       response: z.object({
         id: z.number(),
         name: z.string(),

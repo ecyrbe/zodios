@@ -25,13 +25,6 @@ async function bootstrap() {
       method: "get",
       path: "/users/:id",
       description: "Get a user",
-      parameters: [
-        {
-          type: "Path",
-          name: "id",
-          schema: z.number(),
-        },
-      ],
       response: z.object({
         id: z.number(),
         name: z.string(),
@@ -41,13 +34,6 @@ async function bootstrap() {
       method: "delete",
       path: "/users/:id",
       description: "Delete a user",
-      parameters: [
-        {
-          type: "Path",
-          name: "id",
-          schema: z.number(),
-        },
-      ],
       response: z.object({}),
     },
     {

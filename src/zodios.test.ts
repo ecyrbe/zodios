@@ -68,13 +68,6 @@ describe("Zodios", () => {
       {
         method: "get",
         path: "/:id",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-        ],
         response: z.object({
           id: z.number(),
           name: z.string(),
@@ -95,13 +88,6 @@ describe("Zodios", () => {
       {
         method: "get",
         path: "/:id",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-        ],
         response: z.object({
           id: z.number(),
           name: z.string(),
@@ -118,13 +104,6 @@ describe("Zodios", () => {
       {
         method: "get",
         path: "/:id",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-        ],
         response: z.object({
           id: z.number(),
           name: z.string(),
@@ -158,18 +137,6 @@ describe("Zodios", () => {
       {
         method: "get",
         path: "/:id/address/:address",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-          {
-            name: "address",
-            type: "Path",
-            schema: z.string(),
-          },
-        ],
         response: z.object({
           id: z.number(),
           address: z.string(),
@@ -258,13 +225,6 @@ describe("Zodios", () => {
       {
         method: "delete",
         path: "/:id",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-        ],
         response: z.object({
           id: z.number(),
         }),
@@ -339,13 +299,6 @@ describe("Zodios", () => {
       {
         method: "get",
         path: "/:id",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-        ],
         response: z.object({
           id: z.number(),
           name: z.string(),

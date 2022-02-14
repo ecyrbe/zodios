@@ -40,13 +40,6 @@ async function bootstrap() {
       method: "get",
       path: "/users/:id",
       description: "Get a user",
-      parameters: [
-        {
-          type: "Path",
-          name: "id",
-          schema: z.number(),
-        },
-      ],
       response: userSchema,
     },
   ] as const);
