@@ -6,8 +6,18 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - src/**
+      - yarn.lock
+      - package.json
+      - tsconfig.json
   pull_request:
     branches: [main]
+    paths:
+      - src/**
+      - yarn.lock
+      - package.json
+      - tsconfig.json
 
 jobs:
   build:
