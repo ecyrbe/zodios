@@ -6,7 +6,7 @@
  </p>
  
  <p align="center">
-    Zodios is a typescript api client with auto-completion features backed by <a src="https://axios-http.com" >axios</a>, <a src="https://github.com/colinhacks/zod">zod</a> and <a src="https://www.typescriptlang.org/">typescript</a>
+    Zodios is a typescript api client with auto-completion features backed by <a src="https://axios-http.com" >axios</a> and <a src="https://github.com/colinhacks/zod">zod</a>
  </p>
  
  <p align="center">
@@ -67,7 +67,7 @@ const apiClient = new Zodios(
     getToken: () => Promise.resolve("token"),
   }
 );
-//  typed                      auto-complete url  auto-complete params
+//    typed                     auto-complete url  auto-complete params
 //     ▼                               ▼                   ▼
 const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);
