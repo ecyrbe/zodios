@@ -6,7 +6,7 @@
  </p>
  
  <p align="center">
-    Zodios is a typescript api client with auto-completion features backed by zod and typescript
+    Zodios is a typescript api client with auto-completion features backed by <a src="https://axios-http.com" >axios</a>, <a src="https://github.com/colinhacks/zod">zod</a> and <a src="https://www.typescriptlang.org/">typescript</a>
  </p>
  
  <p align="center">
@@ -15,11 +15,20 @@
    <a href="https://github.com/ecyrbe/zodios/blob/main/LICENSE">
     <img alt="GitHub" src="https://img.shields.io/github/license/ecyrbe/zodios">   
    </a>
+   <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/ecyrbe/zodios/CI">
  </p>
 
 # What is it ?
 
-It's an API client, made with axios, zod and typescript to allow easy client API definitions
+It's an axios compatible API client, with the following features:  
+  
+- really simple centralized API declaration
+- typescript autocompletion in your favorite IDE for URL and parameters
+- typescript response types
+- parameters and responses schema thanks to zod
+- response schema validation
+- bearer token injection and token renewal with simple token provider interface
+- all axios features available
 
 # Install
 
