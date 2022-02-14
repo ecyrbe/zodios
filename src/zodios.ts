@@ -62,6 +62,7 @@ export class Zodios<
   private createRequestInterceptor() {
     return async (config: AxiosRequestConfig) => {
       config.withCredentials = true;
+      // istanbul ignore next
       if (!config.headers) {
         config.headers = {};
       }
@@ -114,7 +115,7 @@ export class Zodios<
     const validation = endpoint.response.safeParse(response);
     if (!validation.success) {
       console.error(
-        `Invalid response for ${endpoint.method} ${endpoint.path}: ${validation.error.message}`
+        `Invalid response for '${endpoint.method} ${endpoint.path}' : ${validation.error.message}`
       );
       throw validation.error;
     }
@@ -128,7 +129,9 @@ export class Zodios<
     let result: string = url;
     const params = anyConfig?.params;
     if (params) {
-      result = result.replace(paramsRegExp, (_match, id) => `${params[id]}`);
+      result = result.replace(paramsRegExp, (match, key) =>
+        key in params ? `${params[key]}` : match
+      );
     }
     return result;
   }
@@ -148,6 +151,7 @@ export class Zodios<
     config?: ZodiosRequestOptions<Api, M, Path>
   ): Promise<Response<Api, M, Path>> {
     const endpoint = this.findEndpoint(method, url);
+    // istanbul ignore next
     if (!endpoint) {
       throw new Error(`No endpoint found for ${method} ${url}`);
     }

@@ -22,7 +22,14 @@ describe("Zodios", () => {
       res.status(401).json({});
     });
     app.get("/:id", (req, res) => {
+      console.log(req.params);
       res.status(200).json({ id: Number(req.params.id), name: "test" });
+    });
+    app.get("/:id/address/:address", (req, res) => {
+      console.log(req.params);
+      res
+        .status(200)
+        .json({ id: Number(req.params.id), address: req.params.address });
     });
     app.post("/", (req, res) => {
       res.status(200).json({ id: 3, name: req.body.name });
@@ -106,7 +113,7 @@ describe("Zodios", () => {
     });
     expect(response).toEqual({ id: 7, name: "test" });
   });
-  it("should make an http get", async () => {
+  it("should make an http get with one path params", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
         method: "get",
@@ -127,7 +134,55 @@ describe("Zodios", () => {
     const response = await zodios.get("/:id", { params: { id: 7 } });
     expect(response).toEqual({ id: 7, name: "test" });
   });
-  it("should make an http post", async () => {
+
+  it("should make a get request with forgotten params and get back a zod error", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    try {
+      await zodios.get("/:id");
+    } catch (e) {
+      expect(e).toBeInstanceOf(ZodError);
+    }
+  });
+
+  it("should make an http get with multiples path params", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id/address/:address",
+        parameters: [
+          {
+            name: "id",
+            type: "Path",
+            schema: z.number(),
+          },
+          {
+            name: "address",
+            type: "Path",
+            schema: z.string(),
+          },
+        ],
+        response: z.object({
+          id: z.number(),
+          address: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.get("/:id/address/:address", {
+      params: { id: 7, address: "address" },
+    });
+    expect(response).toEqual({ id: 7, address: "address" });
+  });
+
+  it("should make an http post with body param", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
         method: "post",
