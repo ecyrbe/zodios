@@ -69,18 +69,40 @@ export type PickDefined<T> = Pick<
 >;
 
 /**
- * remove empty object union from a type
+ * check if two types are equal
+ */
+type IfEquals<T, U, Y = unknown, N = never> = (<G>() => G extends T
+  ? 1
+  : 2) extends <G>() => G extends U ? 1 : 2
+  ? Y
+  : N;
+
+/**
+ * get never if empty type
  * @param T - type
  * @example
  * ```ts
- * type A = { a: number } | {};
- * type B = NotEmpty<A>; // { a: number }
+ * type A = {};
+ * type B = NotEmpty<A>; // B = never
  */
-export type NotEmpty<T> = {} extends Required<OptionalProps<T>>
-  ? {} extends RequiredProps<T>
-    ? never
-    : T
-  : T;
+export type NeverIfEmpty<T> = IfEquals<T, {}, never, T>;
+
+type RequiredChildProps<T> = {
+  [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, never, K>;
+}[keyof T];
+
+type OptionalChildProps<T> = {
+  [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, K, never>;
+}[keyof T];
+
+/**
+ * set properties to optional if their child properties are optional
+ * @param T - object type
+ */
+export type SetPropsOptionalIfChildrenAreOptional<T> = MergeSimplify<
+  Pick<Partial<T>, OptionalChildProps<T>>,
+  Pick<T, RequiredChildProps<T>>
+>;
 
 /**
  * transform an array type into a readonly array type
@@ -139,28 +161,11 @@ export type SplitTemplateType<
   ? [F, ...SplitTemplateType<R, C>]
   : [T];
 
-/**
- * Trim away a type string from each element of an array of template type string
- * @param T - type string
- * @param C - type string
- */
-export type TrimLeftArray<T, C extends string> = T extends readonly [
-  infer F,
-  ...infer R
-]
-  ? F extends `${C}${infer U}`
-    ? [U, ...TrimLeftArray<R, C>]
-    : [F, ...TrimLeftArray<R, C>]
+export type GetParamsKeys<T> = T extends `${infer F}:${infer R}/${infer S}`
+  ? [R, ...GetParamsKeys<S>]
+  : T extends `${infer G}:${infer U}`
+  ? [U]
   : [];
-
-/**
- * Extract params prefixed with ':' from a type string URL
- * @param T - type string URL
- */
-export type Params<T extends string> = TrimLeftArray<
-  FilterArray<SplitTemplateType<T>, `:${string}`>,
-  ":"
->;
 
 export type ParamsToObject<T> = T extends [infer F, ...infer R]
   ? F extends string

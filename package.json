@@ -20,7 +20,7 @@
   "scripts": {
     "prebuild": "rimraf lib",
     "example": "ts-node examples/jsonplaceholder.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.build.json",
     "test": "jest --coverage"
   },
   "peerDependencies": {

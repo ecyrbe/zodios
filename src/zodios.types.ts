@@ -4,10 +4,11 @@ import type {
   MapSchemaParameters,
   MergeUnion,
   PickDefined,
-  NotEmpty,
+  NeverIfEmpty,
   UndefinedToOptional,
-  Params,
+  GetParamsKeys,
   ParamsToObject,
+  SetPropsOptionalIfChildrenAreOptional,
 } from "./utils.types";
 import { z } from "zod";
 
@@ -46,7 +47,7 @@ export type Body<Api, M extends Method, Path> = z.infer<
   >[number]["schema"]
 >;
 
-export type QueryParams<Api, M extends Method, Path> = NotEmpty<
+export type QueryParams<Api, M extends Method, Path> = NeverIfEmpty<
   UndefinedToOptional<
     MergeUnion<
       MapSchemaParameters<
@@ -59,11 +60,11 @@ export type QueryParams<Api, M extends Method, Path> = NotEmpty<
   >
 >;
 
-export type PathParams<Path extends string> = NotEmpty<
-  ParamsToObject<Params<Path>>
+export type PathParams<Path extends string> = NeverIfEmpty<
+  ParamsToObject<GetParamsKeys<Path>>
 >;
 
-export type HeaderParams<Api, M extends Method, Path> = NotEmpty<
+export type HeaderParams<Api, M extends Method, Path> = NeverIfEmpty<
   UndefinedToOptional<
     MergeUnion<
       MapSchemaParameters<
@@ -89,11 +90,13 @@ export type ZodiosRequestOptions<
   Api,
   M extends Method,
   Path extends string
-> = PickDefined<{
-  params: PathParams<Path>;
-  queries: QueryParams<Api, M, Path>;
-  headers: HeaderParams<Api, M, Path>;
-}> &
+> = SetPropsOptionalIfChildrenAreOptional<
+  PickDefined<{
+    params: PathParams<Path>;
+    queries: QueryParams<Api, M, Path>;
+    headers: HeaderParams<Api, M, Path>;
+  }>
+> &
   Omit<
     AxiosRequestConfig,
     "params" | "headers" | "baseURL" | "data" | "method"
