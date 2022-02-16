@@ -89,7 +89,7 @@ you can get back the underlying axios instance to customize it.
 ```typescript
 const axiosInstance = apiClient.axios;
 ```
-## Give your own axios intance to zodios
+## Give your own axios instance to zodios
 
 you can instanciate zodios with your own axios intance.
 
