@@ -9,6 +9,7 @@ import type {
   GetParamsKeys,
   ParamsToObject,
   SetPropsOptionalIfChildrenAreOptional,
+  ReadonlyDeep,
 } from "./utils.types";
 import { z } from "zod";
 
@@ -119,9 +120,9 @@ export interface TokenProvider {
  */
 export type ZodiosOptions = {
   /**
-   * Token provider to allow zodios to inject a token into the request or renew it
+   * use the header api interceptor? Default: true
    */
-  tokenProvider?: TokenProvider;
+  usePluginApi?: boolean;
   /**
    * Should zodios validate the response? Default: true
    */
@@ -146,3 +147,7 @@ export type ZodiosEndpointDescription<R> = {
   }>;
   response: z.ZodType<R>;
 };
+
+export type ZodiosEnpointDescriptions = ReadonlyDeep<
+  ZodiosEndpointDescription<any>[]
+>;

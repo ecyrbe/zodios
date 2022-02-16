@@ -1,18 +1,17 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { z } from "zod";
+import { pluginApi } from "./plugins/api";
 import {
   AnyZodiosRequestOptions,
   ZodiosEndpointDescription,
   ZodiosRequestOptions,
-  AxiosRetryRequestConfig,
   Body,
   Method,
   Paths,
   Response,
-  TokenProvider,
   ZodiosOptions,
+  ZodiosEnpointDescriptions,
 } from "./zodios.types";
-import { ReadonlyDeep } from "./utils.types";
 import { omit } from "./utils";
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
@@ -20,9 +19,7 @@ const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 /**
  * zodios api client based on axios
  */
-export class Zodios<
-  Api extends ReadonlyDeep<ZodiosEndpointDescription<any>[]>
-> {
+export class Zodios<Api extends ZodiosEnpointDescriptions> {
   axiosInstance: AxiosInstance;
   options: ZodiosOptions;
 
@@ -35,6 +32,7 @@ export class Zodios<
   constructor(baseURL: string, private api: Api, options?: ZodiosOptions) {
     this.options = {
       validateResponse: true,
+      usePluginApi: true,
       ...options,
     };
 
@@ -47,16 +45,8 @@ export class Zodios<
       });
     }
 
-    if (this.options.tokenProvider) {
-      this.axiosInstance.interceptors.request.use(
-        this.createRequestInterceptor()
-      );
-      if (this.options.tokenProvider?.renewToken) {
-        this.axiosInstance.interceptors.response.use(
-          undefined,
-          this.createResponseInterceptor()
-        );
-      }
+    if (this.options.usePluginApi) {
+      this.use(pluginApi());
     }
   }
 
@@ -67,44 +57,12 @@ export class Zodios<
     return this.axiosInstance;
   }
 
-  private createRequestInterceptor() {
-    return async (config: AxiosRequestConfig) => {
-      config.withCredentials = true;
-      // istanbul ignore next
-      if (!config.headers) {
-        config.headers = {};
-      }
-      const token = await this.options.tokenProvider?.getToken();
-      if (token && config.method !== "get") {
-        config.headers = {
-          ...config.headers,
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        };
-      } else if (token) {
-        config.headers = {
-          ...config.headers,
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        };
-      }
-      return config;
-    };
-  }
-
-  private createResponseInterceptor() {
-    return async (error: Error) => {
-      if (axios.isAxiosError(error) && this.options.tokenProvider?.renewToken) {
-        const retryConfig = error.config as AxiosRetryRequestConfig;
-        if (error.response?.status === 401 && !retryConfig.retried) {
-          retryConfig.retried = true;
-          this.options.tokenProvider.renewToken();
-          return this.axiosInstance.request(retryConfig);
-        }
-      }
-      throw error;
-    };
+  /**
+   * use a plugin to cusomize the client
+   * @param plugin - the plugin to use
+   */
+  use(plugin: (zodios: Zodios<Api>) => void) {
+    plugin(this);
   }
 
   private findEndpoint<M extends Method, Path extends Paths<Api, M>>(

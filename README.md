@@ -64,12 +64,6 @@ const apiClient = new Zodios(
       }),
     },
   ] as const,
-  // Optional Token provider
-  {
-    tokenProvider: {
-      getToken: () => Promise.resolve("token"),
-    }
-  }
 );
 //   typed                     auto-complete url   auto-complete params
 //     ▼                               ▼                   ▼
@@ -77,6 +71,17 @@ const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);
 // Output: { id: 7, name: 'Kurtis Weissnat' }
 ```
+## Use token provider plugin
+
+Zodios comes with a plugin to inject and renew your tokens :
+```typescript
+  import { pluginToken } from 'zodios/plugins/token';
+
+  apiClient.use(pluginToken({
+    getToken: async () => "token"
+  }));
+```
+
 ## Get underlying axios instance
 
 you can get back the underlying axios instance to customize it.

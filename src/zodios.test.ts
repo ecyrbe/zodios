@@ -3,6 +3,7 @@ import express, { Application } from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
 import { Zodios } from "./zodios";
+import { pluginToken } from "./plugins/token";
 
 describe("Zodios", () => {
   let app: express.Express;
@@ -77,12 +78,12 @@ describe("Zodios", () => {
     expect(zodios).toBeDefined();
   });
   it("should create a new instance when providing a token provider", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [], {
-      tokenProvider: {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    zodios.use(
+      pluginToken({
         getToken: async () => "token",
-        renewToken: async () => {},
-      },
-    });
+      })
+    );
     expect(zodios).toBeDefined();
   });
   it("should make an http request", async () => {
@@ -236,67 +237,59 @@ describe("Zodios", () => {
     expect(response).toEqual({ id: 6 });
   });
   it("should make an http request with a token", async () => {
-    const zodios = new Zodios(
-      `http://localhost:${port}`,
-      [
-        {
-          method: "get",
-          path: "/token",
-          response: z.object({
-            token: z.string(),
-          }),
-        },
-      ] as const,
+    const zodios = new Zodios(`http://localhost:${port}`, [
       {
-        tokenProvider: {
-          getToken: async () => "token",
-          renewToken: async () => {},
-        },
-      }
+        method: "get",
+        path: "/token",
+        response: z.object({
+          token: z.string(),
+        }),
+      },
+    ] as const);
+    zodios.use(
+      pluginToken({
+        getToken: async () => "token",
+      })
     );
     const response = await zodios.get("/token");
     expect(response).toEqual({ token: "Bearer token" });
   });
   it("should make an http post with a token", async () => {
-    const zodios = new Zodios(
-      `http://localhost:${port}`,
-      [
-        {
-          method: "post",
-          path: "/token",
-          response: z.object({
-            token: z.string(),
-          }),
-        },
-      ] as const,
+    const zodios = new Zodios(`http://localhost:${port}`, [
       {
-        tokenProvider: {
-          getToken: async () => "token",
-          renewToken: async () => {},
+        method: "post",
+        path: "/token",
+        response: z.object({
+          token: z.string(),
+        }),
+      },
+    ] as const);
+    zodios.use(
+      pluginToken({
+        getToken: async () => {
+          console.log("get token");
+          return "token";
         },
-      }
+      })
     );
     const response = await zodios.post("/token");
     expect(response).toEqual({ token: "Bearer token" });
   });
-  it("should handle 401 error with a token", async () => {
-    const zodios = new Zodios(
-      `http://localhost:${port}`,
-      [
-        {
-          method: "get",
-          path: "/error401",
-          response: z.object({}),
-        },
-      ] as const,
+  it("should handle 401 error with a renew token", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
       {
-        tokenProvider: {
+        method: "get",
+        path: "/error401",
+        response: z.object({}),
+      },
+    ] as const);
+    try {
+      zodios.use(
+        pluginToken({
           getToken: async () => "token",
           renewToken: async () => {},
-        },
-      }
-    );
-    try {
+        })
+      );
       await zodios.get("/error401");
     } catch (e) {
       expect((e as AxiosError).response?.status).toBe(401);
