@@ -24,25 +24,28 @@ export class Zodios<
   Api extends ReadonlyDeep<ZodiosEndpointDescription<any>[]>
 > {
   axiosInstance: AxiosInstance;
+  options: ZodiosOptions;
 
   /**
    * constructor
    * @param baseURL - the base url to use
-   * @param provider - the token provider to use
    * @param api - the description of all the api endpoints
+   * @param options - the options to setup the client API
    */
-  constructor(
-    baseURL: string,
-    private api: Api,
-    private options?: ZodiosOptions
-  ) {
-    this.axiosInstance = axios.create({
-      baseURL,
-    });
+  constructor(baseURL: string, private api: Api, options?: ZodiosOptions) {
     this.options = {
       validateResponse: true,
       ...options,
     };
+
+    if (this.options.axiosInstance) {
+      this.axiosInstance = this.options.axiosInstance;
+      this.axiosInstance.defaults.baseURL = baseURL;
+    } else {
+      this.axiosInstance = axios.create({
+        baseURL,
+      });
+    }
 
     if (this.options.tokenProvider) {
       this.axiosInstance.interceptors.request.use(
@@ -71,7 +74,7 @@ export class Zodios<
       if (!config.headers) {
         config.headers = {};
       }
-      const token = await this.options?.tokenProvider?.getToken();
+      const token = await this.options.tokenProvider?.getToken();
       if (token && config.method !== "get") {
         config.headers = {
           ...config.headers,
@@ -92,10 +95,7 @@ export class Zodios<
 
   private createResponseInterceptor() {
     return async (error: Error) => {
-      if (
-        axios.isAxiosError(error) &&
-        this.options?.tokenProvider?.renewToken
-      ) {
+      if (axios.isAxiosError(error) && this.options.tokenProvider?.renewToken) {
         const retryConfig = error.config as AxiosRetryRequestConfig;
         if (error.response?.status === 401 && !retryConfig.retried) {
           retryConfig.retried = true;
@@ -171,7 +171,7 @@ export class Zodios<
       data,
     };
     const response = await this.axiosInstance.request(requestConfig);
-    if (this.options?.validateResponse) {
+    if (this.options.validateResponse) {
       return this.validateResponse(endpoint, response.data);
     }
     return response.data;

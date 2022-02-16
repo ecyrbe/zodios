@@ -42,7 +42,9 @@ or
 > yarn add zodios
 ```
 
-# Declare your API with zodios
+# Usage
+
+## Declare your API with zodios
 
 ```typescript
 import { Zodios } from "zodios";
@@ -69,9 +71,43 @@ const apiClient = new Zodios(
     }
   }
 );
-//    typed                     auto-complete url  auto-complete params
+//   typed                     auto-complete url   auto-complete params
 //     ▼                               ▼                   ▼
 const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);
 // Output: { id: 7, name: 'Kurtis Weissnat' }
+```
+## Get underlying axios instance
+
+you can get back the underlying axios instance to customize it.
+
+```typescript
+const axiosInstance = apiClient.axios;
+```
+## Give your own axios intance to zodios
+
+you can instanciate zodios with your own axios intance.
+
+```typescript
+const apiClient = new Zodios(
+  "https://jsonplaceholder.typicode.com",
+  [ ... ] as const,
+  // Optional Axios instance
+  {
+    axiosIntance: customAxiosInstance
+  }
+);
+```
+
+## Disable zodios response validation
+
+```typescript
+const apiClient = new Zodios(
+  "https://jsonplaceholder.typicode.com",
+  [ ... ] as const,
+  // Optional Axios instance
+  {
+    validateResponse: false
+  }
+);
 ```

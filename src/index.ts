@@ -1,2 +1,6 @@
 export { Zodios } from "./zodios";
-export type { ZodiosEndpointDescription } from "./zodios.types";
+export type {
+  ZodiosEndpointDescription,
+  ZodiosOptions,
+  ZodiosRequestOptions,
+} from "./zodios.types";
