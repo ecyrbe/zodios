@@ -115,6 +115,14 @@ export interface TokenProvider {
 }
 
 /**
+ * Zodios options
+ */
+export type ZodiosOptions = {
+  tokenProvider?: TokenProvider;
+  validateResponse?: boolean;
+};
+
+/**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
 export type ZodiosEndpointDescription<R> = {
