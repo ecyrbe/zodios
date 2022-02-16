@@ -64,7 +64,9 @@ const apiClient = new Zodios(
   ] as const,
   // Optional Token provider
   {
-    getToken: () => Promise.resolve("token"),
+    tokenProvider: {
+      getToken: () => Promise.resolve("token"),
+    }
   }
 );
 //    typed                     auto-complete url  auto-complete params

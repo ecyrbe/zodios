@@ -10,6 +10,7 @@ import {
   Paths,
   Response,
   TokenProvider,
+  ZodiosOptions,
 } from "./zodios.types";
 import { ReadonlyDeep } from "./utils.types";
 import { omit } from "./utils";
@@ -33,17 +34,21 @@ export class Zodios<
   constructor(
     baseURL: string,
     private api: Api,
-    private provider?: TokenProvider
+    private options?: ZodiosOptions
   ) {
     this.axiosInstance = axios.create({
       baseURL,
     });
+    this.options = {
+      validateResponse: true,
+      ...options,
+    };
 
-    if (this.provider) {
+    if (this.options.tokenProvider) {
       this.axiosInstance.interceptors.request.use(
         this.createRequestInterceptor()
       );
-      if (this.provider?.renewToken) {
+      if (this.options.tokenProvider?.renewToken) {
         this.axiosInstance.interceptors.response.use(
           undefined,
           this.createResponseInterceptor()
@@ -66,7 +71,7 @@ export class Zodios<
       if (!config.headers) {
         config.headers = {};
       }
-      const token = await this.provider?.getToken();
+      const token = await this.options?.tokenProvider?.getToken();
       if (token && config.method !== "get") {
         config.headers = {
           ...config.headers,
@@ -87,11 +92,14 @@ export class Zodios<
 
   private createResponseInterceptor() {
     return async (error: Error) => {
-      if (axios.isAxiosError(error) && this.provider?.renewToken) {
+      if (
+        axios.isAxiosError(error) &&
+        this.options?.tokenProvider?.renewToken
+      ) {
         const retryConfig = error.config as AxiosRetryRequestConfig;
         if (error.response?.status === 401 && !retryConfig.retried) {
           retryConfig.retried = true;
-          this.provider.renewToken();
+          this.options.tokenProvider.renewToken();
           return this.axiosInstance.request(retryConfig);
         }
       }
@@ -163,7 +171,10 @@ export class Zodios<
       data,
     };
     const response = await this.axiosInstance.request(requestConfig);
-    return this.validateResponse(endpoint, response.data);
+    if (this.options?.validateResponse) {
+      return this.validateResponse(endpoint, response.data);
+    }
+    return response.data;
   }
 
   /**

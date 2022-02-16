@@ -17,6 +17,13 @@
     "url": "https://github.com/ecyrbe/zodios.git"
   },
   "license": "MIT",
+  "keywords": [
+    "axios",
+    "openapi",
+    "zod",
+    "autocomplete",
+    "validation"
+  ],
   "scripts": {
     "prebuild": "rimraf lib",
     "example": "ts-node examples/jsonplaceholder.ts",
