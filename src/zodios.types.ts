@@ -1,4 +1,4 @@
-import { AxiosRequestConfig } from "axios";
+import { AxiosInstance, AxiosRequestConfig } from "axios";
 import type {
   FilterArray,
   MapSchemaParameters,
@@ -118,8 +118,18 @@ export interface TokenProvider {
  * Zodios options
  */
 export type ZodiosOptions = {
+  /**
+   * Token provider to allow zodios to inject a token into the request or renew it
+   */
   tokenProvider?: TokenProvider;
+  /**
+   * Should zodios validate the response? Default: true
+   */
   validateResponse?: boolean;
+  /**
+   * Override the default axios instance. Default: zodios will create it's own axios instance
+   */
+  axiosInstance?: AxiosInstance;
 };
 
 /**
