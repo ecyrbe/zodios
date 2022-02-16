@@ -105,7 +105,7 @@ const apiClient = new Zodios(
 const apiClient = new Zodios(
   "https://jsonplaceholder.typicode.com",
   [ ... ] as const,
-  // Optional Axios instance
+  // Disable validation
   {
     validateResponse: false
   }
