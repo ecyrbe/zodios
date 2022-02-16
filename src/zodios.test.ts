@@ -78,8 +78,10 @@ describe("Zodios", () => {
   });
   it("should create a new instance when providing a token provider", () => {
     const zodios = new Zodios(`http://localhost:${port}`, [], {
-      getToken: async () => "token",
-      renewToken: async () => {},
+      tokenProvider: {
+        getToken: async () => "token",
+        renewToken: async () => {},
+      },
     });
     expect(zodios).toBeDefined();
   });
@@ -246,8 +248,10 @@ describe("Zodios", () => {
         },
       ] as const,
       {
-        getToken: async () => "token",
-        renewToken: async () => {},
+        tokenProvider: {
+          getToken: async () => "token",
+          renewToken: async () => {},
+        },
       }
     );
     const response = await zodios.get("/token");
@@ -266,8 +270,10 @@ describe("Zodios", () => {
         },
       ] as const,
       {
-        getToken: async () => "token",
-        renewToken: async () => {},
+        tokenProvider: {
+          getToken: async () => "token",
+          renewToken: async () => {},
+        },
       }
     );
     const response = await zodios.post("/token");
@@ -284,8 +290,10 @@ describe("Zodios", () => {
         },
       ] as const,
       {
-        getToken: async () => "token",
-        renewToken: async () => {},
+        tokenProvider: {
+          getToken: async () => "token",
+          renewToken: async () => {},
+        },
       }
     );
     try {
