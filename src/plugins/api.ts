@@ -29,8 +29,11 @@ function createRequestInterceptor() {
  * plugin that add application/json header to all requests
  * @param zodios
  */
-export function pluginApi<Api extends ZodiosEnpointDescriptions>() {
-  return (zodios: Zodios<Api>) => {
+export function pluginApi<
+  Url extends string,
+  Api extends ZodiosEnpointDescriptions
+>() {
+  return (zodios: Zodios<Url, Api>) => {
     zodios.axios.interceptors.request.use(createRequestInterceptor());
   };
 }
