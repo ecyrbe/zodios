@@ -19,7 +19,7 @@ const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 /**
  * zodios api client based on axios
  */
-export class Zodios<Api extends ZodiosEnpointDescriptions> {
+export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   axiosInstance: AxiosInstance;
   options: ZodiosOptions;
 
@@ -28,8 +28,29 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
    * @param baseURL - the base url to use
    * @param api - the description of all the api endpoints
    * @param options - the options to setup the client API
+   * @example
+   *   const apiClient = new Zodios("https://jsonplaceholder.typicode.com", [
+   *     {
+   *       method: "get",
+   *       path: "/users",
+   *       description: "Get all users",
+   *       parameters: [
+   *         {
+   *           name: "q",
+   *           type: "Query",
+   *           schema: z.string(),
+   *         },
+   *         {
+   *           name: "page",
+   *           type: "Query",
+   *           schema: z.string().optional(),
+   *         },
+   *       ],
+   *       response: z.array(z.object({ id: z.number(), name: z.string() })),
+   *     }
+   *   ]);
    */
-  constructor(baseURL: string, private api: Api, options?: ZodiosOptions) {
+  constructor(baseURL: URL, private api: Api, options?: ZodiosOptions) {
     this.options = {
       validateResponse: true,
       usePluginApi: true,
@@ -50,6 +71,10 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
     }
   }
 
+  get baseURL() {
+    return this.axiosInstance.defaults.baseURL!;
+  }
+
   /**
    * get the underlying axios instance
    */
@@ -61,7 +86,7 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
    * use a plugin to cusomize the client
    * @param plugin - the plugin to use
    */
-  use(plugin: (zodios: Zodios<Api>) => void) {
+  use(plugin: (zodios: Zodios<URL, Api>) => void) {
     plugin(this);
   }
 
@@ -206,3 +231,6 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
     return this.request("delete", url, undefined, config);
   }
 }
+
+export type ApiOf<Z> = Z extends Zodios<infer Url, infer Api> ? Api : never;
+export type UrlOf<Z> = Z extends Zodios<infer Url, infer Api> ? Url : never;

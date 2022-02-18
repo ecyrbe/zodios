@@ -116,3 +116,73 @@ const apiClient = new Zodios(
   }
 );
 ```
+
+## React helpers
+
+Zodios comes with a React Provider to register all your api clients and a hook to use them.  
+The hook is a thin wrapper around react-query useQuery, so you need to also add a react-query provider.
+
+```typescript
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Paths, Zodios, ZodiosRequestOptions } from "zodios";
+import { useZodios, ZodiosProvider } from "zodios/react";
+import { z } from "zod";
+
+const userSchema = z
+  .object({
+    id: z.number(),
+    name: z.string(),
+  });
+const usersSchema = z.array(userSchema);
+
+type User = z.infer<typeof userSchema>;
+type Users = z.infer<typeof usersSchema>;
+
+const api = [
+  {
+    method: "get",
+    path: "/users",
+    description: "Get all users",
+    response: usersSchema,
+  }
+] as const;
+const baseUrl = "https://jsonplaceholder.typicode.com";
+
+type Api = typeof api;
+
+function useJsonPlaceholder<Path extends Paths<Api, "get">>(url: Path, config?: ZodiosRequestOptions<Api, "get", Path>) {
+  return useZodios(baseUrl, url, config);
+}
+
+const Users = () => {
+  const { data: users, isLoading, error } = useJsonPlaceholder("/users");
+
+  return (
+    <div>
+      <h1>Users</h1>
+      {isLoading && <div>Loading...</div>}
+      {error && <div>Error: {(error as Error).message}</div>}
+      {users && (
+        <ul>
+          {users.map((user) => (
+            <li key={user.id}>{user.name}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+const apiClient = new Zodios(baseUrl, api);
+const queryClient = new QueryClient();
+
+export const App = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ZodiosProvider apis={[apiClient]}>
+        <Users />
+      </ZodiosProvider>
+    </QueryClientProvider>
+  );
+};
+```
