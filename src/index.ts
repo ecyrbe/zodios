@@ -1,4 +1,4 @@
-export { Zodios, ApiOf } from "./zodios";
+export { Zodios, ApiOf, UrlOf, ZodiosPlugin } from "./zodios";
 export type {
   ZodiosEndpointDescription,
   ZodiosEnpointDescriptions,

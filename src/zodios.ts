@@ -86,7 +86,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
    * use a plugin to cusomize the client
    * @param plugin - the plugin to use
    */
-  use(plugin: (zodios: Zodios<URL, Api>) => void) {
+  use(plugin: ZodiosPlugin<URL, Api>) {
     plugin(this);
   }
 
@@ -246,3 +246,13 @@ export type ApiOf<Z extends Zodios<any, any>> = Z extends Zodios<any, infer Api>
 export type UrlOf<Z extends Zodios<any, any>> = Z extends Zodios<infer Url, any>
   ? Url
   : never;
+
+/**
+ * Zodios Plugin type
+ * @Param URL - the url of the api
+ * @Param Api - the api description type
+ */
+export type ZodiosPlugin<
+  URL extends string,
+  Api extends ZodiosEnpointDescriptions
+> = (zodios: Zodios<URL, Api>) => void;
