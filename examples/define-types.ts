@@ -15,34 +15,40 @@ const usersSchema = z.array(userSchema);
 type User = z.infer<typeof userSchema>;
 type Users = z.infer<typeof usersSchema>;
 
+// you can also predefine your API
+const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
+const jsonplaceholderApi = [
+  {
+    method: "get",
+    path: "/users",
+    description: "Get all users",
+    parameters: [
+      {
+        name: "q",
+        description: "full text search",
+        type: "Query",
+        schema: z.string(),
+      },
+      {
+        name: "page",
+        description: "page number",
+        type: "Query",
+        schema: z.number().optional(),
+      },
+    ],
+    response: usersSchema,
+  },
+  {
+    method: "get",
+    path: "/users/:id",
+    description: "Get a user",
+    response: userSchema,
+  },
+] as const;
+
 // and then use them in your API
 async function bootstrap() {
-  const apiClient = new Zodios("https://jsonplaceholder.typicode.com", [
-    {
-      method: "get",
-      path: "/users",
-      description: "Get all users",
-      parameters: [
-        {
-          name: "q",
-          type: "Query",
-          schema: z.string(),
-        },
-        {
-          name: "page",
-          type: "Query",
-          schema: z.string().optional(),
-        },
-      ],
-      response: usersSchema,
-    },
-    {
-      method: "get",
-      path: "/users/:id",
-      description: "Get a user",
-      response: userSchema,
-    },
-  ] as const);
+  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi);
 
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
   console.log(users);
