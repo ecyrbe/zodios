@@ -9,3 +9,4 @@ export type {
   Body,
   AxiosRetryRequestConfig,
 } from "./zodios.types";
+export { asApi } from "./api";
