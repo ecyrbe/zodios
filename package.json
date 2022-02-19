@@ -27,6 +27,7 @@
   "scripts": {
     "prebuild": "rimraf lib",
     "example": "ts-node examples/jsonplaceholder.ts",
+    "example:dev.to": "ts-node examples/dev.to/example.ts",
     "build": "tsc -p tsconfig.build.json",
     "test": "jest --coverage"
   },
