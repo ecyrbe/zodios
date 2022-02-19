@@ -142,6 +142,7 @@ export type ZodiosEndpointDescription<R> = {
   description?: string;
   parameters?: Array<{
     name: string;
+    description?: string;
     type: "Query" | "Body" | "Header";
     schema: z.ZodType<unknown>;
   }>;
