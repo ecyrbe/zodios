@@ -92,10 +92,10 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
 
   private findEndpoint<M extends Method, Path extends Paths<Api, M>>(
     method: M,
-    url: Path
+    path: Path
   ) {
     return (this.api as unknown as ZodiosEndpointDescription<unknown>[]).find(
-      (e) => e.method === method && e.path === url
+      (e) => e.method === method && e.path === path
     );
   }
 
@@ -114,10 +114,10 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   }
 
   private replacePathParams<M extends Method, Path extends Paths<Api, M>>(
-    url: Path,
+    path: Path,
     anyConfig?: AnyZodiosRequestOptions
   ) {
-    let result: string = url;
+    let result: string = path;
     const params = anyConfig?.params;
     if (params) {
       result = result.replace(paramsRegExp, (match, key) =>
@@ -130,26 +130,26 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   /**
    * make a request to the api
    * @param method - the method to use
-   * @param url - the url to api domain
+   * @param path - the path to api endpoint
    * @param data - the data to send
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async request<M extends Method, Path extends Paths<Api, M>>(
     method: M,
-    url: Path,
+    path: Path,
     data?: Body<Api, M, Path>,
     config?: ZodiosRequestOptions<Api, M, Path>
   ): Promise<Response<Api, M, Path>> {
-    const endpoint = this.findEndpoint(method, url);
+    const endpoint = this.findEndpoint(method, path);
     // istanbul ignore next
     if (!endpoint) {
-      throw new Error(`No endpoint found for ${method} ${url}`);
+      throw new Error(`No endpoint found for ${method} ${path}`);
     }
     const requestConfig: AxiosRequestConfig = {
       ...omit(config as AnyZodiosRequestOptions, ["params", "queries"]),
       method,
-      url: this.replacePathParams(url, config as AnyZodiosRequestOptions),
+      url: this.replacePathParams(path, config as AnyZodiosRequestOptions),
       params: (config as AnyZodiosRequestOptions)?.queries,
       data,
     };
@@ -162,75 +162,87 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
 
   /**
    * make a get request to the api
-   * @param url - the url to api domain
+   * @param path - the path to api endpoint
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async get<Path extends Paths<Api, "get">>(
-    url: Path,
+    path: Path,
     config?: ZodiosRequestOptions<Api, "get", Path>
   ): Promise<Response<Api, "get", Path>> {
-    return this.request("get", url, undefined, config);
+    return this.request("get", path, undefined, config);
   }
 
   /**
    * make a post request to the api
-   * @param url - the url to api domain
+   * @param path - the path to api endpoint
    * @param data - the data to send
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async post<Path extends Paths<Api, "post">>(
-    url: Path,
+    path: Path,
     data?: Body<Api, "post", Path>,
     config?: ZodiosRequestOptions<Api, "post", Path>
   ): Promise<Response<Api, "post", Path>> {
-    return this.request("post", url, data, config);
+    return this.request("post", path, data, config);
   }
 
   /**
    * make a put request to the api
-   * @param url - the url to api domain
+   * @param path - the path to api endpoint
    * @param data - the data to send
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async put<Path extends Paths<Api, "put">>(
-    url: Path,
+    path: Path,
     data?: Body<Api, "put", Path>,
     config?: ZodiosRequestOptions<Api, "put", Path>
   ): Promise<Response<Api, "put", Path>> {
-    return this.request("put", url, data, config);
+    return this.request("put", path, data, config);
   }
 
   /**
    * make a patch request to the api
-   * @param url - the url to api domain
+   * @param path - the path to api endpoint
    * @param data - the data to send
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async patch<Path extends Paths<Api, "patch">>(
-    url: Path,
+    path: Path,
     data?: Body<Api, "patch", Path>,
     config?: ZodiosRequestOptions<Api, "patch", Path>
   ): Promise<Response<Api, "patch", Path>> {
-    return this.request("patch", url, data, config);
+    return this.request("patch", path, data, config);
   }
 
   /**
    * make a delete request to the api
-   * @param url - the url to api domain
+   * @param path - the path to api endpoint
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async delete<Path extends Paths<Api, "delete">>(
-    url: Path,
+    path: Path,
     config?: ZodiosRequestOptions<Api, "delete", Path>
   ): Promise<Response<Api, "delete", Path>> {
-    return this.request("delete", url, undefined, config);
+    return this.request("delete", path, undefined, config);
   }
 }
 
-export type ApiOf<Z> = Z extends Zodios<infer Url, infer Api> ? Api : never;
-export type UrlOf<Z> = Z extends Zodios<infer Url, infer Api> ? Url : never;
+/**
+ * Get the Api description type from zodios
+ * @param Z - zodios type
+ */
+export type ApiOf<Z extends Zodios<any, any>> = Z extends Zodios<any, infer Api>
+  ? Api
+  : never;
+/**
+ * Get the Url string type from zodios
+ * @param Z - zodios type
+ */
+export type UrlOf<Z extends Zodios<any, any>> = Z extends Zodios<infer Url, any>
+  ? Url
+  : never;

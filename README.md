@@ -65,7 +65,7 @@ const apiClient = new Zodios(
     },
   ] as const,
 );
-//   typed                     auto-complete url   auto-complete params
+//   typed                     auto-complete path   auto-complete params
 //     ▼                               ▼                   ▼
 const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);
@@ -150,8 +150,8 @@ const baseUrl = "https://jsonplaceholder.typicode.com";
 
 type Api = typeof api;
 
-function useJsonPlaceholder<Path extends Paths<Api, "get">>(url: Path, config?: ZodiosRequestOptions<Api, "get", Path>) {
-  return useZodios(baseUrl, url, config);
+function useJsonPlaceholder<Path extends Paths<Api, "get">>(path: Path, config?: ZodiosRequestOptions<Api, "get", Path>) {
+  return useZodios(baseUrl, path, config);
 }
 
 const Users = () => {

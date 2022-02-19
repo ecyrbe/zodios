@@ -48,10 +48,10 @@ const baseUrl = "https://jsonplaceholder.typicode.com";
 type Api = typeof api;
 
 function useJsonPlaceholder<Path extends Paths<Api, "get">>(
-  url: Path,
+  path: Path,
   config?: ZodiosRequestOptions<Api, "get", Path>
 ) {
-  return useZodios(baseUrl, url, config);
+  return useZodios(baseUrl, path, config);
 }
 
 const Users = () => {

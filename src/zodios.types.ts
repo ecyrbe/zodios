@@ -84,7 +84,7 @@ export type AnyZodiosRequestOptions = {
   headers?: Record<string, string>;
 } & Omit<
   AxiosRequestConfig,
-  "params" | "headers" | "baseURL" | "data" | "method"
+  "params" | "headers" | "baseURL" | "data" | "method" | "url"
 >;
 
 export type ZodiosRequestOptions<
