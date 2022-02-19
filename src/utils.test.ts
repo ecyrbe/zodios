@@ -17,4 +17,15 @@ describe("omit", () => {
       c: 3,
     });
   });
+
+  it("should accept to remove all keys from object", () => {
+    const obj = {
+      a: 1,
+      b: 2,
+      c: 3,
+    };
+
+    expect(omit(obj, ["a","b","c"])).toEqual({});
+  });
+
 });
