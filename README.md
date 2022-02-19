@@ -44,6 +44,8 @@ or
 
 # Usage
 
+For an almost complete example on how to use zodios and how to split your APIs declarations, take a look at [dev.to](examples/dev.to/) example.
+
 ## Declare your API with zodios
 
 ```typescript
