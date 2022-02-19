@@ -1,4 +1,4 @@
-import { Zodios } from "../src/index";
+import { Zodios, asApi } from "../src/index";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type
@@ -17,7 +17,7 @@ type Users = z.infer<typeof usersSchema>;
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
-const jsonplaceholderApi = [
+const jsonplaceholderApi = asApi([
   {
     method: "get",
     path: "/users",
@@ -44,7 +44,7 @@ const jsonplaceholderApi = [
     description: "Get a user",
     response: userSchema,
   },
-] as const;
+] as const);
 
 // and then use them in your API
 async function bootstrap() {
