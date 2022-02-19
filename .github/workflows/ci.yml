@@ -21,8 +21,8 @@ on:
 
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]
@@ -38,3 +38,23 @@ jobs:
       - run: yarn install
       - run: yarn build
       - run: yarn test
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript' ]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
