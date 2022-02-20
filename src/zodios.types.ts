@@ -2,7 +2,6 @@ import { AxiosInstance, AxiosRequestConfig } from "axios";
 import type {
   FilterArray,
   MapSchemaParameters,
-  MergeUnion,
   PickDefined,
   NeverIfEmpty,
   UndefinedToOptional,
@@ -50,12 +49,10 @@ export type Body<Api, M extends Method, Path> = z.infer<
 
 export type QueryParams<Api, M extends Method, Path> = NeverIfEmpty<
   UndefinedToOptional<
-    MergeUnion<
-      MapSchemaParameters<
-        FilterArray<
-          EndpointApiDescription<Api, M, Path>[number]["parameters"],
-          { type: "Query" }
-        >
+    MapSchemaParameters<
+      FilterArray<
+        EndpointApiDescription<Api, M, Path>[number]["parameters"],
+        { type: "Query" }
       >
     >
   >
@@ -67,12 +64,10 @@ export type PathParams<Path extends string> = NeverIfEmpty<
 
 export type HeaderParams<Api, M extends Method, Path> = NeverIfEmpty<
   UndefinedToOptional<
-    MergeUnion<
-      MapSchemaParameters<
-        FilterArray<
-          EndpointApiDescription<Api, M, Path>[number]["parameters"],
-          { type: "Header" }
-        >
+    MapSchemaParameters<
+      FilterArray<
+        EndpointApiDescription<Api, M, Path>[number]["parameters"],
+        { type: "Header" }
       >
     >
   >
