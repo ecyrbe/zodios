@@ -44,17 +44,23 @@ type OptionalProps<T> = Pick<
 >;
 
 /**
- * merge two types into a single type
+ * Simplify a type by merging intersections if possible
+ * @param T - type to simplify
+ */
+export type Simplify<T> = T extends unknown ? { [K in keyof T]: T[K] } : T;
+
+/**
+ * Merge two types into a single type
  * @param T - first type
  * @param U - second type
  */
-type MergeSimplify<T, U> = MergeUnion<T | U>;
+export type Merge<T, U> = Simplify<T & U>;
 
 /**
  * transform possible undefined properties from a type into optional properties
  * @param T - object type
  */
-export type UndefinedToOptional<T> = MergeSimplify<
+export type UndefinedToOptional<T> = Merge<
   RequiredProps<T>,
   Partial<OptionalProps<T>>
 >;
@@ -99,7 +105,7 @@ type OptionalChildProps<T> = {
  * set properties to optional if their child properties are optional
  * @param T - object type
  */
-export type SetPropsOptionalIfChildrenAreOptional<T> = MergeSimplify<
+export type SetPropsOptionalIfChildrenAreOptional<T> = Merge<
   Pick<Partial<T>, OptionalChildProps<T>>,
   Pick<T, RequiredChildProps<T>>
 >;
@@ -140,14 +146,15 @@ export type MapSchemaParameters<T> = T extends readonly [infer F, ...infer R]
       schema: z.ZodType<infer Z>;
     }>
     ? Name extends string
-      ?
-          | {
-              [Key in Name]: Z;
-            }
-          | MapSchemaParameters<R>
+      ? Merge<
+          {
+            [Key in Name]: Z;
+          },
+          MapSchemaParameters<R>
+        >
       : never
     : never
-  : never;
+  : {};
 
 /**
  * split template type string with '/' separator into a tuple of strings
@@ -161,15 +168,24 @@ export type SplitTemplateType<
   ? [F, ...SplitTemplateType<R, C>]
   : [T];
 
-export type GetParamsKeys<T> = T extends `${infer F}:${infer R}/${infer S}`
-  ? [R, ...GetParamsKeys<S>]
-  : T extends `${infer G}:${infer U}`
-  ? [U]
-  : [];
+/**
+ * get all parameters from an API path
+ * @param Path - API path
+ */
+export type GetParamsKeys<Path> =
+  Path extends `${infer F}:${infer R}/${infer S}`
+    ? [R, ...GetParamsKeys<S>]
+    : Path extends `${infer G}:${infer U}`
+    ? [U]
+    : [];
 
+/**
+ * Transform a list of parameters string into a a api type declaration
+ * @param T - list of parameters string
+ */
 export type ParamsToObject<T> = T extends [infer F, ...infer R]
   ? F extends string
-    ? MergeSimplify<
+    ? Merge<
         {
           [Key in F]: string | number;
         },
