@@ -9,6 +9,7 @@ import type {
   ParamsToObject,
   SetPropsOptionalIfChildrenAreOptional,
   ReadonlyDeep,
+  Merge,
 } from "./utils.types";
 import { z } from "zod";
 
@@ -73,30 +74,50 @@ export type HeaderParams<Api, M extends Method, Path> = NeverIfEmpty<
   >
 >;
 
-export type AnyZodiosRequestOptions = {
-  params?: Record<string, unknown>;
-  queries?: Record<string, unknown>;
-  headers?: Record<string, string>;
-} & Omit<
-  AxiosRequestConfig,
-  "params" | "headers" | "baseURL" | "data" | "method" | "url"
+export type AnyZodiosMethodOptions = Merge<
+  {
+    params?: Record<string, unknown>;
+    queries?: Record<string, unknown>;
+    headers?: Record<string, string>;
+  },
+  Omit<AxiosRequestConfig, "params" | "headers" | "baseURL" | "url" | "method">
+>;
+
+export type AnyZodiosRequestOptions = Merge<
+  { method: Method; path: string },
+  AnyZodiosMethodOptions
+>;
+
+export type ZodiosMethodOptions<
+  Api,
+  M extends Method,
+  Path extends string
+> = Merge<
+  SetPropsOptionalIfChildrenAreOptional<
+    PickDefined<{
+      params: PathParams<Path>;
+      queries: QueryParams<Api, M, Path>;
+      headers: HeaderParams<Api, M, Path>;
+    }>
+  >,
+  Omit<
+    AxiosRequestConfig,
+    "params" | "headers" | "baseURL" | "data" | "method" | "url"
+  >
 >;
 
 export type ZodiosRequestOptions<
   Api,
   M extends Method,
   Path extends string
-> = SetPropsOptionalIfChildrenAreOptional<
-  PickDefined<{
-    params: PathParams<Path>;
-    queries: QueryParams<Api, M, Path>;
-    headers: HeaderParams<Api, M, Path>;
-  }>
-> &
-  Omit<
-    AxiosRequestConfig,
-    "params" | "headers" | "baseURL" | "data" | "method"
-  >;
+> = Merge<
+  {
+    method: M;
+    path: Path;
+    data?: Body<Api, M, Path>;
+  },
+  ZodiosMethodOptions<Api, M, Path>
+>;
 
 export type AxiosRetryRequestConfig = AxiosRequestConfig & {
   retried?: boolean;

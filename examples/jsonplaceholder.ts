@@ -57,7 +57,7 @@ async function bootstrap() {
   console.log(user);
   const createdUser = await apiClient.post("/users", { name: "john doe" });
   console.log(createdUser);
-  const deletedUser = await apiClient.delete("/users/:id", {
+  const deletedUser = await apiClient.delete("/users/:id", undefined, {
     params: { id: 7 },
   });
   console.log(deletedUser);

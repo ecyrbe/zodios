@@ -1,5 +1,5 @@
 import { createContext, useMemo } from "react";
-import { Zodios, ZodiosEnpointDescriptions } from "../index";
+import { Zodios } from "../zodios";
 
 type ZodiosProviderProps = {
   children: React.ReactNode;

@@ -1,5 +1,5 @@
 import { AxiosError } from "axios";
-import express, { Application } from "express";
+import express from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
 import { Zodios } from "./zodios";
@@ -96,8 +96,20 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
+      {
+        method: "get",
+        path: "/users",
+        response: z.array(
+          z.object({
+            id: z.number(),
+            name: z.string(),
+          })
+        ),
+      },
     ] as const);
-    const response = await zodios.request("get", "/:id", undefined, {
+    const response = await zodios.request({
+      method: "get",
+      path: "/:id",
       params: { id: 7 },
     });
     expect(response).toEqual({ id: 7, name: "test" });
@@ -233,7 +245,9 @@ describe("Zodios", () => {
         }),
       },
     ] as const);
-    const response = await zodios.delete("/:id", { params: { id: 6 } });
+    const response = await zodios.delete("/:id", undefined, {
+      params: { id: 6 },
+    });
     expect(response).toEqual({ id: 6 });
   });
   it("should make an http request with a token", async () => {

@@ -1,10 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { ReadonlyDeep } from "../utils.types";
 import { Zodios } from "../zodios";
 import {
   AxiosRetryRequestConfig,
   TokenProvider,
-  ZodiosEndpointDescription,
   ZodiosEnpointDescriptions,
 } from "../zodios.types";
 

@@ -11,6 +11,7 @@ import {
   Response,
   ZodiosOptions,
   ZodiosEnpointDescriptions,
+  ZodiosMethodOptions,
 } from "./zodios.types";
 import { omit } from "./utils";
 
@@ -103,22 +104,16 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     endpoint: ZodiosEndpointDescription<unknown>,
     response: unknown
   ) {
-    const validation = endpoint.response.safeParse(response);
-    if (!validation.success) {
-      console.error(
-        `Invalid response for '${endpoint.method} ${endpoint.path}' : ${validation.error.message}`
-      );
-      throw validation.error;
-    }
-    return validation.data as z.infer<Response<Api, "get", Path>>;
+    return endpoint.response.parse(response) as z.infer<
+      Response<Api, "get", Path>
+    >;
   }
 
   private replacePathParams<M extends Method, Path extends Paths<Api, M>>(
-    path: Path,
-    anyConfig?: AnyZodiosRequestOptions
+    config: AnyZodiosRequestOptions
   ) {
-    let result: string = path;
-    const params = anyConfig?.params;
+    let result: string = config.path;
+    const params = config.params;
     if (params) {
       result = result.replace(paramsRegExp, (match, key) =>
         key in params ? `${params[key]}` : match
@@ -136,22 +131,18 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
    * @returns response validated with zod schema provided in the api description
    */
   async request<M extends Method, Path extends Paths<Api, M>>(
-    method: M,
-    path: Path,
-    data?: Body<Api, M, Path>,
-    config?: ZodiosRequestOptions<Api, M, Path>
+    config: ZodiosRequestOptions<Api, M, Path>
   ): Promise<Response<Api, M, Path>> {
-    const endpoint = this.findEndpoint(method, path);
+    const conf = config as unknown as AnyZodiosRequestOptions;
+    const endpoint = this.findEndpoint(config.method, config.path);
     // istanbul ignore next
     if (!endpoint) {
-      throw new Error(`No endpoint found for ${method} ${path}`);
+      throw new Error(`No endpoint found for ${config.method} ${config.path}`);
     }
     const requestConfig: AxiosRequestConfig = {
-      ...omit(config as AnyZodiosRequestOptions, ["params", "queries"]),
-      method,
-      url: this.replacePathParams(path, config as AnyZodiosRequestOptions),
-      params: (config as AnyZodiosRequestOptions)?.queries,
-      data,
+      ...omit(conf, ["params", "queries"]),
+      url: this.replacePathParams(conf),
+      params: conf.queries,
     };
     const response = await this.axiosInstance.request(requestConfig);
     if (this.options.validateResponse) {
@@ -168,9 +159,13 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
    */
   async get<Path extends Paths<Api, "get">>(
     path: Path,
-    config?: ZodiosRequestOptions<Api, "get", Path>
+    config?: ZodiosMethodOptions<Api, "get", Path>
   ): Promise<Response<Api, "get", Path>> {
-    return this.request("get", path, undefined, config);
+    return this.request({
+      method: "get",
+      path,
+      ...config,
+    } as unknown as ZodiosRequestOptions<Api, "get", Path>);
   }
 
   /**
@@ -183,9 +178,14 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   async post<Path extends Paths<Api, "post">>(
     path: Path,
     data?: Body<Api, "post", Path>,
-    config?: ZodiosRequestOptions<Api, "post", Path>
+    config?: ZodiosMethodOptions<Api, "post", Path>
   ): Promise<Response<Api, "post", Path>> {
-    return this.request("post", path, data, config);
+    return this.request({
+      ...config,
+      method: "post",
+      path,
+      data,
+    } as unknown as ZodiosRequestOptions<Api, "post", Path>);
   }
 
   /**
@@ -198,9 +198,14 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   async put<Path extends Paths<Api, "put">>(
     path: Path,
     data?: Body<Api, "put", Path>,
-    config?: ZodiosRequestOptions<Api, "put", Path>
+    config?: ZodiosMethodOptions<Api, "put", Path>
   ): Promise<Response<Api, "put", Path>> {
-    return this.request("put", path, data, config);
+    return this.request({
+      ...config,
+      method: "put",
+      path,
+      data,
+    } as unknown as ZodiosRequestOptions<Api, "put", Path>);
   }
 
   /**
@@ -213,9 +218,14 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   async patch<Path extends Paths<Api, "patch">>(
     path: Path,
     data?: Body<Api, "patch", Path>,
-    config?: ZodiosRequestOptions<Api, "patch", Path>
+    config?: ZodiosMethodOptions<Api, "patch", Path>
   ): Promise<Response<Api, "patch", Path>> {
-    return this.request("patch", path, data, config);
+    return this.request({
+      ...config,
+      method: "patch",
+      path,
+      data,
+    } as unknown as ZodiosRequestOptions<Api, "patch", Path>);
   }
 
   /**
@@ -226,9 +236,15 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
    */
   async delete<Path extends Paths<Api, "delete">>(
     path: Path,
-    config?: ZodiosRequestOptions<Api, "delete", Path>
+    data?: Body<Api, "patch", Path>,
+    config?: ZodiosMethodOptions<Api, "delete", Path>
   ): Promise<Response<Api, "delete", Path>> {
-    return this.request("delete", path, undefined, config);
+    return this.request({
+      ...config,
+      method: "delete",
+      path,
+      data,
+    } as unknown as ZodiosRequestOptions<Api, "delete", Path>);
   }
 }
 
