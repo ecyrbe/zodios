@@ -124,10 +124,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
 
   /**
    * make a request to the api
-   * @param method - the method to use
-   * @param path - the path to api endpoint
-   * @param data - the data to send
-   * @param config - the config to setup axios options and parameters
+   * @param config - the config to setup zodios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async request<M extends Method, Path extends Paths<Api, M>>(
