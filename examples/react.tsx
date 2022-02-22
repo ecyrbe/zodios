@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Paths, Zodios, ZodiosRequestOptions } from "../src/index";
+import { Paths, Zodios, ZodiosMethodOptions } from "../src/index";
 import { useZodios, ZodiosProvider } from "../src/react";
 import { z } from "zod";
 
@@ -46,12 +46,13 @@ const api = [
 const baseUrl = "https://jsonplaceholder.typicode.com";
 
 type Api = typeof api;
+type ApiUrl = typeof baseUrl;
 
 function useJsonPlaceholder<Path extends Paths<Api, "get">>(
   path: Path,
-  config?: ZodiosRequestOptions<Api, "get", Path>
+  config?: ZodiosMethodOptions<Api, "get", Path>
 ) {
-  return useZodios(baseUrl, path, config);
+  return useZodios<ApiUrl, Api, Path>(baseUrl, path, config);
 }
 
 const Users = () => {

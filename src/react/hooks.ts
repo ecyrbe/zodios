@@ -1,11 +1,12 @@
 import { useContext } from "react";
 import { useQuery, UseQueryOptions } from "react-query";
 import { ZodiosContext } from "./provider";
-import { Zodios, ZodiosEnpointDescriptions } from "../index";
+import { Zodios } from "../zodios";
 import {
-  AnyZodiosRequestOptions,
+  ZodiosEnpointDescriptions,
+  AnyZodiosMethodOptions,
   Paths,
-  ZodiosRequestOptions,
+  ZodiosMethodOptions,
 } from "../zodios.types";
 import { pick } from "../utils";
 
@@ -38,11 +39,11 @@ export function useZodios<
 >(
   baseUrl: URL,
   path: Path,
-  config?: ZodiosRequestOptions<Api, "get", Path>,
+  config?: ZodiosMethodOptions<Api, "get", Path>,
   queryOptions?: Omit<UseQueryOptions, "queryKey" | "queryFn">
 ) {
   const zodios = useContext(ZodiosContext)[baseUrl] as Zodios<URL, Api>;
-  const params = pick(config as AnyZodiosRequestOptions | undefined, [
+  const params = pick(config as AnyZodiosMethodOptions | undefined, [
     "params",
     "queries",
   ]);
