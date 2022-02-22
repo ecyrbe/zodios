@@ -162,9 +162,9 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     config?: ZodiosMethodOptions<Api, "get", Path>
   ): Promise<Response<Api, "get", Path>> {
     return this.request({
+      ...config,
       method: "get",
       path,
-      ...config,
     } as unknown as ZodiosRequestOptions<Api, "get", Path>);
   }
 
