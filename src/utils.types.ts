@@ -157,24 +157,15 @@ export type MapSchemaParameters<T> = T extends readonly [infer F, ...infer R]
   : {};
 
 /**
- * split template type string with '/' separator into a tuple of strings
- * @param T - template type string
- * @param S - separator
- */
-export type SplitTemplateType<
-  T,
-  C extends string = "/"
-> = T extends `${infer F}${C}${infer R}`
-  ? [F, ...SplitTemplateType<R, C>]
-  : [T];
-
-/**
  * get all parameters from an API path
  * @param Path - API path
+ * @details this is using typescript 4.4 tail recursion type optimisation
  */
-export type PathParamNames<Path> =
-  Path extends `${string}:${infer Name}/${infer R}`
-    ? Name | PathParamNames<R>
-    : Path extends `${string}:${infer Name}`
-    ? Name
-    : never;
+export type PathParamNames<
+  Path,
+  Acc = never
+> = Path extends `${string}:${infer Name}/${infer R}`
+  ? PathParamNames<R, Name | Acc>
+  : Path extends `${string}:${infer Name}`
+  ? Name | Acc
+  : Acc;
