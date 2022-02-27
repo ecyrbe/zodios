@@ -5,8 +5,7 @@ import type {
   PickDefined,
   NeverIfEmpty,
   UndefinedToOptional,
-  GetParamsKeys,
-  ParamsToObject,
+  PathParamNames,
   SetPropsOptionalIfChildrenAreOptional,
   ReadonlyDeep,
   Merge,
@@ -60,7 +59,7 @@ export type QueryParams<Api, M extends Method, Path> = NeverIfEmpty<
 >;
 
 export type PathParams<Path extends string> = NeverIfEmpty<
-  ParamsToObject<GetParamsKeys<Path>>
+  Record<PathParamNames<Path>, string | number>
 >;
 
 export type HeaderParams<Api, M extends Method, Path> = NeverIfEmpty<

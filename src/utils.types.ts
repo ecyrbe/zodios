@@ -172,24 +172,9 @@ export type SplitTemplateType<
  * get all parameters from an API path
  * @param Path - API path
  */
-export type GetParamsKeys<Path> =
-  Path extends `${infer F}:${infer R}/${infer S}`
-    ? [R, ...GetParamsKeys<S>]
-    : Path extends `${infer G}:${infer U}`
-    ? [U]
-    : [];
-
-/**
- * Transform a list of parameters string into a a api type declaration
- * @param T - list of parameters string
- */
-export type ParamsToObject<T> = T extends [infer F, ...infer R]
-  ? F extends string
-    ? Merge<
-        {
-          [Key in F]: string | number;
-        },
-        ParamsToObject<R>
-      >
-    : ParamsToObject<R>
-  : {};
+export type PathParamNames<Path> =
+  Path extends `${string}:${infer Name}/${infer R}`
+    ? Name | PathParamNames<R>
+    : Path extends `${string}:${infer Name}`
+    ? Name
+    : never;
