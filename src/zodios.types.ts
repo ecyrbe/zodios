@@ -83,7 +83,7 @@ export type AnyZodiosMethodOptions = Merge<
 >;
 
 export type AnyZodiosRequestOptions = Merge<
-  { method: Method; path: string },
+  { method: Method; url: string },
   AnyZodiosMethodOptions
 >;
 
@@ -112,7 +112,7 @@ export type ZodiosRequestOptions<
 > = Merge<
   {
     method: M;
-    path: Path;
+    url: Path;
     data?: Body<Api, M, Path>;
   },
   ZodiosMethodOptions<Api, M, Path>
