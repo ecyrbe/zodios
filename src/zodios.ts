@@ -112,7 +112,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   private replacePathParams<M extends Method, Path extends Paths<Api, M>>(
     config: AnyZodiosRequestOptions
   ) {
-    let result: string = config.path;
+    let result: string = config.url;
     const params = config.params;
     if (params) {
       result = result.replace(paramsRegExp, (match, key) =>
@@ -131,10 +131,10 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     config: ZodiosRequestOptions<Api, M, Path>
   ): Promise<Response<Api, M, Path>> {
     const conf = config as unknown as AnyZodiosRequestOptions;
-    const endpoint = this.findEndpoint(config.method, config.path);
+    const endpoint = this.findEndpoint(config.method, config.url);
     // istanbul ignore next
     if (!endpoint) {
-      throw new Error(`No endpoint found for ${config.method} ${config.path}`);
+      throw new Error(`No endpoint found for ${config.method} ${config.url}`);
     }
     const requestConfig: AxiosRequestConfig = {
       ...omit(conf, ["params", "queries"]),
@@ -161,7 +161,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     return this.request({
       ...config,
       method: "get",
-      path,
+      url: path,
     } as unknown as ZodiosRequestOptions<Api, "get", Path>);
   }
 
@@ -180,7 +180,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     return this.request({
       ...config,
       method: "post",
-      path,
+      url: path,
       data,
     } as unknown as ZodiosRequestOptions<Api, "post", Path>);
   }
@@ -200,7 +200,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     return this.request({
       ...config,
       method: "put",
-      path,
+      url: path,
       data,
     } as unknown as ZodiosRequestOptions<Api, "put", Path>);
   }
@@ -220,7 +220,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     return this.request({
       ...config,
       method: "patch",
-      path,
+      url: path,
       data,
     } as unknown as ZodiosRequestOptions<Api, "patch", Path>);
   }
@@ -239,7 +239,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
     return this.request({
       ...config,
       method: "delete",
-      path,
+      url: path,
       data,
     } as unknown as ZodiosRequestOptions<Api, "delete", Path>);
   }

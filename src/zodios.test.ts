@@ -109,7 +109,7 @@ describe("Zodios", () => {
     ] as const);
     const response = await zodios.request({
       method: "get",
-      path: "/:id",
+      url: "/:id",
       params: { id: 7 },
     });
     expect(response).toEqual({ id: 7, name: "test" });
