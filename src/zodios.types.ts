@@ -21,33 +21,44 @@ export type Method =
   | "head"
   | "options";
 
-type MethodApiDescription<Api, M extends Method> = FilterArray<
-  Api,
-  { method: M }
->;
+type MethodApiDescription<
+  Api extends readonly unknown[],
+  M extends Method
+> = FilterArray<Api, { method: M }>;
 
-type EndpointApiDescription<Api, M extends Method, Path> = FilterArray<
-  Api,
-  { method: M; path: Path }
->;
+type EndpointApiDescription<
+  Api extends readonly unknown[],
+  M extends Method,
+  Path
+> = FilterArray<Api, { method: M; path: Path }>;
 
-export type Paths<Api, M extends Method> = MethodApiDescription<
-  Api,
-  M
->[number]["path"];
+export type Paths<
+  Api extends readonly unknown[],
+  M extends Method
+> = MethodApiDescription<Api, M>[number]["path"];
 
-export type Response<Api, M extends Method, Path> = z.infer<
-  EndpointApiDescription<Api, M, Path>[number]["response"]
->;
+export type Response<
+  Api extends readonly unknown[],
+  M extends Method,
+  Path
+> = z.infer<EndpointApiDescription<Api, M, Path>[number]["response"]>;
 
-export type Body<Api, M extends Method, Path> = z.infer<
+export type Body<
+  Api extends readonly unknown[],
+  M extends Method,
+  Path
+> = z.infer<
   FilterArray<
     EndpointApiDescription<Api, M, Path>[number]["parameters"],
     { type: "Body" }
   >[number]["schema"]
 >;
 
-export type QueryParams<Api, M extends Method, Path> = NeverIfEmpty<
+export type QueryParams<
+  Api extends readonly unknown[],
+  M extends Method,
+  Path
+> = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArray<
@@ -62,7 +73,11 @@ export type PathParams<Path extends string> = NeverIfEmpty<
   Record<PathParamNames<Path>, string | number>
 >;
 
-export type HeaderParams<Api, M extends Method, Path> = NeverIfEmpty<
+export type HeaderParams<
+  Api extends readonly unknown[],
+  M extends Method,
+  Path
+> = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArray<
@@ -88,7 +103,7 @@ export type AnyZodiosRequestOptions = Merge<
 >;
 
 export type ZodiosMethodOptions<
-  Api,
+  Api extends readonly unknown[],
   M extends Method,
   Path extends string
 > = Merge<
@@ -106,7 +121,7 @@ export type ZodiosMethodOptions<
 >;
 
 export type ZodiosRequestOptions<
-  Api,
+  Api extends readonly unknown[],
   M extends Method,
   Path extends string
 > = Merge<
