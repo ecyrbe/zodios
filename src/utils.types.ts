@@ -4,12 +4,17 @@ import { z } from "zod";
  * filter an array type by a predicate
  * @param T - array type
  * @param C - predicate object to match
+ * @details - this is using tail recursion type optimization from typescript 4.5
  */
-export type FilterArray<T, C> = T extends readonly [infer F, ...infer R]
-  ? F extends Readonly<C>
-    ? [F, ...FilterArray<R, C>]
-    : FilterArray<R, C>
-  : [];
+export type FilterArray<
+  T extends readonly unknown[],
+  C,
+  Acc extends unknown[] = []
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends Readonly<C>
+    ? FilterArray<Tail, C, [Head, ...Acc]>
+    : FilterArray<Tail, C, Acc>
+  : Acc;
 
 /**
  * merge all union types into a single type
@@ -139,27 +144,34 @@ export type ReadonlyDeep<T> = T extends (infer R)[]
 /**
  * Map a type an api description parameter to a zod infer type
  * @param T - array of api description parameters
+ * @details -  this is using tail recursion type optimization from typescript 4.5
  */
-export type MapSchemaParameters<T> = T extends readonly [infer F, ...infer R]
-  ? F extends Readonly<{
+export type MapSchemaParameters<T, Acc = {}> = T extends readonly [
+  infer Head,
+  ...infer Tail
+]
+  ? Head extends Readonly<{
       name: infer Name;
       schema: z.ZodType<infer Z>;
     }>
     ? Name extends string
-      ? Merge<
-          {
-            [Key in Name]: Z;
-          },
-          MapSchemaParameters<R>
+      ? MapSchemaParameters<
+          Tail,
+          Merge<
+            {
+              [Key in Name]: Z;
+            },
+            Acc
+          >
         >
-      : never
-    : never
-  : {};
+      : Acc
+    : Acc
+  : Acc;
 
 /**
  * get all parameters from an API path
  * @param Path - API path
- * @details this is using typescript 4.4 tail recursion type optimisation
+ * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type PathParamNames<
   Path,
