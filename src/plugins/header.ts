@@ -6,11 +6,11 @@ import {
   ZodiosEnpointDescriptions,
 } from "../zodios.types";
 
-export function pluginHeader<
-  Url extends string,
-  Api extends ZodiosEnpointDescriptions
->(key: string, valueFn: () => Promise<string>) {
-  return (zodios: Zodios<Url, Api>) => {
+export function pluginHeader<Api extends ZodiosEnpointDescriptions>(
+  key: string,
+  valueFn: () => Promise<string>
+) {
+  return (zodios: Zodios<Api>) => {
     zodios.axios.interceptors.request.use(
       async (config: AxiosRequestConfig) => {
         config.headers = {

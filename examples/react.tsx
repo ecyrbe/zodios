@@ -46,13 +46,12 @@ const api = [
 const baseUrl = "https://jsonplaceholder.typicode.com";
 
 type Api = typeof api;
-type ApiUrl = typeof baseUrl;
 
 function useJsonPlaceholder<Path extends Paths<Api, "get">>(
   path: Path,
   config?: ZodiosMethodOptions<Api, "get", Path>
 ) {
-  return useZodios<ApiUrl, Api, Path>(baseUrl, path, config);
+  return useZodios<Api, Path>(baseUrl, path, config);
 }
 
 const Users = () => {
@@ -80,7 +79,7 @@ const queryClient = new QueryClient();
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ZodiosProvider apis={[apiClient]}>
+      <ZodiosProvider apis={{ [baseUrl]: apiClient }}>
         <Users />
       </ZodiosProvider>
     </QueryClientProvider>

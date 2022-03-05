@@ -161,6 +161,10 @@ export type ZodiosOptions = {
    * Override the default axios instance. Default: zodios will create it's own axios instance
    */
   axiosInstance?: AxiosInstance;
+  /**
+   * default config for axios requests
+   */
+  axiosConfig?: AxiosRequestConfig;
 };
 
 /**

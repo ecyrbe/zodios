@@ -36,11 +36,10 @@ function createResponseInterceptor(
   };
 }
 
-export function pluginToken<
-  Url extends string,
-  Api extends ZodiosEnpointDescriptions
->(provider: TokenProvider) {
-  return (zodios: Zodios<Url, Api>) => {
+export function pluginToken<Api extends ZodiosEnpointDescriptions>(
+  provider: TokenProvider
+) {
+  return (zodios: Zodios<Api>) => {
     zodios.axios.interceptors.request.use(createRequestInterceptor(provider));
     if (provider?.renewToken) {
       zodios.axios.interceptors.response.use(
