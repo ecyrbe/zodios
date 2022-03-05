@@ -77,6 +77,19 @@ describe("Zodios", () => {
     ]);
     expect(zodios).toBeDefined();
   });
+  it("should create a new instance whithout base URL", () => {
+    const zodios = new Zodios([
+      {
+        method: "get",
+        path: "/:id",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ]);
+    expect(zodios).toBeDefined();
+  });
   it("should create a new instance when providing a token provider", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     zodios.use(

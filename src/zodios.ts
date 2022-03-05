@@ -20,13 +20,14 @@ const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 /**
  * zodios api client based on axios
  */
-export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
+export class Zodios<Api extends ZodiosEnpointDescriptions> {
   axiosInstance: AxiosInstance;
   options: ZodiosOptions;
+  private api: Api;
 
   /**
    * constructor
-   * @param baseURL - the base url to use
+   * @param baseURL - the base url to use - if omited will use the browser domain
    * @param api - the description of all the api endpoints
    * @param options - the options to setup the client API
    * @example
@@ -51,21 +52,31 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
    *     }
    *   ]);
    */
-  constructor(baseURL: URL, private api: Api, options?: ZodiosOptions) {
+  constructor(api: Api, options?: ZodiosOptions);
+  constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
+  constructor(api: Api, options?: ZodiosOptions);
+  constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
+  constructor(...args: unknown[]) {
+    let baseURL: string | undefined;
+    if (typeof args[0] === "string") {
+      baseURL = args[0];
+      args = args.slice(1);
+    }
+    this.api = args[0] as unknown as Api;
     this.options = {
       validateResponse: true,
       usePluginApi: true,
-      ...options,
+      ...(args[1] as unknown as ZodiosOptions),
     };
 
     if (this.options.axiosInstance) {
       this.axiosInstance = this.options.axiosInstance;
-      this.axiosInstance.defaults.baseURL = baseURL;
     } else {
       this.axiosInstance = axios.create({
-        baseURL,
+        ...this.options.axiosConfig,
       });
     }
+    if (baseURL) this.axiosInstance.defaults.baseURL = baseURL;
 
     if (this.options.usePluginApi) {
       this.use(pluginApi());
@@ -73,7 +84,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
   }
 
   get baseURL() {
-    return this.axiosInstance.defaults.baseURL!;
+    return this.axiosInstance.defaults.baseURL;
   }
 
   /**
@@ -87,7 +98,7 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
    * use a plugin to cusomize the client
    * @param plugin - the plugin to use
    */
-  use(plugin: ZodiosPlugin<URL, Api>) {
+  use(plugin: ZodiosPlugin<Api>) {
     plugin(this);
   }
 
@@ -249,23 +260,19 @@ export class Zodios<URL extends string, Api extends ZodiosEnpointDescriptions> {
  * Get the Api description type from zodios
  * @param Z - zodios type
  */
-export type ApiOf<Z extends Zodios<any, any>> = Z extends Zodios<any, infer Api>
+export type ApiOf<Z extends Zodios<any>> = Z extends Zodios<infer Api>
   ? Api
   : never;
 /**
  * Get the Url string type from zodios
  * @param Z - zodios type
  */
-export type UrlOf<Z extends Zodios<any, any>> = Z extends Zodios<infer Url, any>
-  ? Url
-  : never;
 
 /**
  * Zodios Plugin type
  * @Param URL - the url of the api
  * @Param Api - the api description type
  */
-export type ZodiosPlugin<
-  URL extends string,
-  Api extends ZodiosEnpointDescriptions
-> = (zodios: Zodios<URL, Api>) => void;
+export type ZodiosPlugin<Api extends ZodiosEnpointDescriptions> = (
+  zodios: Zodios<Api>
+) => void;

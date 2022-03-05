@@ -33,21 +33,22 @@ import { pick } from "../utils";
  * ```
  */
 export function useZodios<
-  URL extends string,
   Api extends ZodiosEnpointDescriptions,
   Path extends Paths<Api, "get">
 >(
-  baseUrl: URL,
+  apiName: string,
   path: Path,
   config?: ZodiosMethodOptions<Api, "get", Path>,
   queryOptions?: Omit<UseQueryOptions, "queryKey" | "queryFn">
 ) {
-  const zodios = useContext(ZodiosContext)[baseUrl] as Zodios<URL, Api>;
+  const api = useContext(ZodiosContext)[apiName];
+  if (!api) throw new Error(`can't find api ${apiName}`);
+  const zodios = api as Zodios<Api>;
   const params = pick(config as AnyZodiosMethodOptions | undefined, [
     "params",
     "queries",
   ]);
-  const keys = [baseUrl, path, params];
+  const keys = [apiName, path, params];
   const query = () => zodios.get(path, config);
   type QueryOptions =
     | Omit<

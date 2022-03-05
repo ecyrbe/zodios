@@ -4,7 +4,6 @@ import { ZodiosEnpointDescriptions } from "../zodios.types";
 
 function createRequestInterceptor() {
   return async (config: AxiosRequestConfig) => {
-    config.withCredentials = true;
     // istanbul ignore next
     if (!config.headers) {
       config.headers = {};
@@ -29,11 +28,8 @@ function createRequestInterceptor() {
  * plugin that add application/json header to all requests
  * @param zodios
  */
-export function pluginApi<
-  Url extends string,
-  Api extends ZodiosEnpointDescriptions
->() {
-  return (zodios: Zodios<Url, Api>) => {
+export function pluginApi<Api extends ZodiosEnpointDescriptions>() {
+  return (zodios: Zodios<Api>) => {
     zodios.axios.interceptors.request.use(createRequestInterceptor());
   };
 }
