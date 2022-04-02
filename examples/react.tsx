@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "react-query";
-import { Paths, Zodios, ZodiosMethodOptions } from "../src/index";
-import { useZodios, ZodiosProvider } from "../src/react";
+import { Zodios } from "../src/index";
+import { createReactHooks } from "../src/react";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type
@@ -42,24 +42,36 @@ const api = [
     description: "Get a user",
     response: userSchema,
   },
+  {
+    method: "post",
+    path: "/users",
+    description: "Create a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: userSchema,
+      },
+    ],
+    response: userSchema,
+  },
 ] as const;
 const baseUrl = "https://jsonplaceholder.typicode.com";
 
-type Api = typeof api;
-
-function useJsonPlaceholder<Path extends Paths<Api, "get">>(
-  path: Path,
-  config?: ZodiosMethodOptions<Api, "get", Path>
-) {
-  return useZodios<Api, Path>(baseUrl, path, config);
-}
+const queryClient = new QueryClient();
+const zodios = new Zodios(baseUrl, api);
+const zodiosHooks = createReactHooks("jsonplaceholder", zodios);
 
 const Users = () => {
-  const { data: users, isLoading, error } = useJsonPlaceholder("/users");
+  const { data: users, isLoading, error } = zodiosHooks.useQuery("/users");
+  const { mutate } = zodiosHooks.useMutation("post", "/users");
 
   return (
     <div>
       <h1>Users</h1>
+      <button onClick={() => mutate({ data: { id: 10, name: "john doe" } })}>
+        add user
+      </button>
       {isLoading && <div>Loading...</div>}
       {error && <div>Error: {(error as Error).message}</div>}
       {users && (
@@ -73,15 +85,10 @@ const Users = () => {
   );
 };
 
-const apiClient = new Zodios(baseUrl, api);
-const queryClient = new QueryClient();
-
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ZodiosProvider apis={{ [baseUrl]: apiClient }}>
-        <Users />
-      </ZodiosProvider>
+      <Users />
     </QueryClientProvider>
   );
 };

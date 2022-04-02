@@ -1,2 +1,1 @@
-export { useZodios } from "./hooks";
-export { ZodiosProvider } from "./provider";
+export { createReactHooks, ZodiosReact } from "./hooks";
