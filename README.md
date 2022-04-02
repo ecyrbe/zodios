@@ -121,13 +121,13 @@ const apiClient = new Zodios(
 
 ## React helpers
 
-Zodios comes with a React Provider to register all your api clients and a hook to use them.  
-The hook is a thin wrapper around react-query useQuery, so you need to also add a react-query provider.
+Zodios comes with a Query and Mutation hook helper.  
+It's a thin wrapper around React-Query but with zodios auto completion.
 
 ```typescript
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Paths, Zodios, ZodiosRequestOptions } from "zodios";
-import { useZodios, ZodiosProvider } from "zodios/react";
+import { createReactClient } from "zodios/react";
 import { z } from "zod";
 
 const userSchema = z
@@ -146,22 +146,37 @@ const api = [
     path: "/users",
     description: "Get all users",
     response: usersSchema,
-  }
+  },
+  {
+    method: "post",
+    path: "/users",
+    description: "Create a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: userSchema,
+      },
+    ],
+    response: userSchema,
+  },
 ] as const;
 const baseUrl = "https://jsonplaceholder.typicode.com";
 
-type Api = typeof api;
-
-function useJsonPlaceholder<Path extends Paths<Api, "get">>(path: Path, config?: ZodiosRequestOptions<Api, "get", Path>) {
-  return useZodios(baseUrl, path, config);
-}
+const queryClient = new QueryClient();
+const zodios = new Zodios(baseUrl, api);
+const zodiosHooks = createReactHooks("jsonplaceholder", zodios);
 
 const Users = () => {
-  const { data: users, isLoading, error } = useJsonPlaceholder("/users");
+  const { data: users, isLoading, error } = zodiosHooks.useQuery("/users");
+  const { mutate } = zodiosHooks.useMutation("post", "/users");
 
   return (
     <div>
       <h1>Users</h1>
+      <button onClick={() => mutate({ data: { id: 10, name: "john doe" } })}>
+        add user
+      </button>
       {isLoading && <div>Loading...</div>}
       {error && <div>Error: {(error as Error).message}</div>}
       {users && (
@@ -175,15 +190,10 @@ const Users = () => {
   );
 };
 
-const apiClient = new Zodios(baseUrl, api);
-const queryClient = new QueryClient();
-
 export const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ZodiosProvider apis={[apiClient]}>
-        <Users />
-      </ZodiosProvider>
+      <Users />
     </QueryClientProvider>
   );
 };
