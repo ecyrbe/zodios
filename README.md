@@ -126,8 +126,8 @@ It's a thin wrapper around React-Query but with zodios auto completion.
 
 ```typescript
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Paths, Zodios, ZodiosRequestOptions } from "zodios";
-import { createReactClient } from "zodios/react";
+import { Zodios } from "zodios";
+import { ZodiosHooks } from "zodios/react";
 import { z } from "zod";
 
 const userSchema = z
@@ -165,7 +165,7 @@ const baseUrl = "https://jsonplaceholder.typicode.com";
 
 const queryClient = new QueryClient();
 const zodios = new Zodios(baseUrl, api);
-const zodiosHooks = createReactHooks("jsonplaceholder", zodios);
+const zodiosHooks = new ZodiosHooks("jsonplaceholder", zodios);
 
 const Users = () => {
   const { data: users, isLoading, error } = zodiosHooks.useQuery("/users");

@@ -1,1 +1,1 @@
-export { createReactHooks, ZodiosReact } from "./hooks";
+export { ZodiosHooks } from "./hooks";

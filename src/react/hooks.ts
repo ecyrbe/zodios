@@ -18,7 +18,7 @@ import {
 } from "../zodios.types";
 import { pick } from "../utils";
 
-export class ZodiosReact<Api extends ZodiosEnpointDescriptions> {
+export class ZodiosHooks<Api extends ZodiosEnpointDescriptions> {
   constructor(
     private readonly apiName: string,
     private readonly zodios: Zodios<Api>
@@ -111,11 +111,4 @@ export class ZodiosReact<Api extends ZodiosEnpointDescriptions> {
   ) {
     return this.useMutation("delete", path, mutationOptions);
   }
-}
-
-export function createReactHooks<Api extends ZodiosEnpointDescriptions>(
-  apiName: string,
-  zodios: Zodios<Api>
-) {
-  return new ZodiosReact(apiName, zodios);
 }
