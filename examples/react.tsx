@@ -1,6 +1,6 @@
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Zodios } from "../src/index";
-import { createReactHooks } from "../src/react";
+import { ZodiosHooks } from "../src/react";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type
@@ -60,7 +60,7 @@ const baseUrl = "https://jsonplaceholder.typicode.com";
 
 const queryClient = new QueryClient();
 const zodios = new Zodios(baseUrl, api);
-const zodiosHooks = createReactHooks("jsonplaceholder", zodios);
+const zodiosHooks = new ZodiosHooks("jsonplaceholder", zodios);
 
 const Users = () => {
   const { data: users, isLoading, error } = zodiosHooks.useQuery("/users");
