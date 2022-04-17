@@ -58,13 +58,19 @@ const api = [
 ] as const;
 const baseUrl = "https://jsonplaceholder.typicode.com";
 
-const queryClient = new QueryClient();
 const zodios = new Zodios(baseUrl, api);
 const zodiosHooks = new ZodiosHooks("jsonplaceholder", zodios);
 
 const Users = () => {
-  const { data: users, isLoading, error } = zodiosHooks.useQuery("/users");
-  const { mutate } = zodiosHooks.useMutation("post", "/users");
+  const {
+    data: users,
+    isLoading,
+    error,
+    invalidate: invalidateUsers, // zodios also provides invalidation helpers
+  } = zodiosHooks.useQuery("/users");
+  const { mutate } = zodiosHooks.useMutation("post", "/users", {
+    onSuccess: () => invalidateUsers(),
+  });
 
   return (
     <div>
@@ -84,6 +90,9 @@ const Users = () => {
     </div>
   );
 };
+
+// on another file
+const queryClient = new QueryClient();
 
 export const App = () => {
   return (

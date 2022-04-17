@@ -48,6 +48,8 @@ For an almost complete example on how to use zodios and how to split your APIs d
 
 ## Declare your API with zodios
 
+Here is an example of API declaration with Zodios.
+  
 ```typescript
 import { Zodios } from "zodios";
 import { z } from "zod";
@@ -67,14 +69,24 @@ const apiClient = new Zodios(
     },
   ] as const,
 );
+```
+Calling this API is now easy and has builtin autocomplete features :  
+  
+```typescript
 //   typed                     auto-complete path   auto-complete params
 //     ▼                               ▼                   ▼
 const user = await apiClient.get("/users/:id", { params: { id: 7 } });
 console.log(user);
-// Output: { id: 7, name: 'Kurtis Weissnat' }
 ```
+  
+It should output  
+  
+```js
+{ id: 7, name: 'Kurtis Weissnat' }
+```
+  
 ## Use token provider plugin
-
+  
 Zodios comes with a plugin to inject and renew your tokens :
 ```typescript
   import { pluginToken } from 'zodios/plugins/token';
@@ -123,7 +135,9 @@ const apiClient = new Zodios(
 
 Zodios comes with a Query and Mutation hook helper.  
 It's a thin wrapper around React-Query but with zodios auto completion.
-
+  
+Zodios query hook also returns an invalidation helper to allow you to reset react query cache easily
+  
 ```typescript
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Zodios } from "zodios";
@@ -163,13 +177,19 @@ const api = [
 ] as const;
 const baseUrl = "https://jsonplaceholder.typicode.com";
 
-const queryClient = new QueryClient();
 const zodios = new Zodios(baseUrl, api);
 const zodiosHooks = new ZodiosHooks("jsonplaceholder", zodios);
 
 const Users = () => {
-  const { data: users, isLoading, error } = zodiosHooks.useQuery("/users");
-  const { mutate } = zodiosHooks.useMutation("post", "/users");
+  const {
+    data: users,
+    isLoading,
+    error,
+    invalidate: invalidateUsers,
+  } = zodiosHooks.useQuery("/users");
+  const { mutate } = zodiosHooks.useMutation("post", "/users", {
+    onSuccess: () => invalidateUsers(), // zodios also provides invalidation helpers
+  });
 
   return (
     <div>
@@ -189,6 +209,9 @@ const Users = () => {
     </div>
   );
 };
+
+// on another file
+const queryClient = new QueryClient();
 
 export const App = () => {
   return (
