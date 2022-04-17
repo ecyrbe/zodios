@@ -4,6 +4,7 @@ import {
   useMutation,
   UseMutationOptions,
   MutationFunction,
+  useQueryClient,
 } from "react-query";
 import { Zodios } from "../zodios";
 import {
@@ -41,7 +42,12 @@ export class ZodiosHooks<Api extends ZodiosEnpointDescriptions> {
           "queryKey" | "queryFn"
         >
       | undefined;
-    return useQuery(keys, query, queryOptions as QueryOptions);
+    const queryClient = useQueryClient();
+    const invalidate = () => queryClient.invalidateQueries(keys);
+    return {
+      invalidate,
+      ...useQuery(keys, query, queryOptions as QueryOptions),
+    };
   }
 
   useMutation<M extends Method, Path extends Paths<Api, M>>(
