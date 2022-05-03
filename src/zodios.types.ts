@@ -138,21 +138,9 @@ export type AxiosRetryRequestConfig = AxiosRequestConfig & {
 };
 
 /**
- * Token interface to allow zodios to inject a token into the request or renew it
- */
-export interface TokenProvider {
-  getToken: () => Promise<string>;
-  renewToken?: () => Promise<void>;
-}
-
-/**
  * Zodios options
  */
 export type ZodiosOptions = {
-  /**
-   * use the header api interceptor? Default: true
-   */
-  usePluginApi?: boolean;
   /**
    * Should zodios validate the response? Default: true
    */

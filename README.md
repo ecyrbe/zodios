@@ -51,7 +51,7 @@ For an almost complete example on how to use zodios and how to split your APIs d
 Here is an example of API declaration with Zodios.
   
 ```typescript
-import { Zodios } from "zodios";
+import { Zodios } from "@zodios/core";
 import { z } from "zod";
 
 const apiClient = new Zodios(
@@ -89,7 +89,7 @@ It should output
   
 Zodios comes with a plugin to inject and renew your tokens :
 ```typescript
-  import { pluginToken } from 'zodios/plugins/token';
+  import { pluginToken } from '@zodios/plugins';
 
   apiClient.use(pluginToken({
     getToken: async () => "token"
@@ -140,8 +140,8 @@ Zodios query hook also returns an invalidation helper to allow you to reset reac
   
 ```typescript
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { Zodios } from "zodios";
-import { ZodiosHooks } from "zodios/react";
+import { Zodios } from "@zodios/core";
+import { ZodiosHooks } from "@zodios/react";
 import { z } from "zod";
 
 const userSchema = z

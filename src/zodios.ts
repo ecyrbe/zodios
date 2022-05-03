@@ -1,6 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { z } from "zod";
-import { pluginApi } from "./plugins/api";
 import {
   AnyZodiosRequestOptions,
   ZodiosEndpointDescription,
@@ -65,7 +64,6 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
     this.api = args[0] as unknown as Api;
     this.options = {
       validateResponse: true,
-      usePluginApi: true,
       ...(args[1] as unknown as ZodiosOptions),
     };
 
@@ -77,10 +75,6 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
       });
     }
     if (baseURL) this.axiosInstance.defaults.baseURL = baseURL;
-
-    if (this.options.usePluginApi) {
-      this.use(pluginApi());
-    }
   }
 
   get baseURL() {
