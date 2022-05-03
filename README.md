@@ -10,8 +10,12 @@
  </p>
  
  <p align="center">
-   <img src="https://img.shields.io/npm/v/zodios.svg" alt="langue typescript">
-   <img alt="npm" src="https://img.shields.io/npm/dw/zodios">
+   <a href="https://www.npmjs.com/package/@zodios/core">
+   <img src="https://img.shields.io/npm/v/@zodios/core.svg" alt="langue typescript">
+   </a>
+   <a href="https://www.npmjs.com/package/@zodios/core">
+   <img alt="npm" src="https://img.shields.io/npm/dw/@zodios/core">
+   </a>
    <a href="https://github.com/ecyrbe/zodios/blob/main/LICENSE">
     <img alt="GitHub" src="https://img.shields.io/github/license/ecyrbe/zodios">   
    </a>
