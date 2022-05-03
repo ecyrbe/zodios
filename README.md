@@ -33,13 +33,13 @@ It's an axios compatible API client, with the following features:
 # Install
 
 ```bash
-> npm install zodios
+> npm install @zodios/core
 ```
 
 or
 
 ```bash
-> yarn add zodios
+> yarn add @zodios/core
 ```
 
 # Usage
