@@ -1,5 +1,5 @@
 {
-  "name": "zodios",
+  "name": "@zodios/core",
   "description": "Typescript API client with autocompletion and zod validations",
   "version": "5.1.0",
   "main": "lib/index.js",
