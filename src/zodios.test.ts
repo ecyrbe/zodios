@@ -55,6 +55,23 @@ describe("Zodios", () => {
     expect(Zodios).toBeDefined();
   });
 
+  it("should throw if baseUrl is not provided", () => {
+    // @ts-ignore
+    expect(() => new Zodios(undefined, [])).toThrowError(
+      "Zodios: missing base url"
+    );
+  });
+
+  it("should throw if api is not provided", () => {
+    // @ts-ignore
+    expect(() => new Zodios()).toThrowError("Zodios: missing api description");
+  });
+
+  it("should throw if api is not an array", () => {
+    // @ts-ignore
+    expect(() => new Zodios({})).toThrowError("Zodios: api must be an array");
+  });
+
   it("should return the underlying axios instance", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     expect(zodios.axios).toBeDefined();
