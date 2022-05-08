@@ -21,6 +21,9 @@ describe("Zodios", () => {
     app.get("/error401", (req, res) => {
       res.status(401).json({});
     });
+    app.get("/error502", (req, res) => {
+      res.status(502).json({ error: { message: "bad gateway" } });
+    });
     app.get("/:id", (req, res) => {
       console.log(req.params);
       res.status(200).json({ id: Number(req.params.id), name: "test" });
@@ -286,6 +289,27 @@ describe("Zodios", () => {
       await zodios.get("/:id", { params: { id: 1 } });
     } catch (e) {
       expect(e).toBeInstanceOf(ZodError);
+    }
+  });
+  it("should trigger an axios error with error response", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/error502",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    try {
+      await zodios.get("/error502");
+    } catch (e) {
+      expect((e as AxiosError).response?.data).toEqual({
+        error: {
+          message: "bad gateway",
+        },
+      });
     }
   });
 });
