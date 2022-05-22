@@ -65,6 +65,7 @@ const apiClient = new Zodios(
     {
       method: "get",
       path: "/users/:id", // auto detect :id and ask for it in apiClient get params
+      alias: "getUser", // optionnal alias to call this endpoint with it
       description: "Get a user",
       response: z.object({
         id: z.number(),
@@ -87,6 +88,14 @@ It should output
   
 ```js
 { id: 7, name: 'Kurtis Weissnat' }
+```
+You can also use aliases :
+  
+```typescript
+//   typed                     alias   auto-complete params
+//     ▼                        ▼                ▼
+const user = await apiClient.getUser({ params: { id: 7 } });
+console.log(user);
 ```
   
 ## Use token provider plugin

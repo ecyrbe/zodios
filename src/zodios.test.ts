@@ -152,6 +152,22 @@ describe("Zodios", () => {
     expect(response).toEqual({ id: 7, name: "test" });
   });
 
+  it("should make an http alias request with one path params", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id",
+        alias: "getById",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.getById({ params: { id: 7 } });
+    expect(response).toEqual({ id: 7, name: "test" });
+  });
+
   it("should make a get request with forgotten params and get back a zod error", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
@@ -210,6 +226,32 @@ describe("Zodios", () => {
     const response = await zodios.post("/", { name: "post" });
     expect(response).toEqual({ id: 3, name: "post" });
   });
+
+  it("should make an http mutation alias request with body param", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/",
+        alias: "create",
+        parameters: [
+          {
+            name: "name",
+            type: "Body",
+            schema: z.object({
+              name: z.string(),
+            }),
+          },
+        ],
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.create({ name: "post" });
+    expect(response).toEqual({ id: 3, name: "post" });
+  });
+
   it("should make an http put", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
@@ -217,7 +259,7 @@ describe("Zodios", () => {
         path: "/",
         parameters: [
           {
-            name: "id",
+            name: "body",
             type: "Body",
             schema: z.object({
               id: z.number(),
@@ -234,6 +276,33 @@ describe("Zodios", () => {
     const response = await zodios.put("/", { id: 5, name: "put" });
     expect(response).toEqual({ id: 5, name: "put" });
   });
+
+  it("should make an http put alias", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "put",
+        path: "/",
+        alias: "update",
+        parameters: [
+          {
+            name: "body",
+            type: "Body",
+            schema: z.object({
+              id: z.number(),
+              name: z.string(),
+            }),
+          },
+        ],
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.update({ id: 5, name: "put" });
+    expect(response).toEqual({ id: 5, name: "put" });
+  });
+
   it("should make an http patch", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
@@ -258,6 +327,33 @@ describe("Zodios", () => {
     const response = await zodios.patch("/", { id: 4, name: "patch" });
     expect(response).toEqual({ id: 4, name: "patch" });
   });
+
+  it("should make an http patch alias", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "patch",
+        path: "/",
+        alias: "update",
+        parameters: [
+          {
+            name: "id",
+            type: "Body",
+            schema: z.object({
+              id: z.number(),
+              name: z.string(),
+            }),
+          },
+        ],
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.update({ id: 4, name: "patch" });
+    expect(response).toEqual({ id: 4, name: "patch" });
+  });
+
   it("should make an http delete", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
@@ -273,6 +369,24 @@ describe("Zodios", () => {
     });
     expect(response).toEqual({ id: 6 });
   });
+
+  it("should make an http delete alias", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "delete",
+        path: "/:id",
+        alias: "remove",
+        response: z.object({
+          id: z.number(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.remove(undefined, {
+      params: { id: 6 },
+    });
+    expect(response).toEqual({ id: 6 });
+  });
+
   it("should not validate bad formatted responses", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
