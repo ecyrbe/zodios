@@ -1,19 +1,49 @@
 import { z } from "zod";
 
 /**
- * filter an array type by a predicate
+ * filter an array type by a predicate value
  * @param T - array type
  * @param C - predicate object to match
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
-export type FilterArray<
+export type FilterArrayByValue<
   T extends readonly unknown[],
   C,
   Acc extends unknown[] = []
 > = T extends readonly [infer Head, ...infer Tail]
   ? Head extends Readonly<C>
-    ? FilterArray<Tail, C, [Head, ...Acc]>
-    : FilterArray<Tail, C, Acc>
+    ? FilterArrayByValue<Tail, C, [Head, ...Acc]>
+    : FilterArrayByValue<Tail, C, Acc>
+  : Acc;
+
+/**
+ * filter an array type by key
+ * @param T - array type
+ * @param K - key to match
+ * @details - this is using tail recursion type optimization from typescript 4.5
+ */
+export type FilterArrayByKey<
+  T extends readonly unknown[],
+  K extends string,
+  Acc extends unknown[] = []
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends { [Key in K]: unknown }
+    ? FilterArrayByKey<Tail, K, [Head, ...Acc]>
+    : FilterArrayByKey<Tail, K, Acc>
+  : Acc;
+
+/**
+ * filter an array type by removing undefined values
+ * @param T - array type
+ * @details - this is using tail recursion type optimization from typescript 4.5
+ */
+export type DefinedArray<
+  T extends unknown[],
+  Acc extends unknown[] = []
+> = T extends [infer Head, ...infer Tail]
+  ? Head extends undefined
+    ? DefinedArray<Tail, Acc>
+    : DefinedArray<Tail, [Head, ...Acc]>
   : Acc;
 
 /**
@@ -82,7 +112,7 @@ export type PickDefined<T> = Pick<
 /**
  * check if two types are equal
  */
-type IfEquals<T, U, Y = unknown, N = never> = (<G>() => G extends T
+export type IfEquals<T, U, Y = unknown, N = never> = (<G>() => G extends T
   ? 1
   : 2) extends <G>() => G extends U ? 1 : 2
   ? Y
@@ -97,6 +127,16 @@ type IfEquals<T, U, Y = unknown, N = never> = (<G>() => G extends T
  * type B = NotEmpty<A>; // B = never
  */
 export type NeverIfEmpty<T> = IfEquals<T, {}, never, T>;
+
+/**
+ * get undefined if empty type
+ * @param T - type
+ * @example
+ * ```ts
+ * type A = {};
+ * type B = NotEmpty<A>; // B = never
+ */
+export type UndefinedIfEmpty<T> = IfEquals<T, {}, undefined, T>;
 
 type RequiredChildProps<T> = {
   [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, never, K>;

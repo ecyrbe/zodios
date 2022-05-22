@@ -11,6 +11,7 @@ import {
   ZodiosOptions,
   ZodiosEnpointDescriptions,
   ZodiosMethodOptions,
+  ZodiosAliases,
 } from "./zodios.types";
 import { omit } from "./utils";
 
@@ -19,7 +20,7 @@ const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 /**
  * zodios api client based on axios
  */
-export class Zodios<Api extends ZodiosEnpointDescriptions> {
+export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   axiosInstance: AxiosInstance;
   options: ZodiosOptions;
   private api: Api;
@@ -86,6 +87,8 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
       });
     }
     if (baseURL) this.axiosInstance.defaults.baseURL = baseURL;
+
+    this.injectAliasEndpoints();
   }
 
   get baseURL() {
@@ -104,7 +107,30 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
    * @param plugin - the plugin to use
    */
   use(plugin: ZodiosPlugin<Api>) {
-    plugin(this);
+    plugin(this as unknown as ZodiosInstance<Api>);
+  }
+
+  private injectAliasEndpoints() {
+    this.api.forEach((endpoint) => {
+      if (endpoint.alias) {
+        if (["post", "put", "patch", "delete"].includes(endpoint.method)) {
+          (this as any)[endpoint.alias] = (data: any, config: any) =>
+            this.request({
+              ...config,
+              method: endpoint.method,
+              url: endpoint.path,
+              data,
+            });
+        } else {
+          (this as any)[endpoint.alias] = (config: any) =>
+            this.request({
+              ...config,
+              method: endpoint.method,
+              url: endpoint.path,
+            });
+        }
+      }
+    });
   }
 
   private findEndpoint<M extends Method, Path extends Paths<Api, M>>(
@@ -261,13 +287,37 @@ export class Zodios<Api extends ZodiosEnpointDescriptions> {
   }
 }
 
+type ZodiosInstance<Api extends ZodiosEnpointDescriptions> = ZodiosClass<Api> &
+  ZodiosAliases<Api>;
+
+type ZodiosConstructor = {
+  new <Api extends ZodiosEnpointDescriptions>(
+    api: Api,
+    options?: ZodiosOptions
+  ): ZodiosInstance<Api>;
+  new <Api extends ZodiosEnpointDescriptions>(
+    baseUrl: string,
+    api: Api,
+    options?: ZodiosOptions
+  ): ZodiosInstance<Api>;
+  new <Api extends ZodiosEnpointDescriptions>(
+    api: Api,
+    options?: ZodiosOptions
+  ): ZodiosInstance<Api>;
+  new <Api extends ZodiosEnpointDescriptions>(
+    baseUrl: string,
+    api: Api,
+    options?: ZodiosOptions
+  ): ZodiosInstance<Api>;
+};
+
+export const Zodios = ZodiosClass as ZodiosConstructor;
+
 /**
  * Get the Api description type from zodios
  * @param Z - zodios type
  */
-export type ApiOf<Z extends Zodios<any>> = Z extends Zodios<infer Api>
-  ? Api
-  : never;
+export type ApiOf<Z> = Z extends ZodiosInstance<infer Api> ? Api : never;
 /**
  * Get the Url string type from zodios
  * @param Z - zodios type
@@ -279,5 +329,5 @@ export type ApiOf<Z extends Zodios<any>> = Z extends Zodios<infer Api>
  * @Param Api - the api description type
  */
 export type ZodiosPlugin<Api extends ZodiosEnpointDescriptions> = (
-  zodios: Zodios<Api>
+  zodios: ZodiosInstance<Api>
 ) => void;

@@ -1,6 +1,6 @@
 import { AxiosInstance, AxiosRequestConfig } from "axios";
 import type {
-  FilterArray,
+  FilterArrayByValue,
   MapSchemaParameters,
   PickDefined,
   NeverIfEmpty,
@@ -9,33 +9,40 @@ import type {
   SetPropsOptionalIfChildrenAreOptional,
   ReadonlyDeep,
   Merge,
+  MergeUnion,
+  FilterArrayByKey,
 } from "./utils.types";
 import { z } from "zod";
 
-export type Method =
-  | "get"
-  | "post"
-  | "put"
-  | "delete"
-  | "patch"
-  | "head"
-  | "options";
+export type MutationMethod = "post" | "put" | "patch" | "delete";
+
+export type Method = "get" | "head" | "options" | MutationMethod;
 
 type MethodApiDescription<
   Api extends readonly unknown[],
   M extends Method
-> = FilterArray<Api, { method: M }>;
+> = FilterArrayByValue<Api, { method: M }>;
 
 type EndpointApiDescription<
   Api extends readonly unknown[],
   M extends Method,
   Path
-> = FilterArray<Api, { method: M; path: Path }>;
+> = FilterArrayByValue<Api, { method: M; path: Path }>;
+
+type AliasEndpointApiDescription<
+  Api extends readonly unknown[],
+  Alias extends string
+> = FilterArrayByValue<Api, { alias: Alias }>;
 
 export type Paths<
   Api extends readonly unknown[],
   M extends Method
 > = MethodApiDescription<Api, M>[number]["path"];
+
+export type Aliases<Api extends readonly unknown[]> = FilterArrayByKey<
+  Api,
+  "alias"
+>[number]["alias"];
 
 export type Response<
   Api extends readonly unknown[],
@@ -43,13 +50,28 @@ export type Response<
   Path
 > = z.infer<EndpointApiDescription<Api, M, Path>[number]["response"]>;
 
+export type ResponseByAlias<
+  Api extends readonly unknown[],
+  Alias extends string
+> = z.infer<AliasEndpointApiDescription<Api, Alias>[number]["response"]>;
+
 export type Body<
   Api extends readonly unknown[],
   M extends Method,
   Path
 > = z.infer<
-  FilterArray<
+  FilterArrayByValue<
     EndpointApiDescription<Api, M, Path>[number]["parameters"],
+    { type: "Body" }
+  >[number]["schema"]
+>;
+
+export type BodyByAlias<
+  Api extends readonly unknown[],
+  Alias extends string
+> = z.infer<
+  FilterArrayByValue<
+    AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
     { type: "Body" }
   >[number]["schema"]
 >;
@@ -61,8 +83,22 @@ export type QueryParams<
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
-      FilterArray<
+      FilterArrayByValue<
         EndpointApiDescription<Api, M, Path>[number]["parameters"],
+        { type: "Query" }
+      >
+    >
+  >
+>;
+
+export type QueryParamsByAlias<
+  Api extends readonly unknown[],
+  Alias extends string
+> = NeverIfEmpty<
+  UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<
+        AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
         { type: "Query" }
       >
     >
@@ -73,6 +109,16 @@ export type PathParams<Path extends string> = NeverIfEmpty<
   Record<PathParamNames<Path>, string | number>
 >;
 
+export type PathParamByAlias<
+  Api extends readonly unknown[],
+  Alias extends string
+> = NeverIfEmpty<
+  Record<
+    PathParamNames<AliasEndpointApiDescription<Api, Alias>[number]["path"]>,
+    string | number
+  >
+>;
+
 export type HeaderParams<
   Api extends readonly unknown[],
   M extends Method,
@@ -80,12 +126,63 @@ export type HeaderParams<
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
-      FilterArray<
+      FilterArrayByValue<
         EndpointApiDescription<Api, M, Path>[number]["parameters"],
         { type: "Header" }
       >
     >
   >
+>;
+
+export type HeaderParamsByAlias<
+  Api extends readonly unknown[],
+  Alias extends string
+> = NeverIfEmpty<
+  UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<
+        AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
+        { type: "Header" }
+      >
+    >
+  >
+>;
+
+export type ZodiosConfigByAlias<
+  Api extends readonly unknown[],
+  Alias extends string
+> = Merge<
+  SetPropsOptionalIfChildrenAreOptional<
+    PickDefined<{
+      params: PathParamByAlias<Api, Alias>;
+      queries: QueryParamsByAlias<Api, Alias>;
+      headers: HeaderParamsByAlias<Api, Alias>;
+    }>
+  >,
+  Omit<
+    AxiosRequestConfig,
+    "params" | "headers" | "baseURL" | "data" | "method" | "url"
+  >
+>;
+
+export type ZodiosAliases<Api extends readonly unknown[]> = MergeUnion<
+  Aliases<Api> extends infer Aliases
+    ? Aliases extends string
+      ? {
+          [Alias in Aliases]: AliasEndpointApiDescription<
+            Api,
+            Alias
+          >[number]["method"] extends MutationMethod
+            ? (
+                data?: BodyByAlias<Api, Alias>,
+                configOptions?: ZodiosConfigByAlias<Api, Alias>
+              ) => Promise<ResponseByAlias<Api, Alias>>
+            : (
+                configOptions?: ZodiosConfigByAlias<Api, Alias>
+              ) => Promise<ResponseByAlias<Api, Alias>>;
+        }
+      : never
+    : never
 >;
 
 export type AnyZodiosMethodOptions = Merge<
@@ -161,6 +258,7 @@ export type ZodiosOptions = {
 export type ZodiosEndpointDescription<R> = {
   method: Method;
   path: string;
+  alias?: string;
   description?: string;
   parameters?: Array<{
     name: string;

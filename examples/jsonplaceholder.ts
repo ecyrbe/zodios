@@ -1,4 +1,4 @@
-import { Zodios } from "../src/index";
+import { ApiOf, Zodios } from "../src/index";
 import { z } from "zod";
 
 async function bootstrap() {
@@ -6,6 +6,7 @@ async function bootstrap() {
     {
       method: "get",
       path: "/users",
+      alias: "getUsers",
       description: "Get all users",
       parameters: [
         {
@@ -24,6 +25,7 @@ async function bootstrap() {
     {
       method: "get",
       path: "/users/:id",
+      alias: "getUser",
       description: "Get a user",
       response: z.object({
         id: z.number(),
@@ -33,12 +35,14 @@ async function bootstrap() {
     {
       method: "delete",
       path: "/users/:id",
+      alias: "deleteUser",
       description: "Delete a user",
       response: z.object({}),
     },
     {
       method: "post",
       path: "/users",
+      alias: "createUser",
       description: "Create a user",
       parameters: [
         {
@@ -51,7 +55,7 @@ async function bootstrap() {
     },
   ] as const);
 
-  const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
+  const users = await apiClient.getUsers({ queries: { q: "Nicholas" } });
   console.log(users);
   const user = await apiClient.get("/users/:id", { params: { id: 7 } });
   console.log(user);
