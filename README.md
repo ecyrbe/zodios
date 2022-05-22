@@ -152,18 +152,29 @@ It's a thin wrapper around React-Query but with zodios auto completion.
 Zodios query hook also returns an invalidation helper to allow you to reset react query cache easily
   
 ```typescript
-import { QueryClient, QueryClientProvider } from 'react-query';
+import React from "react";
+import { QueryClient, QueryClientProvider } from "react-query";
 import { Zodios } from "@zodios/core";
-import { ZodiosHooks } from "@zodios/react";
+import { ZodiosHooks } from "../src";
 import { z } from "zod";
 
+// you can define schema before declaring the API to get back the type
 const userSchema = z
   .object({
     id: z.number(),
     name: z.string(),
-  });
+  })
+  .required();
+
+const createUserSchema = z
+  .object({
+    name: z.string(),
+  })
+  .required();
+
 const usersSchema = z.array(userSchema);
 
+// you can then get back the types
 type User = z.infer<typeof userSchema>;
 type Users = z.infer<typeof usersSchema>;
 
@@ -172,7 +183,25 @@ const api = [
     method: "get",
     path: "/users",
     description: "Get all users",
+    parameters: [
+      {
+        name: "q",
+        type: "Query",
+        schema: z.string(),
+      },
+      {
+        name: "page",
+        type: "Query",
+        schema: z.string().optional(),
+      },
+    ],
     response: usersSchema,
+  },
+  {
+    method: "get",
+    path: "/users/:id",
+    description: "Get a user",
+    response: userSchema,
   },
   {
     method: "post",
@@ -182,7 +211,7 @@ const api = [
       {
         name: "body",
         type: "Body",
-        schema: userSchema,
+        schema: createUserSchema,
       },
     ],
     response: userSchema,
@@ -198,18 +227,16 @@ const Users = () => {
     data: users,
     isLoading,
     error,
-    invalidate: invalidateUsers,
+    invalidate: invalidateUsers, // zodios also provides invalidation helpers
   } = zodiosHooks.useQuery("/users");
-  const { mutate } = zodiosHooks.useMutation("post", "/users", {
-    onSuccess: () => invalidateUsers(), // zodios also provides invalidation helpers
+  const { mutate } = zodiosHooks.useMutation("post", "/users", undefined, {
+    onSuccess: () => invalidateUsers(),
   });
 
   return (
-    <div>
+    <>
       <h1>Users</h1>
-      <button onClick={() => mutate({ data: { id: 10, name: "john doe" } })}>
-        add user
-      </button>
+      <button onClick={() => mutate({ name: "john doe" })}>add user</button>
       {isLoading && <div>Loading...</div>}
       {error && <div>Error: {(error as Error).message}</div>}
       {users && (
@@ -219,7 +246,7 @@ const Users = () => {
           ))}
         </ul>
       )}
-    </div>
+    </>
   );
 };
 
