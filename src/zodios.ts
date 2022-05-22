@@ -287,10 +287,10 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   }
 }
 
-type ZodiosInstance<Api extends ZodiosEnpointDescriptions> = ZodiosClass<Api> &
-  ZodiosAliases<Api>;
+export type ZodiosInstance<Api extends ZodiosEnpointDescriptions> =
+  ZodiosClass<Api> & ZodiosAliases<Api>;
 
-type ZodiosConstructor = {
+export type ZodiosConstructor = {
   new <Api extends ZodiosEnpointDescriptions>(
     api: Api,
     options?: ZodiosOptions
