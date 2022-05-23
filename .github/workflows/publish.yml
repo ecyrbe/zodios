@@ -19,9 +19,40 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
-      - run: yarn install
-      - run: yarn build
-      - run: yarn test
-      - run: yarn publish --access public
+      - name: install dependencies
+        run: yarn install
+      - name: build
+        run: yarn build
+      - name: run test
+        run: yarn test
+      - name: generate changelog
+        uses: orhun/git-cliff-action@v1
+        id: git-cliff
+        with:
+          args: -vv --latest --strip header
+        env:
+          OUTPUT: CHANGES.md
+      - name: save changelog
+        id: changelog
+        shell: bash
+        run: |
+          r=$(cat ${{ steps.git-cliff.outputs.changelog }})
+          r="${r//'%'/'%25'}"     # Multiline escape sequences for %
+          r="${r//$'\n'/'%0A'}"   # Multiline escape sequences for '\n'
+          r="${r//$'\r'/'%0D'}"   # Multiline escape sequences for '\r'
+          echo "::set-output name=CHANGELOG::$r"
+      - name: create release
+        id: release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{ steps.changelog.outputs.CHANGELOG }}
+          draft: false
+          prerelease: false
+      - name: npm publish
+        run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
