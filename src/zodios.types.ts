@@ -23,13 +23,13 @@ type MethodApiDescription<
   M extends Method
 > = FilterArrayByValue<Api, { method: M }>;
 
-type EndpointApiDescription<
+export type EndpointApiDescription<
   Api extends readonly unknown[],
   M extends Method,
   Path
 > = FilterArrayByValue<Api, { method: M; path: Path }>;
 
-type AliasEndpointApiDescription<
+export type AliasEndpointApiDescription<
   Api extends readonly unknown[],
   Alias extends string
 > = FilterArrayByValue<Api, { alias: Alias }>;

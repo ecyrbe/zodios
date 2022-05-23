@@ -60,7 +60,7 @@ export type MergeUnion<T> = (
  * get all required properties from an object type
  * @param T - object type
  */
-type RequiredProps<T> = Omit<
+export type RequiredProps<T> = Omit<
   T,
   {
     [P in keyof T]-?: undefined extends T[P] ? P : never;
@@ -71,7 +71,7 @@ type RequiredProps<T> = Omit<
  * get all optional properties from an object type
  * @param T - object type
  */
-type OptionalProps<T> = Pick<
+export type OptionalProps<T> = Pick<
   T,
   {
     [P in keyof T]-?: undefined extends T[P] ? P : never;
@@ -142,7 +142,7 @@ type RequiredChildProps<T> = {
   [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, never, K>;
 }[keyof T];
 
-type OptionalChildProps<T> = {
+export type OptionalChildProps<T> = {
   [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, K, never>;
 }[keyof T];
 

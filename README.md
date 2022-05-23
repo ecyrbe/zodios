@@ -155,7 +155,7 @@ Zodios query hook also returns an invalidation helper to allow you to reset reac
 import React from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Zodios } from "@zodios/core";
-import { ZodiosHooks } from "../src";
+import { ZodiosHooks } from "@zodios/react";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type
