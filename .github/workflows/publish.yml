@@ -27,20 +27,20 @@ jobs:
         run: yarn test
       - name: generate changelog
         uses: orhun/git-cliff-action@v1
-        id: git-cliff
+        id: cliff
         with:
-          args: -vv --latest --strip header
+          args: --latest --strip footer
         env:
           OUTPUT: CHANGES.md
       - name: save changelog
         id: changelog
         shell: bash
         run: |
-          r=$(cat ${{ steps.git-cliff.outputs.changelog }})
-          r="${r//'%'/'%25'}"     # Multiline escape sequences for %
-          r="${r//$'\n'/'%0A'}"   # Multiline escape sequences for '\n'
-          r="${r//$'\r'/'%0D'}"   # Multiline escape sequences for '\r'
-          echo "::set-output name=CHANGELOG::$r"
+          changelog=$(cat ${{ steps.cliff.outputs.changelog }})
+          changelog="${changelog//'%'/'%25'}"
+          changelog="${changelog//$'\n'/'%0A'}"
+          changelog="${changelog//$'\r'/'%0D'}"
+          echo "::set-output name=changelog::$changelog"
       - name: create release
         id: release
         uses: actions/create-release@v1
@@ -49,7 +49,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
-          body: ${{ steps.changelog.outputs.CHANGELOG }}
+          body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
       - name: npm publish
