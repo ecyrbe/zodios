@@ -21,9 +21,9 @@ const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
  * zodios api client based on axios
  */
 export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
-  axiosInstance: AxiosInstance;
-  options: ZodiosOptions;
-  private api: Api;
+  private axiosInstance: AxiosInstance;
+  public readonly options: ZodiosOptions;
+  public readonly api: Api;
 
   /**
    * constructor
