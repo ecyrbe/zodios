@@ -25,6 +25,10 @@ jobs:
         run: yarn build
       - name: run test
         run: yarn test
+      - name: publish to npm
+        run: yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: generate changelog
         uses: orhun/git-cliff-action@v1
         id: cliff
@@ -52,7 +56,3 @@ jobs:
           body: ${{ steps.changelog.outputs.changelog }}
           draft: false
           prerelease: false
-      - name: npm publish
-        run: yarn publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
