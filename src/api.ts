@@ -96,13 +96,3 @@ export function asCrudApi<T extends string, S extends z.Schema>(
     },
   ] as const);
 }
-
-const test = asCrudApi(
-  "user",
-  z.object({
-    id: z.number(),
-    name: z.string(),
-  })
-);
-
-type test2 = z.infer<typeof test[2]["parameters"][0]["schema"]>;
