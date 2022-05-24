@@ -18,6 +18,7 @@ export const followersApi = asApi([
   {
     method: "get",
     path: "/followers/users",
+    alias: "getAllFollowers",
     parameters: [
       ...paramPages,
       {

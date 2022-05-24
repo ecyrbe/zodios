@@ -57,6 +57,7 @@ export const articlesApi = asApi([
   {
     method: "get",
     path: "/articles",
+    alias: "getAllArticles",
     description: "Get all articles",
     parameters: [
       ...paramPages,
@@ -106,6 +107,7 @@ export const articlesApi = asApi([
   {
     method: "get",
     path: "/articles/latest",
+    alias: "getLatestArticle",
     description: "Get latest articles",
     parameters: paramPages,
     response: devArticles,
@@ -113,24 +115,28 @@ export const articlesApi = asApi([
   {
     method: "get",
     path: "/articles/:id",
+    alias: "getArticle",
     description: "Get an article by id",
     response: devArticle,
   },
   {
     method: "put",
     path: "/articles/:id",
+    alias: "updateArticle",
     description: "Update an article",
     response: devArticle,
   },
   {
     method: "get",
     path: "/articles/:username/:slug",
+    alias: "getArticleByUsernameAndSlug",
     description: "Get an article by username and slug",
     response: devArticle,
   },
   {
     method: "get",
     path: "/articles/me",
+    alias: "getMyArticles",
     description: "Get current user's articles",
     parameters: paramPages,
     response: devArticles,
@@ -138,6 +144,7 @@ export const articlesApi = asApi([
   {
     method: "get",
     path: "/articles/me/published",
+    alias: "getMyPublishedArticles",
     description: "Get current user's published articles",
     parameters: paramPages,
     response: devArticles,
@@ -145,6 +152,7 @@ export const articlesApi = asApi([
   {
     method: "get",
     path: "/articles/me/unpublished",
+    alias: "getMyUnpublishedArticles",
     description: "Get current user's unpublished articles",
     parameters: paramPages,
     response: devArticles,
@@ -152,6 +160,7 @@ export const articlesApi = asApi([
   {
     method: "get",
     path: "/articles/me/all",
+    alias: "getAllMyArticles",
     description: "Get current user's all articles",
     parameters: paramPages,
     response: devArticles,

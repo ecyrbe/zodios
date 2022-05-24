@@ -31,18 +31,21 @@ export const userApi = asApi([
   {
     method: "get",
     path: "/users/:id",
+    alias: "getUser",
     description: "Get a user",
     response: devUser,
   },
   {
     method: "get",
     path: "/users/me",
+    alias: "getMe",
     description: "Get current user",
     response: devUser,
   },
   {
     method: "get",
     path: "/profile_image/:username",
+    alias: "getProfileImage",
     description: "Get a user's profile image",
     response: devProfileImage,
   },

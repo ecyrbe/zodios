@@ -16,6 +16,7 @@ export const followsApi = asApi([
   {
     method: "get",
     path: "/follows/tags",
+    alias: "getAllFollowedTags",
     description: "Get all followed tags",
     response: devFollows,
   },

@@ -32,6 +32,7 @@ export const commentsApi = asApi([
   {
     method: "get",
     path: "/comments",
+    alias: "getAllComments",
     description: "Get all comments",
     parameters: [
       {
@@ -52,6 +53,7 @@ export const commentsApi = asApi([
   {
     method: "get",
     path: "/comments/:id",
+    alias: "getComment",
     description: "Get a comment",
     response: devComment,
   },

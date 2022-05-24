@@ -1,5 +1,5 @@
 import { ZodiosEnpointDescriptions } from "./zodios.types";
-import z, { ZodObject } from "zod";
+import z from "zod";
 import { capitalize } from "./utils";
 
 /**
