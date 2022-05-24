@@ -14,4 +14,4 @@ export type {
   ZodiosRequestOptions,
   ZodiosMethodOptions,
 } from "./zodios.types";
-export { asApi } from "./api";
+export { asApi, asCrudApi } from "./api";

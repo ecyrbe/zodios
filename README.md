@@ -144,6 +144,95 @@ const apiClient = new Zodios(
 );
 ```
 
+## CRUD helper
+
+Zodios has a helper to generate basic CRUD API. It will generate all the api definitions for you :  
+  
+```typescript
+import { Zodios, asCrudApi } from '@zodios/core';
+
+const apiClient = new Zodios(BASE_URL,
+  asCrudApi(
+    'user',
+    z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+  ));
+```
+
+Is the same as :
+```typescript
+const apiClient = new Zodios(BASE_URL, [
+  {
+    method: "get",
+    path: "/users",
+    alias: "getUsers",
+    description: "Get all users",
+    response: z.array(userSchema),
+  },
+  {
+    method: "get",
+    path: "/users/:id",
+    alias: "getUser",
+    description: "Get a user",
+    response: userSchema,
+  },
+  {
+    method: "post",
+    path: "/users",
+    alias: "createUser",
+    description: "Create a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        description: "The object to create",
+        schema: userSchema.partial(),
+      },
+    ],
+    response: userSchema,
+  },
+  {
+    method: "put",
+    path: "/users/:id",
+    alias: "updateUser",
+    description: "Update a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        description: "The object to update",
+        schema: userSchema,
+      },
+    ],
+    response: userSchema,
+  },
+  {
+    method: "patch",
+    path: "/users/:id",
+    alias: "patchUser",
+    description: "Patch a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        description: "The object to patch",
+        schema: userSchema.partial(),
+      },
+    ],
+    response: userSchema,
+  },
+  {
+    method: "delete",
+    path: "/users/:id",
+    alias: "deleteUser",
+    description: "Delete a user",
+    response: userSchema,
+  },
+] as const);
+```
+
 ## React helpers
 
 Zodios comes with a Query and Mutation hook helper.  
