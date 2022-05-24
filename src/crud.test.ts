@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";

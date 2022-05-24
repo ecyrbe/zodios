@@ -23,25 +23,26 @@ export function asCrudApi<T extends string, S extends z.Schema>(
   schema: S
 ) {
   type Schema = z.infer<S>;
+  const capitalizedResource = capitalize(resource);
   return asApi([
     {
       method: "get",
       path: `/${resource}s`,
-      alias: `get${capitalize(resource)}s`,
+      alias: `get${capitalizedResource}s`,
       description: `Get all ${resource}s`,
       response: z.array(schema),
     },
     {
       method: "get",
       path: `/${resource}s/:id`,
-      alias: `get${capitalize(resource)}`,
+      alias: `get${capitalizedResource}`,
       description: `Get a ${resource}`,
       response: schema,
     },
     {
       method: "post",
       path: `/${resource}s`,
-      alias: `create${capitalize(resource)}`,
+      alias: `create${capitalizedResource}`,
       description: `Create a ${resource}`,
       parameters: [
         {
@@ -58,7 +59,7 @@ export function asCrudApi<T extends string, S extends z.Schema>(
     {
       method: "put",
       path: `/${resource}s/:id`,
-      alias: `update${capitalize(resource)}`,
+      alias: `update${capitalizedResource}`,
       description: `Update a ${resource}`,
       parameters: [
         {
@@ -73,7 +74,7 @@ export function asCrudApi<T extends string, S extends z.Schema>(
     {
       method: "patch",
       path: `/${resource}s/:id`,
-      alias: `patch${capitalize(resource)}`,
+      alias: `patch${capitalizedResource}`,
       description: `Patch a ${resource}`,
       parameters: [
         {
@@ -90,7 +91,7 @@ export function asCrudApi<T extends string, S extends z.Schema>(
     {
       method: "delete",
       path: `/${resource}s/:id`,
-      alias: `delete${capitalize(resource)}`,
+      alias: `delete${capitalizedResource}`,
       description: `Delete a ${resource}`,
       response: schema,
     },
