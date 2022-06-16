@@ -12,7 +12,7 @@ export type FilterArrayByValue<
   Acc extends unknown[] = []
 > = T extends readonly [infer Head, ...infer Tail]
   ? Head extends Readonly<C>
-    ? FilterArrayByValue<Tail, C, [Head, ...Acc]>
+    ? FilterArrayByValue<Tail, C, [...Acc, Head]>
     : FilterArrayByValue<Tail, C, Acc>
   : Acc;
 
@@ -28,7 +28,7 @@ export type FilterArrayByKey<
   Acc extends unknown[] = []
 > = T extends readonly [infer Head, ...infer Tail]
   ? Head extends { [Key in K]: unknown }
-    ? FilterArrayByKey<Tail, K, [Head, ...Acc]>
+    ? FilterArrayByKey<Tail, K, [...Acc, Head]>
     : FilterArrayByKey<Tail, K, Acc>
   : Acc;
 
