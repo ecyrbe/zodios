@@ -25,11 +25,9 @@ describe("Zodios", () => {
       res.status(502).json({ error: { message: "bad gateway" } });
     });
     app.get("/:id", (req, res) => {
-      console.log(req.params);
       res.status(200).json({ id: Number(req.params.id), name: "test" });
     });
     app.get("/:id/address/:address", (req, res) => {
-      console.log(req.params);
       res
         .status(200)
         .json({ id: Number(req.params.id), address: req.params.address });
