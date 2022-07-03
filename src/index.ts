@@ -1,4 +1,5 @@
 export { Zodios, ApiOf, ZodiosPlugin } from "./zodios";
+export { ZodiosError } from "./zodios-error";
 export type { ZodiosInstance, ZodiosClass, ZodiosConstructor } from "./zodios";
 export type {
   AnyZodiosMethodOptions,

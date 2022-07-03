@@ -3,6 +3,7 @@ import express from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
 import { Zodios } from "./zodios";
+import { ZodiosError } from "./zodios-error";
 
 describe("Zodios", () => {
   let app: express.Express;
@@ -94,6 +95,12 @@ describe("Zodios", () => {
     ]);
     expect(zodios).toBeDefined();
   });
+
+  it("should get base url", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [] as const);
+    expect(zodios.baseURL).toBe(`http://localhost:${port}`);
+  });
+
   it("should create a new instance whithout base URL", () => {
     const zodios = new Zodios([
       {
@@ -180,7 +187,7 @@ describe("Zodios", () => {
     try {
       await zodios.get("/:id");
     } catch (e) {
-      expect(e).toBeInstanceOf(ZodError);
+      expect(e).toBeInstanceOf(ZodiosError);
     }
   });
 
@@ -400,9 +407,44 @@ describe("Zodios", () => {
     try {
       await zodios.get("/:id", { params: { id: 1 } });
     } catch (e) {
-      expect(e).toBeInstanceOf(ZodError);
+      expect(e).toBeInstanceOf(ZodiosError);
+      expect((e as ZodiosError).cause).toBeInstanceOf(ZodError);
+      expect((e as ZodiosError).message).toBe("Zodios: invalid response");
+      expect((e as ZodiosError).response).toEqual({
+        id: 1,
+        name: "test",
+      });
+      expect((e as ZodiosError).config).toEqual({
+        method: "get",
+        url: "/:id",
+        params: { id: 1 },
+      });
     }
   });
+
+  it("should return response when disabling validation", async () => {
+    const zodios = new Zodios(
+      `http://localhost:${port}`,
+      [
+        {
+          method: "get",
+          path: "/:id",
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+            more: z.string(),
+          }),
+        },
+      ] as const,
+      { validateResponse: false }
+    );
+    const response = await zodios.get("/:id", { params: { id: 1 } });
+    expect(response).toEqual({
+      id: 1,
+      name: "test",
+    });
+  });
+
   it("should trigger an axios error with error response", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {

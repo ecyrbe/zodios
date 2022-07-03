@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { z } from "zod";
+import { ZodiosError } from "./zodios-error";
 import {
   AnyZodiosRequestOptions,
   ZodiosEndpointDescription,
@@ -142,13 +143,21 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     );
   }
 
-  private validateResponse<Path extends Paths<Api, "get">>(
+  private validateResponse<M extends Method, Path extends Paths<Api, M>>(
     endpoint: ZodiosEndpointDescription<unknown>,
-    response: unknown
+    response: unknown,
+    config: ZodiosRequestOptions<Api, M, Path>
   ) {
-    return endpoint.response.parse(response) as z.infer<
-      Response<Api, "get", Path>
-    >;
+    const parsed = endpoint.response.safeParse(response);
+    if (!parsed.success) {
+      throw new ZodiosError(
+        "Zodios: invalid response",
+        response,
+        config,
+        parsed.error
+      );
+    }
+    return parsed.data as z.infer<Response<Api, "get", Path>>;
   }
 
   private replacePathParams<M extends Method, Path extends Paths<Api, M>>(
@@ -185,7 +194,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     };
     const response = await this.axiosInstance.request(requestConfig);
     if (this.options.validateResponse) {
-      return this.validateResponse(endpoint, response.data);
+      return this.validateResponse(endpoint, response.data, config);
     }
     return response.data;
   }
