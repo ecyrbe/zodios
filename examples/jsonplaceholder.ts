@@ -1,4 +1,4 @@
-import { ApiOf, Zodios } from "../src/index";
+import { ApiOf, ResponseByAlias, Zodios } from "../src/index";
 import { z } from "zod";
 
 async function bootstrap() {
@@ -55,7 +55,11 @@ async function bootstrap() {
     },
   ] as const);
 
-  const users = await apiClient.getUsers({ queries: { q: "Nicholas" } });
+  type UserResponseAlias = ResponseByAlias<ApiOf<typeof apiClient>, "getUsers">;
+
+  const users: UserResponseAlias = await apiClient.getUsers({
+    queries: { q: "Nicholas" },
+  });
   console.log(users);
   const user = await apiClient.get("/users/:id", { params: { id: 7 } });
   console.log(user);

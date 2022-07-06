@@ -9,6 +9,7 @@ export type {
   Method,
   Paths,
   Response,
+  ResponseByAlias,
   ZodiosEndpointDescription,
   ZodiosEnpointDescriptions,
   ZodiosOptions,
