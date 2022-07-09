@@ -18,6 +18,13 @@ export type MutationMethod = "post" | "put" | "patch" | "delete";
 
 export type Method = "get" | "head" | "options" | MutationMethod;
 
+export type RequestFormat =
+  | "json" // default
+  | "form-data" // for file uploads
+  | "form-url" // for hiding query params in the body
+  | "data" // for binary data / file uploads
+  | "text"; // for text data
+
 type MethodApiDescription<
   Api extends readonly unknown[],
   M extends Method
@@ -260,6 +267,7 @@ export type ZodiosEndpointDescription<R> = {
   path: string;
   alias?: string;
   description?: string;
+  requestFormat?: RequestFormat;
   parameters?: Array<{
     name: string;
     description?: string;

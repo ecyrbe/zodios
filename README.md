@@ -144,6 +144,129 @@ const apiClient = new Zodios(
 );
 ```
 
+## Send multipart/form-data requests
+
+Zodios supports multipart/form-data requests with integrated `requestFormat`. Zodios is using `formdata-node` internally on NodeJs as it's the most up to date library for node.
+
+```typescript
+const apiClient = new Zodios(
+  "https://mywebsite.com",
+  [{
+    method: "post",
+    path: "/upload",
+    alias: "upload",
+    description: "Upload a file",
+    requestFormat: "form-data",
+    parameters:[
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({
+          file: z.instanceof(File),
+        }),
+      }
+    ],
+    response: z.object({
+      id: z.number(),
+    }),
+  }] as const,
+);
+const id = await apiClient.upload({ file: document.querySelector('#file').files[0] });
+```
+
+But you can also use your own multipart/form-data library, for example with `form-data` library on node.
+
+```typescript
+import FormData from 'form-data';
+
+const apiClient = new Zodios(
+  "https://mywebsite.com",
+  [{
+    method: "post",
+    path: "/upload",
+    alias: "upload",
+    description: "Upload a file",
+    parameters:[
+      {
+        name: "body",
+        type: "Body",
+        schema: z.instanceof(FormData),
+      }
+    ],
+    response: z.object({
+      id: z.number(),
+    }),
+  }] as const,
+);
+const form = new FormData();
+form.append('file', document.querySelector('#file').files[0]);
+const id = await apiClient.upload(form, { headers: form.getHeaders() });
+```
+
+## Send application/x-www-form-urlencoded requests
+
+Zodios supports application/x-www-form-urlencoded requests with integrated `requestFormat`. Zodios is using URLSearchParams internally on both browser and node. (If you need IE support, see next example)
+    
+  ```typescript
+  const apiClient = new Zodios(
+    "https://mywebsite.com",
+    [{
+      method: "post",
+      path: "/login",
+      alias: "login",
+      description: "Submit a form",
+      requestFormat: "form-url",
+      parameters:[
+        {
+          name: "body",
+          type: "Body",
+          schema: z.object({
+            userName: z.string(),
+            password: z.string(),
+          }),
+        }
+      ],
+      response: z.object({
+        id: z.number(),
+      }),
+    }] as const,
+  );
+  const id = await apiClient.login({ userName: "user", password: "password" });
+  ```
+
+  But you can also use custom code to support for application/x-www-form-urlencoded requests.
+  For example with `qs` library on IE :
+    
+  ```typescript
+  import qs from 'qs';
+
+  const apiClient = new Zodios(
+    "https://mywebsite.com",
+    [{
+      method: "post",
+      path: "/login",
+      alias: "login",
+      description: "Submit a form",
+      parameters:[
+        {
+          name: "body",
+          type: "Body",
+          schema: z.string()
+        }
+      ],
+      response: z.object({
+        id: z.number(),
+      }),
+    }] as const,
+  );
+  const id = await apiClient.login(qs.stringify({ userName: "user", password: "password" }),
+    { headers: 
+        { 
+          'Content-Type': 'application/x-www-form-urlencoded' 
+        }
+    });
+  ```
+
 ## CRUD helper
 
 Zodios has a helper to generate basic CRUD API. It will generate all the api definitions for you :  
@@ -350,3 +473,15 @@ export const App = () => {
   );
 };
 ```
+
+## Dependencies
+
+Zodios do not embed any dependency. It's your Job to install the peer dependencies you need.  
+  
+Internally Zodios uses these libraries on all platforms :
+- zod
+- axios
+  
+In addition, it also uses on NodeJS :
+- formdata-node
+- form-data-encoder

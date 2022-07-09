@@ -7,6 +7,9 @@
   "files": [
     "lib"
   ],
+  "browser": {
+    "./lib/utils.node.js": "./lib/utils.browser.js"
+  },
   "author": {
     "name": "ecyrbe",
     "email": "ecyrbe@gmail.com"
@@ -33,17 +36,23 @@
   },
   "peerDependencies": {
     "axios": "^0.x",
+    "formdata-node": "^4.x",
+    "form-data-encoder": "^1.x",
     "zod": "^3.x"
   },
   "devDependencies": {
     "@types/axios": "0.14.0",
     "@types/express": "4.17.13",
     "@types/jest": "28.1.4",
+    "@types/multer": "1.4.7",
     "@types/node": "17.0.17",
     "@types/react": "18.0.15",
     "axios": "0.27.2",
     "express": "4.18.1",
+    "formdata-node": "4.3.3",
+    "form-data-encoder": "1.7.2",
     "jest": "28.1.2",
+    "multer": "^1.4.5-lts.1",
     "rimraf": "3.0.2",
     "ts-jest": "28.0.5",
     "ts-node": "10.8.2",

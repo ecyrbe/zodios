@@ -4,6 +4,8 @@ import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
 import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
+import multer from "multer";
+const multipart = multer({ storage: multer.memoryStorage() });
 
 describe("Zodios", () => {
   let app: express.Express;
@@ -44,6 +46,12 @@ describe("Zodios", () => {
     });
     app.delete("/:id", (req, res) => {
       res.status(200).json({ id: Number(req.params.id) });
+    });
+    app.post("/form-data", multipart.none(), (req, res) => {
+      res.status(200).json(req.body);
+    });
+    app.post("/form-url", express.urlencoded(), (req, res) => {
+      res.status(200).json(req.body);
     });
     server = app.listen(0);
     port = (server.address() as AddressInfo).port;
@@ -465,5 +473,117 @@ describe("Zodios", () => {
         },
       });
     }
+  });
+
+  it("should send a form data request", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/form-data",
+        requestFormat: "form-data",
+        parameters: [
+          {
+            name: "body",
+            type: "Body",
+            schema: z.object({
+              id: z.number(),
+              name: z.string(),
+            }),
+          },
+        ],
+        response: z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.post("/form-data", { id: 4, name: "post" });
+    expect(response).toEqual({ id: "4", name: "post" });
+  });
+
+  it("should not send an array as form data request", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/form-data",
+        requestFormat: "form-data",
+        parameters: [
+          {
+            name: "body",
+            type: "Body",
+            schema: z.array(z.string()),
+          },
+        ],
+        response: z.string(),
+      },
+    ] as const);
+    let error: Error | undefined;
+    let response: string | undefined;
+    try {
+      response = await zodios.post("/form-data", ["test", "test2"]);
+    } catch (err) {
+      error = err as Error;
+    }
+    expect(response).toBeUndefined();
+    expect(error).toBeInstanceOf(ZodiosError);
+    expect((error as ZodiosError).message).toBe(
+      "Zodios: multipart/form-data body must be an object"
+    );
+  });
+
+  it("should send a form url request", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/form-url",
+        requestFormat: "form-url",
+        parameters: [
+          {
+            name: "body",
+            type: "Body",
+            schema: z.object({
+              id: z.number(),
+              name: z.string(),
+            }),
+          },
+        ],
+        response: z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.post("/form-url", { id: 4, name: "post" });
+    expect(response).toEqual({ id: "4", name: "post" });
+  });
+
+  it("should not send an array as form url request", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/form-url",
+        requestFormat: "form-url",
+        parameters: [
+          {
+            name: "body",
+            type: "Body",
+            schema: z.array(z.string()),
+          },
+        ],
+        response: z.string(),
+      },
+    ] as const);
+    let error: Error | undefined;
+    let response: string | undefined;
+    try {
+      response = await zodios.post("/form-url", ["test", "test2"]);
+    } catch (err) {
+      error = err as Error;
+    }
+    expect(response).toBeUndefined();
+    expect(error).toBeInstanceOf(ZodiosError);
+    expect((error as ZodiosError).message).toBe(
+      "Zodios: application/x-www-form-urlencoded body must be an object"
+    );
   });
 });

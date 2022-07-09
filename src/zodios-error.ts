@@ -8,8 +8,8 @@
 export class ZodiosError extends Error {
   constructor(
     message: string,
-    public readonly response?: unknown,
     public readonly config?: unknown,
+    public readonly response?: unknown,
     public readonly cause?: Error
   ) {
     super(message);

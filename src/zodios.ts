@@ -15,6 +15,7 @@ import {
   ZodiosAliases,
 } from "./zodios.types";
 import { omit } from "./utils";
+import { getFormDataStream } from "./utils.node";
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
@@ -53,8 +54,6 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    *     }
    *   ]);
    */
-  constructor(api: Api, options?: ZodiosOptions);
-  constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
   constructor(api: Api, options?: ZodiosOptions);
   constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
   constructor(...args: unknown[]) {
@@ -152,17 +151,15 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     if (!parsed.success) {
       throw new ZodiosError(
         "Zodios: invalid response",
-        response,
         config,
+        response,
         parsed.error
       );
     }
     return parsed.data as z.infer<Response<Api, "get", Path>>;
   }
 
-  private replacePathParams<M extends Method, Path extends Paths<Api, M>>(
-    config: AnyZodiosRequestOptions
-  ) {
+  private replacePathParams(config: AnyZodiosRequestOptions) {
     let result: string = config.url;
     const params = config.params;
     if (params) {
@@ -171,6 +168,47 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
       );
     }
     return result;
+  }
+
+  private async transformData<M extends Method, Path extends Paths<Api, M>>(
+    endpoint: ZodiosEndpointDescription<unknown>,
+    config: ZodiosRequestOptions<Api, M, Path>
+  ) {
+    if (config.data && endpoint.requestFormat) {
+      switch (endpoint.requestFormat) {
+        case "form-url":
+          if (typeof config.data !== "object" || Array.isArray(config.data)) {
+            throw new ZodiosError(
+              "Zodios: application/x-www-form-urlencoded body must be an object",
+              config
+            );
+          }
+
+          return {
+            data: new URLSearchParams(config.data).toString(),
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          };
+        case "form-data":
+          if (typeof config.data !== "object" || Array.isArray(config.data)) {
+            throw new ZodiosError(
+              "Zodios: multipart/form-data body must be an object",
+              config
+            );
+          }
+          return getFormDataStream(config.data);
+        case "data":
+          return {
+            data: config.data,
+            headers: { "Content-Type": "application/octet-stream" },
+          };
+        case "text":
+          return {
+            data: config.data,
+            headers: { "Content-Type": "text/plain" },
+          };
+      }
+    }
+    return { data: config.data };
   }
 
   /**
@@ -187,8 +225,11 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     if (!endpoint) {
       throw new Error(`No endpoint found for ${config.method} ${config.url}`);
     }
+    const transformed = await this.transformData(endpoint, config);
     const requestConfig: AxiosRequestConfig = {
       ...omit(conf, ["params", "queries"]),
+      data: transformed.data,
+      headers: { ...conf.headers, ...transformed.headers },
       url: this.replacePathParams(conf),
       params: conf.queries,
     };
