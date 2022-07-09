@@ -52,7 +52,7 @@
     "formdata-node": "4.3.3",
     "form-data-encoder": "1.7.2",
     "jest": "28.1.2",
-    "multer": "^1.4.5-lts.1",
+    "multer": "1.4.5-lts.1",
     "rimraf": "3.0.2",
     "ts-jest": "28.0.5",
     "ts-node": "10.8.2",
