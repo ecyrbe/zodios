@@ -1,10 +1,10 @@
 {
   // ts config for es 2021
   "compilerOptions": {
-    "target": "ES2021",
+    "target": "ES2019",
     "module": "CommonJS",
     "moduleResolution": "Node",
-    "lib": ["ES2021"],
+    "lib": ["ES2019"],
     "outDir": "./lib",
     "alwaysStrict": true,
     "strict": true,
