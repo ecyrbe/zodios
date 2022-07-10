@@ -57,18 +57,17 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   constructor(api: Api, options?: ZodiosOptions);
   constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
   constructor(...args: unknown[]) {
-    let baseURL: string | undefined;
-    if (typeof args[0] === "string") {
-      baseURL = args[0];
-      args = args.slice(1);
-    }
     if (!args[0]) {
-      if (!baseURL && Array.isArray(args[1])) {
+      if (Array.isArray(args[1])) {
         throw new Error("Zodios: missing base url");
       }
       throw new Error("Zodios: missing api description");
     }
-    this.api = args[0] as unknown as Api;
+    let baseURL: string | undefined;
+    if (typeof args[0] === "string") {
+      [baseURL, ...args] = args;
+    }
+    this.api = args[0] as Api;
 
     if (!Array.isArray(this.api)) {
       throw new Error("Zodios: api must be an array");
@@ -76,7 +75,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
 
     this.options = {
       validateResponse: true,
-      ...(args[1] as unknown as ZodiosOptions),
+      ...(args[1] as ZodiosOptions),
     };
 
     if (this.options.axiosInstance) {
@@ -91,6 +90,9 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     this.injectAliasEndpoints();
   }
 
+  /**
+   * get the base url of the api
+   */
   get baseURL() {
     return this.axiosInstance.defaults.baseURL;
   }
