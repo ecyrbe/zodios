@@ -352,15 +352,6 @@ export type ZodiosConstructor = {
     api: Api,
     options?: ZodiosOptions
   ): ZodiosInstance<Api>;
-  new <Api extends ZodiosEnpointDescriptions>(
-    api: Api,
-    options?: ZodiosOptions
-  ): ZodiosInstance<Api>;
-  new <Api extends ZodiosEnpointDescriptions>(
-    baseUrl: string,
-    api: Api,
-    options?: ZodiosOptions
-  ): ZodiosInstance<Api>;
 };
 
 export const Zodios = ZodiosClass as ZodiosConstructor;
