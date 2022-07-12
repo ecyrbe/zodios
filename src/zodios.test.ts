@@ -50,8 +50,15 @@ describe("Zodios", () => {
     app.post("/form-data", multipart.none(), (req, res) => {
       res.status(200).json(req.body);
     });
-    app.post("/form-url", express.urlencoded(), (req, res) => {
-      res.status(200).json(req.body);
+    app.post(
+      "/form-url",
+      express.urlencoded({ extended: false }),
+      (req, res) => {
+        res.status(200).json(req.body);
+      }
+    );
+    app.post("/text", express.text(), (req, res) => {
+      res.status(200).send(req.body);
     });
     server = app.listen(0);
     port = (server.address() as AddressInfo).port;
@@ -132,7 +139,7 @@ describe("Zodios", () => {
   it("should register a plugin", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     zodios.use({
-      request: async (api, config) => config,
+      request: async (_, config) => config,
     });
     // @ts-ignore
     expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
@@ -141,13 +148,10 @@ describe("Zodios", () => {
   it("should unregister a plugin", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     const id = zodios.use({
-      request: async (api, config) => config,
+      request: async (_, config) => config,
     });
     // @ts-ignore
     expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
-    console.log(id);
-    // @ts-ignore
-    console.log(zodios.endpointPlugins);
     zodios.eject(id);
     // @ts-ignore
     expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
@@ -175,7 +179,7 @@ describe("Zodios", () => {
       // @ts-ignore
       zodios.use("tests", {
         // @ts-ignore
-        request: async (api, config) => config,
+        request: async (_, config) => config,
       })
     ).toThrowError("Zodios: no alias 'tests' found to register plugin");
   });
@@ -195,7 +199,7 @@ describe("Zodios", () => {
       // @ts-ignore
       zodios.use("get", "/test/:id", {
         // @ts-ignore
-        request: async (api, config) => config,
+        request: async (_, config) => config,
       })
     ).toThrowError(
       "Zodios: no endpoint 'get /test/:id' found to register plugin"
@@ -214,7 +218,7 @@ describe("Zodios", () => {
       },
     ] as const);
     zodios.use("get", "/:id", {
-      request: async (api, config) => config,
+      request: async (_, config) => config,
     });
     // @ts-ignore
     expect(zodios.endpointPlugins["get-/:id"].count()).toBe(1);
@@ -233,7 +237,7 @@ describe("Zodios", () => {
       },
     ] as const);
     zodios.use("test", {
-      request: async (api, config) => config,
+      request: async (_, config) => config,
     });
     // @ts-ignore
     expect(zodios.endpointPlugins["get-/:id"].count()).toBe(1);
@@ -702,5 +706,25 @@ describe("Zodios", () => {
     expect((error as ZodiosError).message).toBe(
       "Zodios: application/x-www-form-urlencoded body must be an object"
     );
+  });
+
+  it("should send a text request", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/text",
+        requestFormat: "text",
+        parameters: [
+          {
+            name: "body",
+            type: "Body",
+            schema: z.string(),
+          },
+        ],
+        response: z.string(),
+      },
+    ] as const);
+    const response = await zodios.post("/text", "test");
+    expect(response).toEqual("test");
   });
 });

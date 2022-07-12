@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { ZodiosError } from "./zodios-error";
 import {
   AnyZodiosRequestOptions,
   ZodiosRequestOptions,
@@ -246,16 +245,18 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     const anyPlugin = this.getAnyEndpointPlugins();
     conf = await anyPlugin.interceptRequest(this.api, conf);
     const endpointPlugin = this.findEnpointPlugins(config.method, config.url);
-    conf = await endpointPlugin?.interceptRequest(this.api, conf);
-
+    if (endpointPlugin) {
+      conf = await endpointPlugin.interceptRequest(this.api, conf);
+    }
     const requestConfig: AxiosRequestConfig = {
       ...omit(conf, ["params", "queries"]),
       url: this.replacePathParams(conf),
       params: conf.queries,
     };
     let response = this.axiosInstance.request(requestConfig);
-    response =
-      endpointPlugin?.interceptResponse(this.api, conf, response) ?? response;
+    if (endpointPlugin) {
+      response = endpointPlugin.interceptResponse(this.api, conf, response);
+    }
     response = anyPlugin.interceptResponse(this.api, conf, response);
     return (await response).data;
   }
