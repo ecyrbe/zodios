@@ -18,7 +18,6 @@ import type {
   FilterArrayByKey,
 } from "./utils.types";
 import { z } from "zod";
-import { ZodiosError } from "./zodios-error";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
@@ -28,7 +27,7 @@ export type RequestFormat =
   | "json" // default
   | "form-data" // for file uploads
   | "form-url" // for hiding query params in the body
-  | "data" // for binary data / file uploads
+  | "binary" // for binary data / file uploads
   | "text"; // for text data
 
 type MethodApiDescription<

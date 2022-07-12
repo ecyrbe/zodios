@@ -4,7 +4,7 @@ import type { ZodiosPlugin } from "../zodios.types";
 
 export function formURLPlugin(): ZodiosPlugin {
   return {
-    request: async (api, config) => {
+    request: async (_, config) => {
       if (typeof config.data !== "object" || Array.isArray(config.data)) {
         throw new ZodiosError(
           "Zodios: application/x-www-form-urlencoded body must be an object",

@@ -2,7 +2,6 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { ZodiosError } from "./zodios-error";
 import {
   AnyZodiosRequestOptions,
-  ZodiosEndpointDescription,
   ZodiosRequestOptions,
   Body,
   Method,
@@ -22,6 +21,7 @@ import {
   zodValidationPlugin,
   formDataPlugin,
   formURLPlugin,
+  headerPlugin,
 } from "./plugins";
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
@@ -109,14 +109,17 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     this.api.forEach((endpoint) => {
       const plugins = new ZodiosPlugins(endpoint.method, endpoint.path);
       switch (endpoint.requestFormat) {
-        case "form-url":
-          plugins.use(formURLPlugin());
+        case "binary":
+          plugins.use(headerPlugin("Content-Type", "application/octet-stream"));
           break;
         case "form-data":
           plugins.use(formDataPlugin());
-        case "data":
+          break;
+        case "form-url":
+          plugins.use(formURLPlugin());
           break;
         case "text":
+          plugins.use(headerPlugin("Content-Type", "text/plain"));
           break;
       }
       this.endpointPlugins[`${endpoint.method}-${endpoint.path}`] = plugins;
