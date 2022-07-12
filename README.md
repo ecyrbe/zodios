@@ -97,10 +97,12 @@ You can also use aliases :
 const user = await apiClient.getUser({ params: { id: 7 } });
 console.log(user);
 ```
+## Plugin system
   
-## Use token provider plugin
-  
-Zodios comes with a plugin to inject and renew your tokens :
+### Use token provider plugin
+
+Zodios has a powefull plugin system that are middleware interceptors for requests and responses.  
+For example, zodios comes with a plugin to inject and renew your tokens :
 ```typescript
   import { pluginToken } from '@zodios/plugins';
 
@@ -108,6 +110,45 @@ Zodios comes with a plugin to inject and renew your tokens :
     getToken: async () => "token"
   }));
 ```
+### use a plugin only for some endpoints
+
+Zodios plugin system is much like the middleware system of `express`. This means you can apply a plugin to a specific endpoint or to all endpoints.
+  
+```typescript
+  import { pluginToken } from '@zodios/plugins';
+
+  // apply a plugin by alias
+  apiClient.use("getUser", pluginToken({
+    getToken: async () => "token"
+  }));
+  // apply a plugin by endpoint
+  apiClient.use("get","/users/:id", pluginToken({
+    getToken: async () => "token"
+  }));
+```
+
+### Plugin execution order
+
+Zodios plugins that are not attached to an endpoint are executed first.
+Then plugins that match your endpoint are executed.
+In addition, plugins are executed in their declaration order for requests, and in reverse order for responses.
+
+example, `pluginLog` logs the message it takes as parameter when it's called :
+  ```typescript
+    apiClient.use(pluginLog('1'));
+    apiClient.use("getUser", pluginLog('2'));
+    apiClient.use("get","/users/:id", pluginLog('3'));
+
+    apiClient.get("/users/:id", { params: { id: 7 } });
+
+    // output :
+    // request 1 
+    // request 2
+    // request 3
+    // response 3
+    // response 2
+    // response 1
+  ```
 
 ## Get underlying axios instance
 
