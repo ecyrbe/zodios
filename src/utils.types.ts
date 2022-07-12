@@ -165,7 +165,7 @@ interface ReadonlyArrayDeep<T> extends ReadonlyArray<ReadonlyDeep<T>> {}
  * transform an object type into a readonly object type
  * @param T - object type
  */
-type DeepReadonlyObject<T> = {
+export type DeepReadonlyObject<T> = {
   readonly [P in keyof T]: ReadonlyDeep<T[P]>;
 };
 

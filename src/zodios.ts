@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
-import { z } from "zod";
 import { ZodiosError } from "./zodios-error";
 import {
   AnyZodiosRequestOptions,
@@ -13,9 +12,17 @@ import {
   ZodiosEnpointDescriptions,
   ZodiosMethodOptions,
   ZodiosAliases,
+  ZodiosPlugin,
 } from "./zodios.types";
 import { omit } from "./utils";
 import { getFormDataStream } from "./utils.node";
+import {
+  PluginId,
+  ZodiosPlugins,
+  zodValidationPlugin,
+  formDataPlugin,
+  formURLPlugin,
+} from "./plugins";
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
@@ -26,6 +33,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   private axiosInstance: AxiosInstance;
   public readonly options: ZodiosOptions;
   public readonly api: Api;
+  private endpointPlugins: Record<string, ZodiosPlugins>;
 
   /**
    * constructor
@@ -88,6 +96,47 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     if (baseURL) this.axiosInstance.defaults.baseURL = baseURL;
 
     this.injectAliasEndpoints();
+    this.endpointPlugins = {};
+    this.initPlugins();
+    if (this.options.validateResponse) {
+      this.use(zodValidationPlugin());
+    }
+  }
+
+  private initPlugins() {
+    this.endpointPlugins["any-any"] = new ZodiosPlugins("any", "any");
+
+    this.api.forEach((endpoint) => {
+      const plugins = new ZodiosPlugins(endpoint.method, endpoint.path);
+      switch (endpoint.requestFormat) {
+        case "form-url":
+          plugins.use(formURLPlugin());
+          break;
+        case "form-data":
+          plugins.use(formDataPlugin());
+        case "data":
+          break;
+        case "text":
+          break;
+      }
+      this.endpointPlugins[`${endpoint.method}-${endpoint.path}`] = plugins;
+    });
+  }
+
+  private getAnyEndpointPlugins() {
+    return this.endpointPlugins["any-any"];
+  }
+
+  private findAliasEndpointPlugins(alias: string) {
+    const endpoint = this.api.find((endpoint) => endpoint.alias === alias);
+    if (endpoint) {
+      return this.endpointPlugins[`${endpoint.method}-${endpoint.path}`];
+    }
+    return undefined;
+  }
+
+  private findEnpointPlugins(method: Method, path: string) {
+    return this.endpointPlugins[`${method}-${path}`];
   }
 
   /**
@@ -105,11 +154,47 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   }
 
   /**
-   * use a plugin to cusomize the client
+   * use a plugin to customize the client
    * @param plugin - the plugin to use
    */
-  use(plugin: ZodiosPlugin<Api>) {
-    plugin(this as unknown as ZodiosInstance<Api>);
+  use(plugin: ZodiosPlugin): PluginId;
+  use<Alias extends keyof ZodiosAliases<Api>>(
+    alias: Alias,
+    plugin: ZodiosPlugin
+  ): PluginId;
+  use<M extends Method, Path extends Paths<Api, M>>(
+    method: M,
+    path: Path,
+    plugin: ZodiosPlugin
+  ): PluginId;
+  use(...args: unknown[]) {
+    if (typeof args[0] === "object") {
+      const plugins = this.getAnyEndpointPlugins();
+      return plugins.use(args[0] as ZodiosPlugin);
+    } else if (typeof args[0] === "string" && typeof args[1] === "object") {
+      const plugins = this.findAliasEndpointPlugins(args[0]);
+      if (!plugins)
+        throw new Error(
+          `Zodios: no alias '${args[0]}' found to register plugin`
+        );
+      return plugins.use(args[1] as ZodiosPlugin);
+    } else if (
+      typeof args[0] === "string" &&
+      typeof args[1] === "string" &&
+      typeof args[2] === "object"
+    ) {
+      const plugins = this.findEnpointPlugins(args[0] as Method, args[1]);
+      if (!plugins)
+        throw new Error(
+          `Zodios: no endpoint '${args[0]} ${args[1]}' found to register plugin`
+        );
+      return plugins.use(args[2] as ZodiosPlugin);
+    }
+    throw new Error("Zodios: invalid plugin registration");
+  }
+
+  eject(plugin: PluginId): void {
+    this.endpointPlugins[plugin.key]?.eject(plugin);
   }
 
   private injectAliasEndpoints() {
@@ -135,32 +220,6 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     });
   }
 
-  private findEndpoint<M extends Method, Path extends Paths<Api, M>>(
-    method: M,
-    path: Path
-  ) {
-    return (this.api as unknown as ZodiosEndpointDescription<unknown>[]).find(
-      (e) => e.method === method && e.path === path
-    );
-  }
-
-  private validateResponse<M extends Method, Path extends Paths<Api, M>>(
-    endpoint: ZodiosEndpointDescription<unknown>,
-    response: unknown,
-    config: ZodiosRequestOptions<Api, M, Path>
-  ) {
-    const parsed = endpoint.response.safeParse(response);
-    if (!parsed.success) {
-      throw new ZodiosError(
-        "Zodios: invalid response",
-        config,
-        response,
-        parsed.error
-      );
-    }
-    return parsed.data as z.infer<Response<Api, "get", Path>>;
-  }
-
   private replacePathParams(config: AnyZodiosRequestOptions) {
     let result: string = config.url;
     const params = config.params;
@@ -172,47 +231,6 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     return result;
   }
 
-  private async transformData<M extends Method, Path extends Paths<Api, M>>(
-    endpoint: ZodiosEndpointDescription<unknown>,
-    config: ZodiosRequestOptions<Api, M, Path>
-  ) {
-    if (config.data && endpoint.requestFormat) {
-      switch (endpoint.requestFormat) {
-        case "form-url":
-          if (typeof config.data !== "object" || Array.isArray(config.data)) {
-            throw new ZodiosError(
-              "Zodios: application/x-www-form-urlencoded body must be an object",
-              config
-            );
-          }
-
-          return {
-            data: new URLSearchParams(config.data).toString(),
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-          };
-        case "form-data":
-          if (typeof config.data !== "object" || Array.isArray(config.data)) {
-            throw new ZodiosError(
-              "Zodios: multipart/form-data body must be an object",
-              config
-            );
-          }
-          return getFormDataStream(config.data);
-        case "data":
-          return {
-            data: config.data,
-            headers: { "Content-Type": "application/octet-stream" },
-          };
-        case "text":
-          return {
-            data: config.data,
-            headers: { "Content-Type": "text/plain" },
-          };
-      }
-    }
-    return { data: config.data };
-  }
-
   /**
    * make a request to the api
    * @param config - the config to setup zodios options and parameters
@@ -221,25 +239,22 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   async request<M extends Method, Path extends Paths<Api, M>>(
     config: ZodiosRequestOptions<Api, M, Path>
   ): Promise<Response<Api, M, Path>> {
-    const conf = config as unknown as AnyZodiosRequestOptions;
-    const endpoint = this.findEndpoint(config.method, config.url);
-    // istanbul ignore next
-    if (!endpoint) {
-      throw new Error(`No endpoint found for ${config.method} ${config.url}`);
-    }
-    const transformed = await this.transformData(endpoint, config);
+    let conf = config as unknown as AnyZodiosRequestOptions;
+    const anyPlugin = this.getAnyEndpointPlugins();
+    conf = await anyPlugin.interceptRequest(this.api, conf);
+    const endpointPlugin = this.findEnpointPlugins(config.method, config.url);
+    conf = await endpointPlugin?.interceptRequest(this.api, conf);
+
     const requestConfig: AxiosRequestConfig = {
       ...omit(conf, ["params", "queries"]),
-      data: transformed.data,
-      headers: { ...conf.headers, ...transformed.headers },
       url: this.replacePathParams(conf),
       params: conf.queries,
     };
-    const response = await this.axiosInstance.request(requestConfig);
-    if (this.options.validateResponse) {
-      return this.validateResponse(endpoint, response.data, config);
-    }
-    return response.data;
+    let response = this.axiosInstance.request(requestConfig);
+    response =
+      endpointPlugin?.interceptResponse(this.api, conf, response) ?? response;
+    response = anyPlugin.interceptResponse(this.api, conf, response);
+    return (await response).data;
   }
 
   /**
@@ -361,16 +376,3 @@ export const Zodios = ZodiosClass as ZodiosConstructor;
  * @param Z - zodios type
  */
 export type ApiOf<Z> = Z extends ZodiosInstance<infer Api> ? Api : never;
-/**
- * Get the Url string type from zodios
- * @param Z - zodios type
- */
-
-/**
- * Zodios Plugin type
- * @Param URL - the url of the api
- * @Param Api - the api description type
- */
-export type ZodiosPlugin<Api extends ZodiosEnpointDescriptions> = (
-  zodios: ZodiosInstance<Api>
-) => void;

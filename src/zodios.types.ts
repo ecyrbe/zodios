@@ -1,4 +1,9 @@
-import { AxiosInstance, AxiosRequestConfig } from "axios";
+import {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import type {
   FilterArrayByValue,
   MapSchemaParameters,
@@ -13,6 +18,7 @@ import type {
   FilterArrayByKey,
 } from "./utils.types";
 import { z } from "zod";
+import { ZodiosError } from "./zodios-error";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
@@ -280,3 +286,20 @@ export type ZodiosEndpointDescription<R> = {
 export type ZodiosEnpointDescriptions = ReadonlyDeep<
   ZodiosEndpointDescription<any>[]
 >;
+
+export type ZodiosPlugin = {
+  request?: (
+    api: ZodiosEnpointDescriptions,
+    config: AnyZodiosRequestOptions
+  ) => Promise<AnyZodiosRequestOptions>;
+  response?: (
+    api: ZodiosEnpointDescriptions,
+    config: AnyZodiosRequestOptions,
+    response: AxiosResponse
+  ) => Promise<AxiosResponse>;
+  error?: (
+    api: ZodiosEnpointDescriptions,
+    config: AnyZodiosRequestOptions,
+    error: Error
+  ) => Promise<AxiosResponse>;
+};

@@ -122,6 +122,123 @@ describe("Zodios", () => {
     ]);
     expect(zodios).toBeDefined();
   });
+
+  it("should register have validation plugin automatically installed", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    // @ts-ignore
+    expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
+  });
+
+  it("should register a plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    zodios.use({
+      request: async (api, config) => config,
+    });
+    // @ts-ignore
+    expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
+  });
+
+  it("should unregister a plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const id = zodios.use({
+      request: async (api, config) => config,
+    });
+    // @ts-ignore
+    expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
+    console.log(id);
+    // @ts-ignore
+    console.log(zodios.endpointPlugins);
+    zodios.eject(id);
+    // @ts-ignore
+    expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
+  });
+
+  it("should throw if invalide parameters when registering a plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    // @ts-ignore
+    expect(() => zodios.use(0)).toThrowError("Zodios: invalid plugin");
+  });
+
+  it("should throw if invalid alias when registering a plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id",
+        alias: "test",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    expect(() =>
+      // @ts-ignore
+      zodios.use("tests", {
+        // @ts-ignore
+        request: async (api, config) => config,
+      })
+    ).toThrowError("Zodios: no alias 'tests' found to register plugin");
+  });
+
+  it("should throw if invalid endpoint when registering a plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    expect(() =>
+      // @ts-ignore
+      zodios.use("get", "/test/:id", {
+        // @ts-ignore
+        request: async (api, config) => config,
+      })
+    ).toThrowError(
+      "Zodios: no endpoint 'get /test/:id' found to register plugin"
+    );
+  });
+
+  it("should register a plugin by endpoint", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    zodios.use("get", "/:id", {
+      request: async (api, config) => config,
+    });
+    // @ts-ignore
+    expect(zodios.endpointPlugins["get-/:id"].count()).toBe(1);
+  });
+
+  it("should register a plugin by alias", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/:id",
+        alias: "test",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    zodios.use("test", {
+      request: async (api, config) => config,
+    });
+    // @ts-ignore
+    expect(zodios.endpointPlugins["get-/:id"].count()).toBe(1);
+  });
+
   it("should make an http request", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {

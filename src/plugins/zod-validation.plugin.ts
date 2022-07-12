@@ -1,0 +1,26 @@
+import { ZodiosError } from "../zodios-error";
+import type { ZodiosPlugin } from "../zodios.types";
+import { findEndpoint } from "./zodios-plugins.utils";
+
+export function zodValidationPlugin(): ZodiosPlugin {
+  return {
+    response: async (api, config, response) => {
+      const endpoint = findEndpoint(api, config.method, config.url);
+      /* istanbul ignore next */
+      if (!endpoint) {
+        throw new Error(`No endpoint found for ${config.method} ${config.url}`);
+      }
+      const parsed = endpoint.response.safeParse(response.data);
+      if (!parsed.success) {
+        throw new ZodiosError(
+          "Zodios: invalid response",
+          config,
+          response.data,
+          parsed.error
+        );
+      }
+      response.data = parsed.data;
+      return response;
+    },
+  };
+}
