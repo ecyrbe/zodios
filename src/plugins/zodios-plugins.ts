@@ -21,10 +21,16 @@ export class ZodiosPlugins {
 
   /**
    * register a plugin
+   * if the plugin has a name it will be replaced if it already exists
    * @param plugin - plugin to register
    * @returns unique id of the plugin
    */
   use(plugin: ZodiosPlugin): PluginId {
+    const id = this.plugins.findIndex((p) => p?.name === plugin.name);
+    if (id !== -1) {
+      this.plugins[id] = plugin;
+      return { key: this.key, value: id };
+    }
     this.plugins.push(plugin);
     return { key: this.key, value: this.plugins.length - 1 };
   }
@@ -33,13 +39,21 @@ export class ZodiosPlugins {
    * unregister a plugin
    * @param plugin - plugin to unregister
    */
-  eject(plugin: PluginId) {
-    if (plugin.key !== this.key) {
-      throw new Error(
-        `Plugin with key '${plugin.key}' is not registered for endpoint '${this.key}'`
-      );
+  eject(plugin: PluginId | string) {
+    if (typeof plugin === "string") {
+      const id = this.plugins.findIndex((p) => p?.name === plugin);
+      if (id === -1) {
+        throw new Error(`Plugin with name '${plugin}' not found`);
+      }
+      this.plugins[id] = undefined;
+    } else {
+      if (plugin.key !== this.key) {
+        throw new Error(
+          `Plugin with key '${plugin.key}' is not registered for endpoint '${this.key}'`
+        );
+      }
+      this.plugins[plugin.value] = undefined;
     }
-    this.plugins[plugin.value] = undefined;
   }
 
   /**

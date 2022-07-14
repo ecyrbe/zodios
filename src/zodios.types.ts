@@ -286,16 +286,45 @@ export type ZodiosEnpointDescriptions = ReadonlyDeep<
   ZodiosEndpointDescription<any>[]
 >;
 
+/**
+ * Zodios plugin that can be used to intercept zodios requests and responses
+ */
 export type ZodiosPlugin = {
+  /**
+   * Optional name of the plugin
+   * naming a plugin allows to remove it or replace it later
+   */
+  name?: string;
+  /**
+   * request interceptor to modify or inspect the request before it is sent
+   * @param api - the api description
+   * @param request - the request config
+   * @returns possibly a new request config
+   */
   request?: (
     api: ZodiosEnpointDescriptions,
     config: AnyZodiosRequestOptions
   ) => Promise<AnyZodiosRequestOptions>;
+  /**
+   * response interceptor to modify or inspect the response before it is returned
+   * @param api - the api description
+   * @param config - the request config
+   * @param response - the response
+   * @returns possibly a new response
+   */
   response?: (
     api: ZodiosEnpointDescriptions,
     config: AnyZodiosRequestOptions,
     response: AxiosResponse
   ) => Promise<AxiosResponse>;
+  /**
+   * error interceptor for response errors
+   * there is no error interceptor for request errors
+   * @param api - the api description
+   * @param config - the config for the request
+   * @param error - the error that occured
+   * @returns possibly a new response or a new error
+   */
   error?: (
     api: ZodiosEnpointDescriptions,
     config: AnyZodiosRequestOptions,

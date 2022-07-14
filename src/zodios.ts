@@ -153,8 +153,9 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   }
 
   /**
-   * use a plugin to customize the client
+   * register a plugin to intercept the requests or responses
    * @param plugin - the plugin to use
+   * @returns an id to allow you to unregister the plugin
    */
   use(plugin: ZodiosPlugin): PluginId;
   use<Alias extends keyof ZodiosAliases<Api>>(
@@ -192,7 +193,18 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     throw new Error("Zodios: invalid plugin registration");
   }
 
-  eject(plugin: PluginId): void {
+  /**
+   * unregister a plugin
+   * if the plugin name is provided instead of the registration plugin id,
+   * it will unregister the plugin with that name only for non endpoint plugins
+   * @param plugin - id of the plugin to remove
+   */
+  eject(plugin: PluginId | string): void {
+    if (typeof plugin === "string") {
+      const plugins = this.getAnyEndpointPlugins();
+      plugins.eject(plugin);
+      return;
+    }
     this.endpointPlugins[plugin.key]?.eject(plugin);
   }
 

@@ -5,6 +5,7 @@ import { z, ZodError } from "zod";
 import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
+import { ZodiosPlugin } from "./zodios.types";
 const multipart = multer({ storage: multer.memoryStorage() });
 
 describe("Zodios", () => {
@@ -153,6 +154,31 @@ describe("Zodios", () => {
     // @ts-ignore
     expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
     zodios.eject(id);
+    // @ts-ignore
+    expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
+  });
+
+  it("should replace a named plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const plugin: ZodiosPlugin = {
+      name: "test",
+      request: async (_, config) => config,
+    };
+    zodios.use(plugin);
+    zodios.use(plugin);
+    zodios.use(plugin);
+    // @ts-ignore
+    expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
+  });
+
+  it("should unregister a named plugin", () => {
+    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const plugin: ZodiosPlugin = {
+      name: "test",
+      request: async (_, config) => config,
+    };
+    zodios.use(plugin);
+    zodios.eject("test");
     // @ts-ignore
     expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
   });

@@ -17,5 +17,11 @@ export type {
   ZodiosMethodOptions,
   ZodiosPlugin,
 } from "./zodios.types";
-export type { PluginId } from "./plugins";
+export type {
+  PluginId,
+  zodValidationPlugin,
+  formDataPlugin,
+  formURLPlugin,
+  headerPlugin,
+} from "./plugins";
 export { asApi, asCrudApi } from "./api";

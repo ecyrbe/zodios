@@ -29,11 +29,30 @@ describe("ZodiosPlugins", () => {
     expect(plugins.count()).toBe(0);
   });
 
+  it("should replace named plugins", () => {
+    const plugins = new ZodiosPlugins("any", "any");
+    const plugin: ZodiosPlugin = {
+      name: "test",
+      request: async (api, config) => config,
+      response: async (api, config, response) => response,
+    };
+    plugins.use(plugin);
+    plugins.use(plugin);
+    expect(plugins.count()).toBe(1);
+  });
+
   it("should throw if plugin is not registered", () => {
     const plugins = new ZodiosPlugins("any", "any");
     const id = { key: "test-any", value: 5 };
     expect(() => plugins.eject(id)).toThrowError(
       `Plugin with key 'test-any' is not registered for endpoint 'any-any'`
+    );
+  });
+
+  it("should throw if named plugin is not registered", () => {
+    const plugins = new ZodiosPlugins("any", "any");
+    expect(() => plugins.eject("test")).toThrowError(
+      `Plugin with name 'test' not found`
     );
   });
 
