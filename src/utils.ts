@@ -1,3 +1,5 @@
+import { AnyZodiosRequestOptions } from "./zodios.types";
+
 /**
  * omit properties from an object
  * @param obj - the object to omit properties from
@@ -41,4 +43,17 @@ export function pick<T, K extends keyof T>(
  */
 export function capitalize<T extends string>(str: T): Capitalize<T> {
   return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
+}
+
+const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
+
+export function replacePathParams(config: AnyZodiosRequestOptions) {
+  let result: string = config.url;
+  const params = config.params;
+  if (params) {
+    result = result.replace(paramsRegExp, (match, key) =>
+      key in params ? `${params[key]}` : match
+    );
+  }
+  return result;
 }

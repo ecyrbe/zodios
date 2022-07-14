@@ -12,8 +12,7 @@ import {
   ZodiosAliases,
   ZodiosPlugin,
 } from "./zodios.types";
-import { omit } from "./utils";
-import { getFormDataStream } from "./utils.node";
+import { omit, replacePathParams } from "./utils";
 import {
   PluginId,
   ZodiosPlugins,
@@ -22,8 +21,6 @@ import {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-
-const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
 /**
  * zodios api client based on axios
@@ -222,17 +219,6 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     });
   }
 
-  private replacePathParams(config: AnyZodiosRequestOptions) {
-    let result: string = config.url;
-    const params = config.params;
-    if (params) {
-      result = result.replace(paramsRegExp, (match, key) =>
-        key in params ? `${params[key]}` : match
-      );
-    }
-    return result;
-  }
-
   /**
    * make a request to the api
    * @param config - the config to setup zodios options and parameters
@@ -250,7 +236,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     }
     const requestConfig: AxiosRequestConfig = {
       ...omit(conf, ["params", "queries"]),
-      url: this.replacePathParams(conf),
+      url: replacePathParams(conf),
       params: conf.queries,
     };
     let response = this.axiosInstance.request(requestConfig);
