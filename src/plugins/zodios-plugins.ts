@@ -75,12 +75,14 @@ export class ZodiosPlugins {
   ) {
     let pluginResponse = response;
     for (const plugin of this.plugins.reverse()) {
-      pluginResponse = pluginResponse.then(
-        plugin?.response
-          ? (res) => plugin.response!(api, config, res)
-          : undefined,
-        plugin?.error ? (err) => plugin.error!(api, config, err) : undefined
-      );
+      if (plugin) {
+        pluginResponse = pluginResponse.then(
+          plugin?.response
+            ? (res) => plugin.response!(api, config, res)
+            : undefined,
+          plugin?.error ? (err) => plugin.error!(api, config, err) : undefined
+        );
+      }
     }
     return pluginResponse;
   }
