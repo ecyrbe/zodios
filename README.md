@@ -4,12 +4,10 @@
      <img align="center" src="https://raw.githubusercontent.com/ecyrbe/zodios/main/docs/logo.svg" width="128px" alt="Zodios logo">
    </a>
  </p>
- 
  <p align="center">
-    Zodios is a typescript api client with auto-completion features backed by <a src="https://axios-http.com" >axios</a> and <a src="https://github.com/colinhacks/zod">zod</a>
- </p>
- <p align="center">
-    <a src="https://ecyrbe.github.io/zodios/">Documentation</a>
+    Zodios is a typescript api client with auto-completion features backed by <a href="https://axios-http.com" >axios</a> and <a href="https://github.com/colinhacks/zod">zod</a>
+    <br/>
+    <a href="https://ecyrbe.github.io/zodios/">Documentation</a>
  </p>
  
  <p align="center">
