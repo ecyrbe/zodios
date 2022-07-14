@@ -11,7 +11,7 @@ const plugin: ZodiosPlugin = {
         config
       );
     }
-    const result = getFormDataStream(config.data);
+    const result = await getFormDataStream(config.data);
     return {
       ...config,
       data: result.data,
