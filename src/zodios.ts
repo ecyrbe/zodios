@@ -236,9 +236,11 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @param config - the config to setup zodios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async request<M extends Method, Path extends Paths<Api, M>>(
-    config: ZodiosRequestOptions<Api, M, Path>
-  ): Promise<Response<Api, M, Path>> {
+  async request<
+    M extends Method,
+    Path extends Paths<Api, M>,
+    Config extends ZodiosRequestOptions<Api, M, Path>
+  >(config: Config): Promise<Response<Api, M, Path>> {
     let conf = config as unknown as AnyZodiosRequestOptions;
     const anyPlugin = this.getAnyEndpointPlugins();
     conf = await anyPlugin.interceptRequest(this.api, conf);
@@ -265,10 +267,10 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async get<Path extends Paths<Api, "get">>(
-    path: Path,
-    config?: ZodiosMethodOptions<Api, "get", Path>
-  ): Promise<Response<Api, "get", Path>> {
+  async get<
+    Path extends Paths<Api, "get">,
+    Config extends ZodiosMethodOptions<Api, "get", Path>
+  >(path: Path, config?: Config): Promise<Response<Api, "get", Path>> {
     return this.request({
       ...config,
       method: "get",
@@ -283,10 +285,13 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async post<Path extends Paths<Api, "post">>(
+  async post<
+    Path extends Paths<Api, "post">,
+    Config extends ZodiosMethodOptions<Api, "post", Path>
+  >(
     path: Path,
     data?: Body<Api, "post", Path>,
-    config?: ZodiosMethodOptions<Api, "post", Path>
+    config?: Config
   ): Promise<Response<Api, "post", Path>> {
     return this.request({
       ...config,
@@ -303,10 +308,13 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async put<Path extends Paths<Api, "put">>(
+  async put<
+    Path extends Paths<Api, "put">,
+    Config extends ZodiosMethodOptions<Api, "put", Path>
+  >(
     path: Path,
     data?: Body<Api, "put", Path>,
-    config?: ZodiosMethodOptions<Api, "put", Path>
+    config?: Config
   ): Promise<Response<Api, "put", Path>> {
     return this.request({
       ...config,
@@ -323,10 +331,13 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async patch<Path extends Paths<Api, "patch">>(
+  async patch<
+    Path extends Paths<Api, "patch">,
+    Config extends ZodiosMethodOptions<Api, "patch", Path>
+  >(
     path: Path,
     data?: Body<Api, "patch", Path>,
-    config?: ZodiosMethodOptions<Api, "patch", Path>
+    config?: Config
   ): Promise<Response<Api, "patch", Path>> {
     return this.request({
       ...config,
@@ -342,10 +353,13 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @param config - the config to setup axios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async delete<Path extends Paths<Api, "delete">>(
+  async delete<
+    Path extends Paths<Api, "delete">,
+    Config extends ZodiosMethodOptions<Api, "delete", Path>
+  >(
     path: Path,
     data?: Body<Api, "patch", Path>,
-    config?: ZodiosMethodOptions<Api, "delete", Path>
+    config?: Config
   ): Promise<Response<Api, "delete", Path>> {
     return this.request({
       ...config,

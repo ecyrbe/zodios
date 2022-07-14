@@ -24,6 +24,11 @@ const plugin: ZodiosPlugin = {
   },
 };
 
+/**
+ * Zod validation plugin used internally by Zodios.
+ * By default zodios always validates the response.
+ * @returns zod-validation plugin
+ */
 export function zodValidationPlugin(): ZodiosPlugin {
   return plugin;
 }
