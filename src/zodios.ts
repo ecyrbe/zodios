@@ -29,7 +29,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   private axiosInstance: AxiosInstance;
   public readonly options: ZodiosOptions;
   public readonly api: Api;
-  private endpointPlugins: Record<string, ZodiosPlugins>;
+  private endpointPlugins: Map<string, ZodiosPlugins> = new Map();
 
   /**
    * constructor
@@ -92,7 +92,6 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     if (baseURL) this.axiosInstance.defaults.baseURL = baseURL;
 
     this.injectAliasEndpoints();
-    this.endpointPlugins = {};
     this.initPlugins();
     if (this.options.validateResponse) {
       this.use(zodValidationPlugin());
@@ -100,7 +99,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   }
 
   private initPlugins() {
-    this.endpointPlugins["any-any"] = new ZodiosPlugins("any", "any");
+    this.endpointPlugins.set("any-any", new ZodiosPlugins("any", "any"));
 
     this.api.forEach((endpoint) => {
       const plugins = new ZodiosPlugins(endpoint.method, endpoint.path);
@@ -118,24 +117,24 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
           plugins.use(headerPlugin("Content-Type", "text/plain"));
           break;
       }
-      this.endpointPlugins[`${endpoint.method}-${endpoint.path}`] = plugins;
+      this.endpointPlugins.set(`${endpoint.method}-${endpoint.path}`, plugins);
     });
   }
 
   private getAnyEndpointPlugins() {
-    return this.endpointPlugins["any-any"];
+    return this.endpointPlugins.get("any-any");
   }
 
   private findAliasEndpointPlugins(alias: string) {
     const endpoint = this.api.find((endpoint) => endpoint.alias === alias);
     if (endpoint) {
-      return this.endpointPlugins[`${endpoint.method}-${endpoint.path}`];
+      return this.endpointPlugins.get(`${endpoint.method}-${endpoint.path}`);
     }
     return undefined;
   }
 
   private findEnpointPlugins(method: Method, path: string) {
-    return this.endpointPlugins[`${method}-${path}`];
+    return this.endpointPlugins.get(`${method}-${path}`);
   }
 
   /**
@@ -169,7 +168,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   ): PluginId;
   use(...args: unknown[]) {
     if (typeof args[0] === "object") {
-      const plugins = this.getAnyEndpointPlugins();
+      const plugins = this.getAnyEndpointPlugins()!;
       return plugins.use(args[0] as ZodiosPlugin);
     } else if (typeof args[0] === "string" && typeof args[1] === "object") {
       const plugins = this.findAliasEndpointPlugins(args[0]);
@@ -201,11 +200,11 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   eject(plugin: PluginId | string): void {
     if (typeof plugin === "string") {
-      const plugins = this.getAnyEndpointPlugins();
+      const plugins = this.getAnyEndpointPlugins()!;
       plugins.eject(plugin);
       return;
     }
-    this.endpointPlugins[plugin.key]?.eject(plugin);
+    this.endpointPlugins.get(plugin.key)?.eject(plugin);
   }
 
   private injectAliasEndpoints() {
@@ -242,7 +241,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     Config extends ZodiosRequestOptions<Api, M, Path>
   >(config: Config): Promise<Response<Api, M, Path>> {
     let conf = config as unknown as AnyZodiosRequestOptions;
-    const anyPlugin = this.getAnyEndpointPlugins();
+    const anyPlugin = this.getAnyEndpointPlugins()!;
     conf = await anyPlugin.interceptRequest(this.api, conf);
     const endpointPlugin = this.findEnpointPlugins(config.method, config.url);
     if (endpointPlugin) {

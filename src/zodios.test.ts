@@ -134,7 +134,7 @@ describe("Zodios", () => {
   it("should register have validation plugin automatically installed", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     // @ts-ignore
-    expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
+    expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
   it("should register a plugin", () => {
@@ -143,7 +143,7 @@ describe("Zodios", () => {
       request: async (_, config) => config,
     });
     // @ts-ignore
-    expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
+    expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
   });
 
   it("should unregister a plugin", () => {
@@ -152,10 +152,10 @@ describe("Zodios", () => {
       request: async (_, config) => config,
     });
     // @ts-ignore
-    expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
+    expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
     zodios.eject(id);
     // @ts-ignore
-    expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
+    expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
   it("should replace a named plugin", () => {
@@ -168,7 +168,7 @@ describe("Zodios", () => {
     zodios.use(plugin);
     zodios.use(plugin);
     // @ts-ignore
-    expect(zodios.endpointPlugins["any-any"].count()).toBe(2);
+    expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
   });
 
   it("should unregister a named plugin", () => {
@@ -180,7 +180,7 @@ describe("Zodios", () => {
     zodios.use(plugin);
     zodios.eject("test");
     // @ts-ignore
-    expect(zodios.endpointPlugins["any-any"].count()).toBe(1);
+    expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
   it("should throw if invalide parameters when registering a plugin", () => {
@@ -247,7 +247,7 @@ describe("Zodios", () => {
       request: async (_, config) => config,
     });
     // @ts-ignore
-    expect(zodios.endpointPlugins["get-/:id"].count()).toBe(1);
+    expect(zodios.endpointPlugins.get("get-/:id").count()).toBe(1);
   });
 
   it("should register a plugin by alias", () => {
@@ -266,7 +266,7 @@ describe("Zodios", () => {
       request: async (_, config) => config,
     });
     // @ts-ignore
-    expect(zodios.endpointPlugins["get-/:id"].count()).toBe(1);
+    expect(zodios.endpointPlugins.get("get-/:id").count()).toBe(1);
   });
 
   it("should make an http request", async () => {
