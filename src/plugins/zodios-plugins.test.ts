@@ -72,4 +72,21 @@ describe("ZodiosPlugins", () => {
     );
     expect(response).toEqual({ test: true });
   });
+
+  it("should count plugins", () => {
+    const plugins = new ZodiosPlugins("any", "any");
+    const namedPlugin: (n: number) => ZodiosPlugin = (n) => ({
+      name: `test${n}`,
+      request: async (api, config) => config,
+      response: async (api, config, response) => response,
+    });
+    const plugin: ZodiosPlugin = {
+      request: async (api, config) => config,
+      response: async (api, config, response) => response,
+    };
+    plugins.use(namedPlugin(1));
+    plugins.use(plugin);
+    plugins.use(namedPlugin(2));
+    expect(plugins.count()).toBe(3);
+  });
 });

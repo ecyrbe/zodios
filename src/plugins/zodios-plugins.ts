@@ -11,12 +11,29 @@ export type PluginId = {
   value: number;
 };
 
+/**
+ * A list of plugins that can be used by the Zodios client.
+ */
 export class ZodiosPlugins {
   public readonly key: string;
   private plugins: Array<ZodiosPlugin | undefined> = [];
 
+  /**
+   * Constructor
+   * @param method - http method of the endpoint where the plugins are registered
+   * @param path - path of the endpoint where the plugins are registered
+   */
   constructor(method: Method | "any", path: string) {
     this.key = `${method}-${path}`;
+  }
+
+  /**
+   * Get the index of a plugin by name
+   * @param name - name of the plugin
+   * @returns the index of the plugin if found, -1 otherwise
+   */
+  indexOf(name: string) {
+    return this.plugins.findIndex((p) => p?.name === name);
   }
 
   /**
@@ -26,10 +43,12 @@ export class ZodiosPlugins {
    * @returns unique id of the plugin
    */
   use(plugin: ZodiosPlugin): PluginId {
-    const id = this.plugins.findIndex((p) => p?.name === plugin.name);
-    if (id !== -1) {
-      this.plugins[id] = plugin;
-      return { key: this.key, value: id };
+    if (plugin.name) {
+      const id = this.indexOf(plugin.name);
+      if (id !== -1) {
+        this.plugins[id] = plugin;
+        return { key: this.key, value: id };
+      }
     }
     this.plugins.push(plugin);
     return { key: this.key, value: this.plugins.length - 1 };
@@ -41,7 +60,7 @@ export class ZodiosPlugins {
    */
   eject(plugin: PluginId | string) {
     if (typeof plugin === "string") {
-      const id = this.plugins.findIndex((p) => p?.name === plugin);
+      const id = this.indexOf(plugin);
       if (id === -1) {
         throw new Error(`Plugin with name '${plugin}' not found`);
       }
@@ -101,7 +120,14 @@ export class ZodiosPlugins {
     return pluginResponse;
   }
 
+  /**
+   * Get the number of plugins registered
+   * @returns the number of plugins registered
+   */
   count() {
-    return this.plugins.filter(Boolean).length;
+    return this.plugins.reduce(
+      (count, plugin) => (plugin ? count + 1 : count),
+      0
+    );
   }
 }
