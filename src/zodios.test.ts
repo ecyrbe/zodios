@@ -636,7 +636,7 @@ describe("Zodios", () => {
       expect(e).toBeInstanceOf(ZodiosError);
       expect((e as ZodiosError).cause).toBeInstanceOf(ZodError);
       expect((e as ZodiosError).message).toBe("Zodios: Invalid response");
-      expect((e as ZodiosError).response).toEqual({
+      expect((e as ZodiosError).data).toEqual({
         id: 1,
         name: "test",
       });
