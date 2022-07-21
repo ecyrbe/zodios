@@ -71,7 +71,7 @@ export type Body<
   Api extends readonly unknown[],
   M extends Method,
   Path
-> = z.infer<
+> = z.input<
   FilterArrayByValue<
     EndpointApiDescription<Api, M, Path>[number]["parameters"],
     { type: "Body" }
@@ -81,7 +81,7 @@ export type Body<
 export type BodyByAlias<
   Api extends readonly unknown[],
   Alias extends string
-> = z.infer<
+> = z.input<
   FilterArrayByValue<
     AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
     { type: "Body" }

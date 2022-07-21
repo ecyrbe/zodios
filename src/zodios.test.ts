@@ -387,6 +387,77 @@ describe("Zodios", () => {
     expect(response).toEqual({ id: 3, name: "post" });
   });
 
+  it("should make an http post with transformed body param", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/",
+        parameters: [
+          {
+            name: "name",
+            type: "Body",
+            schema: z
+              .object({
+                firstname: z.string(),
+                lastname: z.string(),
+              })
+              .transform((data) => ({
+                name: `${data.firstname} ${data.lastname}`,
+              })),
+          },
+        ],
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    const response = await zodios.post("/", {
+      firstname: "post",
+      lastname: "test",
+    });
+    expect(response).toEqual({ id: 3, name: "post test" });
+  });
+
+  it("should throw a zodios error if params are not correct", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "post",
+        path: "/",
+        parameters: [
+          {
+            name: "name",
+            type: "Body",
+            schema: z
+              .object({
+                email: z.string().email(),
+              })
+              .transform((data) => ({
+                name: `${data.email.split("@")[0]}`,
+              })),
+          },
+        ],
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ] as const);
+    let response;
+    let error: ZodiosError | undefined;
+    try {
+      response = await zodios.post("/", {
+        email: "post",
+      });
+    } catch (err) {
+      error = err as ZodiosError;
+    }
+    expect(response).toBeUndefined();
+    expect(error).toBeInstanceOf(ZodiosError);
+    expect(error!.cause).toBeInstanceOf(ZodError);
+    expect(error!.message).toBe("Zodios: Invalid Body parameter 'name'");
+  });
+
   it("should make an http mutation alias request with body param", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
@@ -564,7 +635,7 @@ describe("Zodios", () => {
     } catch (e) {
       expect(e).toBeInstanceOf(ZodiosError);
       expect((e as ZodiosError).cause).toBeInstanceOf(ZodError);
-      expect((e as ZodiosError).message).toBe("Zodios: invalid response");
+      expect((e as ZodiosError).message).toBe("Zodios: Invalid response");
       expect((e as ZodiosError).response).toEqual({
         id: 1,
         name: "test",

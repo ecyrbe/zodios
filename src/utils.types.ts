@@ -192,14 +192,16 @@ export type MapSchemaParameters<T, Acc = {}> = T extends readonly [
 ]
   ? Head extends Readonly<{
       name: infer Name;
-      schema: z.ZodType<infer Z>;
+      schema: infer Schema;
     }>
     ? Name extends string
       ? MapSchemaParameters<
           Tail,
           Merge<
             {
-              [Key in Name]: Z;
+              [Key in Name]: Schema extends z.ZodType<any, any, any>
+                ? z.input<Schema>
+                : never;
             },
             Acc
           >
