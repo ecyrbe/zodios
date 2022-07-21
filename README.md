@@ -261,7 +261,10 @@ Zodios supports application/x-www-form-urlencoded requests with integrated `requ
         {
           name: "body",
           type: "Body",
-          schema: z.string()
+          schema: z.object({
+            userName: z.string(),
+            password: z.string(),
+          }).transform(data=> qs.stringify(data)),
         }
       ],
       response: z.object({
@@ -269,7 +272,7 @@ Zodios supports application/x-www-form-urlencoded requests with integrated `requ
       }),
     }] as const,
   );
-  const id = await apiClient.login(qs.stringify({ userName: "user", password: "password" }),
+  const id = await apiClient.login({ userName: "user", password: "password" },
     { headers: 
         { 
           'Content-Type': 'application/x-www-form-urlencoded' 
