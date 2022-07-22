@@ -78,7 +78,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     }
 
     this.options = {
-      validateResponse: true,
+      validate: true,
       ...(args[1] as ZodiosOptions),
     };
 
@@ -93,7 +93,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
 
     this.injectAliasEndpoints();
     this.initPlugins();
-    if (this.options.validateResponse) {
+    if (this.options.validate || this.options.validateResponse) {
       this.use(zodValidationPlugin());
     }
   }

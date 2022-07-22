@@ -252,8 +252,13 @@ export type AxiosRetryRequestConfig = AxiosRequestConfig & {
 export type ZodiosOptions = {
   /**
    * Should zodios validate the response? Default: true
+   * @deprecated use `validate` instead
    */
   validateResponse?: boolean;
+  /**
+   * Should zodios validate parameters and response? Default: true
+   */
+  validate?: boolean;
   /**
    * Override the default axios instance. Default: zodios will create it's own axios instance
    */

@@ -43,7 +43,7 @@ It's an axios compatible API client, with the following features:
   - [Declare your API with zodios](#declare-your-api-with-zodios)
   - [Get underlying axios instance](#get-underlying-axios-instance)
   - [Give your own axios instance to zodios](#give-your-own-axios-instance-to-zodios)
-  - [Disable zodios response validation](#disable-zodios-response-validation)
+  - [Disable zodios validation](#disable-zodios-validation)
   - [Send multipart/form-data requests](#send-multipartform-data-requests)
   - [Send application/x-www-form-urlencoded requests](#send-applicationx-www-form-urlencoded-requests)
   - [CRUD helper](#crud-helper)
@@ -141,15 +141,17 @@ const apiClient = new Zodios(
 );
 ```
 
-## Disable zodios response validation
+## Disable zodios validation
+
+You can disable zod validation for both parameters and responses. But be aware that this will also disable zod transformations.
+So if you want to disable zod validation, do not use transformations.
 
 ```typescript
 const apiClient = new Zodios(
   "https://jsonplaceholder.typicode.com",
   [ ... ] as const,
-  // Disable validation
   {
-    validateResponse: false
+    validate: false
   }
 );
 ```
