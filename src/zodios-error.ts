@@ -1,3 +1,6 @@
+import { ReadonlyDeep } from "./utils.types";
+import { AnyZodiosRequestOptions } from "./zodios.types";
+
 /**
  * Custom Zodios Error with additional information
  * @param message - the error message
@@ -8,7 +11,7 @@
 export class ZodiosError extends Error {
   constructor(
     message: string,
-    public readonly config?: unknown,
+    public readonly config?: ReadonlyDeep<AnyZodiosRequestOptions>,
     public readonly data?: unknown,
     public readonly cause?: Error
   ) {

@@ -13,15 +13,24 @@ const plugin: ZodiosPlugin = {
     if (!parameters) {
       return config;
     }
+    const conf = {
+      ...config,
+      queries: {
+        ...config.queries,
+      },
+      headers: {
+        ...config.headers,
+      },
+    };
     const paramsOf = {
-      Query: (name: string) => config.queries?.[name],
-      Body: (_: string) => config.data,
-      Header: (name: string) => config.headers?.[name],
+      Query: (name: string) => conf.queries?.[name],
+      Body: (_: string) => conf.data,
+      Header: (name: string) => conf.headers?.[name],
     };
     const setParamsOf = {
-      Query: (name: string, value: any) => (config.queries![name] = value),
-      Body: (_: string, value: any) => (config.data = value),
-      Header: (name: string, value: any) => (config.headers![name] = value),
+      Query: (name: string, value: any) => (conf.queries![name] = value),
+      Body: (_: string, value: any) => (conf.data = value),
+      Header: (name: string, value: any) => (conf.headers![name] = value),
     };
     for (const parameter of parameters) {
       const { name, schema, type } = parameter;
@@ -39,7 +48,7 @@ const plugin: ZodiosPlugin = {
         setParamsOf[type](name, parsed.data);
       }
     }
-    return config;
+    return conf;
   },
   response: async (api, config, response) => {
     const endpoint = findEndpoint(api, config.method, config.url);

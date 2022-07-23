@@ -21,6 +21,7 @@ import {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
+import { ReadonlyDeep } from "./utils.types";
 
 /**
  * zodios api client based on axios
@@ -241,7 +242,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     Path extends Paths<Api, M>,
     Config extends ZodiosRequestOptions<Api, M, Path>
   >(config: Config): Promise<Response<Api, M, Path>> {
-    let conf = config as unknown as AnyZodiosRequestOptions;
+    let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
     const anyPlugin = this.getAnyEndpointPlugins()!;
     conf = await anyPlugin.interceptRequest(this.api, conf);
     const endpointPlugin = this.findEnpointPlugins(config.method, config.url);
@@ -249,7 +250,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
       conf = await endpointPlugin.interceptRequest(this.api, conf);
     }
     const requestConfig: AxiosRequestConfig = {
-      ...omit(conf, ["params", "queries"]),
+      ...omit(conf as AnyZodiosRequestOptions, ["params", "queries"]),
       url: replacePathParams(conf),
       params: conf.queries,
     };

@@ -308,8 +308,8 @@ export type ZodiosPlugin = {
    */
   request?: (
     api: ZodiosEnpointDescriptions,
-    config: AnyZodiosRequestOptions
-  ) => Promise<AnyZodiosRequestOptions>;
+    config: ReadonlyDeep<AnyZodiosRequestOptions>
+  ) => Promise<ReadonlyDeep<AnyZodiosRequestOptions>>;
   /**
    * response interceptor to modify or inspect the response before it is returned
    * @param api - the api description
@@ -319,7 +319,7 @@ export type ZodiosPlugin = {
    */
   response?: (
     api: ZodiosEnpointDescriptions,
-    config: AnyZodiosRequestOptions,
+    config: ReadonlyDeep<AnyZodiosRequestOptions>,
     response: AxiosResponse
   ) => Promise<AxiosResponse>;
   /**
@@ -332,7 +332,7 @@ export type ZodiosPlugin = {
    */
   error?: (
     api: ZodiosEnpointDescriptions,
-    config: AnyZodiosRequestOptions,
+    config: ReadonlyDeep<AnyZodiosRequestOptions>,
     error: Error
   ) => Promise<AxiosResponse>;
 };

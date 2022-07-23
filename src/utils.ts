@@ -1,3 +1,4 @@
+import { ReadonlyDeep } from "./utils.types";
 import { AnyZodiosRequestOptions } from "./zodios.types";
 
 /**
@@ -47,7 +48,9 @@ export function capitalize<T extends string>(str: T): Capitalize<T> {
 
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
-export function replacePathParams(config: AnyZodiosRequestOptions) {
+export function replacePathParams(
+  config: ReadonlyDeep<AnyZodiosRequestOptions>
+) {
   let result: string = config.url;
   const params = config.params;
   if (params) {

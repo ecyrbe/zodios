@@ -412,9 +412,16 @@ describe("Zodios", () => {
         }),
       },
     ] as const);
-    const response = await zodios.post("/", {
-      firstname: "post",
-      lastname: "test",
+    const config = {
+      method: "post",
+      url: "/",
+      data: { firstname: "post", lastname: "test" },
+    } as const;
+    const response = await zodios.request(config);
+    expect(config).toEqual({
+      method: "post",
+      url: "/",
+      data: { firstname: "post", lastname: "test" },
     });
     expect(response).toEqual({ id: 3, name: "post test" });
   });
