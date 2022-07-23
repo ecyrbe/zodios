@@ -44,6 +44,7 @@ It's an axios compatible API client, with the following features:
   - [Get underlying axios instance](#get-underlying-axios-instance)
   - [Give your own axios instance to zodios](#give-your-own-axios-instance-to-zodios)
   - [Disable zodios validation](#disable-zodios-validation)
+  - [Use zod transformations](#use-zod-transformations)
   - [Send multipart/form-data requests](#send-multipartform-data-requests)
   - [Send application/x-www-form-urlencoded requests](#send-applicationx-www-form-urlencoded-requests)
   - [CRUD helper](#crud-helper)
@@ -154,6 +155,41 @@ const apiClient = new Zodios(
     validate: false
   }
 );
+```
+
+## Use zod transformations
+
+Since Zodios is using zod, you can use zod transformations.
+
+```typescript
+const apiClient = new Zodios(
+  "https://jsonplaceholder.typicode.com",
+  [
+    {
+      method: "get",
+      path: "/users/:id",
+      alias: "getUser",
+      description: "Get a user",
+      response: z.object({
+        id: z.number(),
+        name: z.string(),
+      }).transform(({ name,...rest }) => ({
+        ...rest,
+        firstname: name.split(" ")[0],
+        lastname: name.split(" ")[1],
+      })),
+    },
+  ] as const
+);
+
+const user = await apiClient.getUser({ params: { id: 7 } });
+
+console.log(user);
+```
+It should output  
+  
+```js
+{ id: 7, firstname: 'Kurtis', lastname: 'Weissnat' }
 ```
 
 ## Send multipart/form-data requests

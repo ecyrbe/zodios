@@ -56,7 +56,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    *       ],
    *       response: z.array(z.object({ id: z.number(), name: z.string() })),
    *     }
-   *   ]);
+   *   ] as const);
    */
   constructor(api: Api, options?: ZodiosOptions);
   constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
