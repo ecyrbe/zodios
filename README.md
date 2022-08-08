@@ -420,68 +420,8 @@ import { Zodios } from "@zodios/core";
 import { ZodiosHooks } from "@zodios/react";
 import { z } from "zod";
 
-// you can define schema before declaring the API to get back the type
-const userSchema = z
-  .object({
-    id: z.number(),
-    name: z.string(),
-  })
-  .required();
-
-const createUserSchema = z
-  .object({
-    name: z.string(),
-  })
-  .required();
-
-const usersSchema = z.array(userSchema);
-
-// you can then get back the types
-type User = z.infer<typeof userSchema>;
-type Users = z.infer<typeof usersSchema>;
-
-const api = [
-  {
-    method: "get",
-    path: "/users",
-    description: "Get all users",
-    parameters: [
-      {
-        name: "q",
-        type: "Query",
-        schema: z.string(),
-      },
-      {
-        name: "page",
-        type: "Query",
-        schema: z.string().optional(),
-      },
-    ],
-    response: usersSchema,
-  },
-  {
-    method: "get",
-    path: "/users/:id",
-    description: "Get a user",
-    response: userSchema,
-  },
-  {
-    method: "post",
-    path: "/users",
-    description: "Create a user",
-    parameters: [
-      {
-        name: "body",
-        type: "Body",
-        schema: createUserSchema,
-      },
-    ],
-    response: userSchema,
-  },
-] as const;
 const baseUrl = "https://jsonplaceholder.typicode.com";
-
-const zodios = new Zodios(baseUrl, api);
+const zodios = new Zodios(baseUrl, [...] as const);
 const zodiosHooks = new ZodiosHooks("jsonplaceholder", zodios);
 
 const Users = () => {
@@ -490,10 +430,10 @@ const Users = () => {
     isLoading,
     error,
     invalidate: invalidateUsers, // zodios also provides invalidation helpers
-  } = zodiosHooks.useQuery("/users");
+  } = zodiosHooks.useQuery("/users"); // or useGetUsers();
   const { mutate } = zodiosHooks.useMutation("post", "/users", undefined, {
     onSuccess: () => invalidateUsers(),
-  });
+  }); // or .useCreateUser(...);
 
   return (
     <>

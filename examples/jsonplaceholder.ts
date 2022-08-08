@@ -61,11 +61,11 @@ async function bootstrap() {
     queries: { q: "Nicholas" },
   });
   console.log(users);
-  const user = await apiClient.get("/users/:id", { params: { id: 7 } });
+  const user = await apiClient.getUser({ params: { id: 7 } });
   console.log(user);
-  const createdUser = await apiClient.post("/users", { name: "john doe" });
+  const createdUser = await apiClient.createUser({ name: "john doe" });
   console.log(createdUser);
-  const deletedUser = await apiClient.delete("/users/:id", undefined, {
+  const deletedUser = await apiClient.deleteUser(undefined, {
     params: { id: 7 },
   });
   console.log(deletedUser);
