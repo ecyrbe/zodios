@@ -55,6 +55,7 @@ It's an axios compatible API client, with the following features:
   - [Override plugin](#override-plugin)
   - [Plugin execution order](#plugin-execution-order)
   - [Write your own plugin](#write-your-own-plugin)
+- [Roadmap](#roadmap)
 - [Dependencies](#dependencies)
 
 # Install
@@ -586,7 +587,17 @@ export type ZodiosPlugin = {
 };
 ```
 
+# Roadmap
 
+Zodios is a work in progress. Here is a roadmap of the features that are planned for future releases :
+- Nest minor release : add support for fetch only on frontend to replace XHR (with an axios adapter maintained by zodios since all existing ones are old)
+- Improve API definition by adding either construction helpers or add more typescript magic to have better autocompletion and better error messages
+
+The following will need investigation to check if it's doable :
+- implement @zodios/express to define your API endpoints with express and share it with your frontend (like tRPC)
+- implement @zodios/nest to define your API endpoints with nestjs and share it with your frontend (like tRPC)
+
+You have other ideas ? [Let me know !](https://github.com/ecyrbe/zodios/discussions)
 # Dependencies
 
 Zodios do not embed any dependency. It's your Job to install the peer dependencies you need.  
