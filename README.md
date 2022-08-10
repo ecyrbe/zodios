@@ -41,6 +41,7 @@ It's an axios compatible API client, with the following features:
 - [Install](#install)
 - [How to use it ?](#how-to-use-it-)
   - [Declare your API with zodios](#declare-your-api-with-zodios)
+  - [API definition format](#api-definition-format)
   - [Get underlying axios instance](#get-underlying-axios-instance)
   - [Give your own axios instance to zodios](#give-your-own-axios-instance-to-zodios)
   - [Disable zodios validation](#disable-zodios-validation)
@@ -121,6 +122,25 @@ You can also use aliases :
 const user = await apiClient.getUser({ params: { id: 7 } });
 console.log(user);
 ```
+## API definition format
+
+```typescript
+type ZodiosEndpointDescriptions = Array<{
+  method: 'get'|'post'|'put'|'patch'|'delete';
+  path: string; // example: /posts/:postId/comments/:commentId
+  alias?: string; // example: getPostComments
+  description?: string;
+  requestFormat?: 'json'|'form-data'|'form-url'|'binary'|'text'; // default to json if not set
+  parameters?: Array<{
+    name: string;
+    description?: string;
+    type: 'Query'|'Body'|'Header';
+    schema: ZodSchema; // you can use zod `transform` to transform the value of the parameter before sending it to the server
+  }>;
+  response: ZodSchema; // you can use zod `transform` to transform the value of the response before returning it
+}>;
+```
+
 ## Get underlying axios instance
 
 you can get back the underlying axios instance to customize it.

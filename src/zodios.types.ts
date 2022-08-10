@@ -273,17 +273,60 @@ export type ZodiosOptions = {
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
 export type ZodiosEndpointDescription<R> = {
+  /**
+   * http method : get, post, put, patch, delete
+   */
   method: Method;
+  /**
+   * path of the endpoint
+   * @example
+   * ```text
+   * /posts/:postId/comments/:commentId
+   * ```
+   */
   path: string;
+  /**
+   * optional alias to call the endpoint easily
+   * @example
+   * ```text
+   * getPostComments
+   * ```
+   */
   alias?: string;
+  /**
+   * optional description of the endpoint
+   */
   description?: string;
+  /**
+   * optional request format of the endpoint: json, form-data, form-url, binary, text
+   */
   requestFormat?: RequestFormat;
+  /**
+   * optional parameters of the endpoint
+   */
   parameters?: Array<{
+    /**
+     * name of the parameter
+     */
     name: string;
+    /**
+     * optional description of the parameter
+     */
     description?: string;
+    /**
+     * type of the parameter: Query, Body, Header
+     */
     type: "Query" | "Body" | "Header";
+    /**
+     * zod schema of the parameter
+     * you can use zod `transform` to transform the value of the parameter before sending it to the server
+     */
     schema: z.ZodType<unknown>;
   }>;
+  /**
+   * response of the endpoint
+   * you can use zod `transform` to transform the value of the response before returning it
+   */
   response: z.ZodType<R>;
 };
 
