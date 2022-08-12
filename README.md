@@ -51,6 +51,7 @@ It's an axios compatible API client, with the following features:
   - [CRUD helper](#crud-helper)
   - [React helpers](#react-helpers)
 - [Plugin system](#plugin-system)
+  - [Use fetch on browser](#use-fetch-on-browser)
   - [Use token provider plugin](#use-token-provider-plugin)
   - [Use a plugin only for some endpoints](#use-a-plugin-only-for-some-endpoints)
   - [Override plugin](#override-plugin)
@@ -486,11 +487,31 @@ export const App = () => {
 ```
 
 # Plugin system
+
+Zodios has a powefull plugin system that are middleware interceptors for requests and responses.  
+
+## Use fetch on browser
+
+__since__ version 2.2.0 of `@zodios/plugins`
+
+Axios is using XHR on the browser. This might be a showstopper for your application, because XHR lacks some options of `fetch` you might rely on.  
+For those use cases, you can use the `fetch` plugin that implements an axios adapter using the standard fetch.  
+  
+It's worth noting, that you should not use the `fetch` plugin on nodejs. Indeed, fetch lacks a lot of features on backend side and you should use axios default http adapter for node (default). If you still want to use fetch on your backend, you should use a polyfill, zodios does not provide one. 
+**🚧 Warning 🚧** : Do not open an issue for `fetch` support on `nodejs` unless you are willing to add support for it with a PR at the same time. I might reconsider this position in the future when fetch becomes feature complete on nodejs.
+
+```typescript
+import { pluginFetch } from "@zodios/plugins";
+
+apiClient.use(pluginFetch({
+  // all fetch options are supported
+  keepAlive: true,
+}));
+```
   
 ## Use token provider plugin
 
-Zodios has a powefull plugin system that are middleware interceptors for requests and responses.  
-For example, zodios comes with a plugin to inject and renew your tokens :
+`@zodios/plugins` comes with a plugin to inject and renew your tokens :
 ```typescript
   import { pluginToken } from '@zodios/plugins';
 
