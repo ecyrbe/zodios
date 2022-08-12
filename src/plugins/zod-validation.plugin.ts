@@ -56,16 +56,18 @@ const plugin: ZodiosPlugin = {
     if (!endpoint) {
       throw new Error(`No endpoint found for ${config.method} ${config.url}`);
     }
-    const parsed = endpoint.response.safeParse(response.data);
-    if (!parsed.success) {
-      throw new ZodiosError(
-        "Zodios: Invalid response",
-        config,
-        response.data,
-        parsed.error
-      );
+    if (response.headers?.["content-type"]?.includes("application/json")) {
+      const parsed = endpoint.response.safeParse(response.data);
+      if (!parsed.success) {
+        throw new ZodiosError(
+          "Zodios: Invalid response",
+          config,
+          response.data,
+          parsed.error
+        );
+      }
+      response.data = parsed.data;
     }
-    response.data = parsed.data;
     return response;
   },
 };
