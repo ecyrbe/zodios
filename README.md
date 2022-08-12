@@ -631,7 +631,6 @@ export type ZodiosPlugin = {
 # Roadmap
 
 Zodios is a work in progress. Here is a roadmap of the features that are planned for future releases :
-- **Next minor release :** add support for fetch only on frontend to replace XHR (with an axios adapter maintained by zodios since all existing ones are old)
 - Improve API definition by adding either construction helpers or add more typescript magic to have better autocompletion and better error messages
 
 The following will need investigation to check if it's doable :
