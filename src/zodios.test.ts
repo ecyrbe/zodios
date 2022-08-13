@@ -6,6 +6,7 @@ import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
 import { ZodiosPlugin } from "./zodios.types";
+import { apiBuilder } from "./api";
 const multipart = multer({ storage: multer.memoryStorage() });
 
 describe("Zodios", () => {
@@ -324,6 +325,21 @@ describe("Zodios", () => {
         }),
       },
     ] as const);
+    const response = await zodios.getById({ params: { id: 7 } });
+    expect(response).toEqual({ id: 7, name: "test" });
+  });
+
+  it("should work with api builder", async () => {
+    const api = apiBuilder({
+      method: "get",
+      path: "/:id",
+      alias: "getById",
+      response: z.object({
+        id: z.number(),
+        name: z.string(),
+      }),
+    } as const).build();
+    const zodios = new Zodios(`http://localhost:${port}`, api);
     const response = await zodios.getById({ params: { id: 7 } });
     expect(response).toEqual({ id: 7, name: "test" });
   });
