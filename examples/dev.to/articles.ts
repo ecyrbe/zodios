@@ -1,4 +1,4 @@
-import { asApi } from "../../src/index";
+import { apiBuilder, asApi } from "../../src/index";
 import { z } from "zod";
 import { devUser } from "./users";
 import { paramPages } from "./params";
@@ -53,116 +53,115 @@ const devArticles = z.array(devArticle);
 export type Article = z.infer<typeof devArticle>;
 export type Articles = z.infer<typeof devArticles>;
 
-export const articlesApi = asApi([
-  {
-    method: "get",
-    path: "/articles",
-    alias: "getAllArticles",
-    description: "Get all articles",
-    parameters: [
-      ...paramPages,
-      {
-        name: "tag",
-        description: "Filter by tag",
-        type: "Query",
-        schema: z.string().optional(),
-      },
-      {
-        name: "tags",
-        description: "Filter by tags",
-        type: "Query",
-        schema: z.string().optional(),
-      },
-      {
-        name: "tags_exclude",
-        description: "Exclude tags",
-        type: "Query",
-        schema: z.string().optional(),
-      },
-      {
-        name: "username",
-        description: "Filter by username",
-        type: "Query",
-        schema: z.string().optional(),
-      },
-      {
-        name: "state",
-        description: "Filter by state",
-        type: "Query",
-        schema: z.string().optional(),
-      },
-      {
-        name: "top",
-        type: "Query",
-        schema: z.number().optional(),
-      },
-      {
-        name: "collection_id",
-        type: "Query",
-        schema: z.number().optional(),
-      },
-    ],
-    response: devArticles,
-  },
-  {
+export const articlesApi = apiBuilder({
+  method: "get",
+  path: "/articles",
+  alias: "getAllArticles",
+  description: "Get all articles",
+  parameters: [
+    ...paramPages,
+    {
+      name: "tag",
+      description: "Filter by tag",
+      type: "Query",
+      schema: z.string().optional(),
+    },
+    {
+      name: "tags",
+      description: "Filter by tags",
+      type: "Query",
+      schema: z.string().optional(),
+    },
+    {
+      name: "tags_exclude",
+      description: "Exclude tags",
+      type: "Query",
+      schema: z.string().optional(),
+    },
+    {
+      name: "username",
+      description: "Filter by username",
+      type: "Query",
+      schema: z.string().optional(),
+    },
+    {
+      name: "state",
+      description: "Filter by state",
+      type: "Query",
+      schema: z.string().optional(),
+    },
+    {
+      name: "top",
+      type: "Query",
+      schema: z.number().optional(),
+    },
+    {
+      name: "collection_id",
+      type: "Query",
+      schema: z.number().optional(),
+    },
+  ],
+  response: devArticles,
+} as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/latest",
     alias: "getLatestArticle",
     description: "Get latest articles",
     parameters: paramPages,
     response: devArticles,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/:id",
     alias: "getArticle",
     description: "Get an article by id",
     response: devArticle,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "put",
     path: "/articles/:id",
     alias: "updateArticle",
     description: "Update an article",
     response: devArticle,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/:username/:slug",
     alias: "getArticleByUsernameAndSlug",
     description: "Get an article by username and slug",
     response: devArticle,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/me",
     alias: "getMyArticles",
     description: "Get current user's articles",
     parameters: paramPages,
     response: devArticles,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/me/published",
     alias: "getMyPublishedArticles",
     description: "Get current user's published articles",
     parameters: paramPages,
     response: devArticles,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/me/unpublished",
     alias: "getMyUnpublishedArticles",
     description: "Get current user's unpublished articles",
     parameters: paramPages,
     response: devArticles,
-  },
-  {
+  } as const)
+  .addEndpoint({
     method: "get",
     path: "/articles/me/all",
     alias: "getAllMyArticles",
     description: "Get current user's all articles",
     parameters: paramPages,
     response: devArticles,
-  },
-] as const);
+  } as const)
+  .build();

@@ -1,15 +1,43 @@
-import { ZodiosEnpointDescriptions } from "./zodios.types";
+import {
+  ZodiosEndpointDescription,
+  ZodiosEnpointDescriptions,
+} from "./zodios.types";
 import z from "zod";
 import { capitalize } from "./utils";
+import { ReadonlyDeep } from "./utils.types";
 
 /**
- * Helper to split your api definitions into multiple files
+ * Simple helper to split your api definitions into multiple files
  * By just providing autocompletions for the endpoint descriptions
  * @param api - api definitions
  * @returns the api definitions
  */
 export function asApi<T extends ZodiosEnpointDescriptions>(api: T): T {
   return api;
+}
+
+export class Builder<T extends ZodiosEnpointDescriptions> {
+  constructor(private readonly endpoints: T) {}
+  addEndpoint<E extends ReadonlyDeep<ZodiosEndpointDescription<any>>>(
+    endpoint: E
+  ) {
+    return new Builder([...this.endpoints, endpoint] as const);
+  }
+  build(): T {
+    return this.endpoints;
+  }
+}
+
+/**
+ * Advanced helper to build your api definitions
+ * compared to `asApi()` you'll have better autocompletion experience and better error messages,
+ * @param endpoint
+ * @returns - a builder to build your api definitions
+ */
+export function apiBuilder<
+  T extends ReadonlyDeep<ZodiosEndpointDescription<any>>
+>(endpoint: T): Builder<readonly [T]> {
+  return new Builder([endpoint] as const);
 }
 
 /**

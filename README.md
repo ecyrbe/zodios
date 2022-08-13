@@ -42,6 +42,7 @@ It's an axios compatible API client, with the following features:
 - [How to use it ?](#how-to-use-it-)
   - [Declare your API with zodios](#declare-your-api-with-zodios)
   - [API definition format](#api-definition-format)
+  - [API creation helpers](#api-creation-helpers)
   - [Get underlying axios instance](#get-underlying-axios-instance)
   - [Give your own axios instance to zodios](#give-your-own-axios-instance-to-zodios)
   - [Disable zodios validation](#disable-zodios-validation)
@@ -101,6 +102,9 @@ const apiClient = new Zodios(
   ] as const,
 );
 ```
+⚠️ **Be careful** : do not forget to add `const` keywork for each of your API definition array. Else `path` , `alias`, `parameters` and `response` will not be typed and autocompletion will not work.
+
+
 Calling this API is now easy and has builtin autocomplete features :  
   
 ```typescript
@@ -141,6 +145,36 @@ type ZodiosEndpointDescriptions = Array<{
   response: ZodSchema; // you can use zod `transform` to transform the value of the response before returning it
 }>;
 ```
+
+## API creation helpers
+
+Defining your API is easy with zodios, as definitions are just plain objects.  
+But typescript error messages can be cryptic and hard to understand. So zodios provides some helpers to make your life easier.
+
+- `asApi()` : simple helper to create splitted API definition from an array of endpoint descriptions
+- `apiBuilder()`: advanced helper to create splitted API definition endpoint by endpoint. It's the one with the better user experience.
+
+example, [complete example](./examples/dev.to/articles.ts) :
+  
+```typescript
+export const articlesApi = apiBuilder({
+    method: "get",
+    path: "/articles/latest",
+    alias: "getLatestArticle",
+    description: "Get latest articles",
+    parameters: paramPages,
+    response: devArticles,
+  } as const)
+  .addEndpoint({
+    method: "get",
+    path: "/articles/:id",
+    alias: "getArticle",
+    description: "Get an article by id",
+    response: devArticle,
+  } as const)
+  .build();
+```
+⚠️ **Be careful** : do not forget to add `const` keywork for each of your endpoint descriptions. Else `path` , `alias`, `parameters` and `response` will not be typed and autocompletion will not work.
 
 ## Get underlying axios instance
 
@@ -630,12 +664,10 @@ export type ZodiosPlugin = {
 
 # Roadmap
 
-Zodios is a work in progress. Here is a roadmap of the features that are planned for future releases :
-- Improve API definition by adding either construction helpers or add more typescript magic to have better autocompletion and better error messages
-
 The following will need investigation to check if it's doable :
 - implement `@zodios/express` to define your API endpoints with express and share it with your frontend (like tRPC)
 - implement `@zodios/nestjs` to define your API endpoints with nestjs and share it with your frontend (like tRPC)
+- generate openAPI json from your API endpoints
 
 You have other ideas ? [Let me know !](https://github.com/ecyrbe/zodios/discussions)
 # Dependencies
