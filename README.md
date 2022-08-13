@@ -497,7 +497,7 @@ __since__ version 2.2.0 of `@zodios/plugins`
 Axios is using XHR on the browser. This might be a showstopper for your application, because XHR lacks some options of `fetch` you might rely on.  
 For those use cases, you can use the `fetch` plugin that implements an axios adapter using the standard fetch.  
   
-It's worth noting, that you should not use the `fetch` plugin on nodejs. Indeed, fetch lacks a lot of features on backend side and you should use axios default http adapter for node (default). If you still want to use fetch on your backend, you should use a polyfill, zodios does not provide one. 
+It's worth noting, that you should not use the `fetch` plugin on nodejs. Indeed, fetch lacks a lot of features on backend side and you should use axios default http adapter for node (default). If you still want to use fetch on your backend, you should use a polyfill, zodios does not provide one.   
 **🚧 Warning 🚧** : Do not open an issue for `fetch` support on `nodejs` unless you are willing to add support for it with a PR at the same time. I might reconsider this position in the future when fetch becomes feature complete on nodejs.
 
 ```typescript
