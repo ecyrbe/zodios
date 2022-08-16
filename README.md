@@ -58,6 +58,7 @@ It's an axios compatible API client, with the following features:
   - [Override plugin](#override-plugin)
   - [Plugin execution order](#plugin-execution-order)
   - [Write your own plugin](#write-your-own-plugin)
+- [Ecosystem](#ecosystem)
 - [Roadmap](#roadmap)
 - [Dependencies](#dependencies)
 
@@ -662,6 +663,12 @@ export type ZodiosPlugin = {
   ) => Promise<AxiosResponse>;
 };
 ```
+
+# Ecosystem
+
+- [openapi-zod-client](https://github.com/astahmer/openapi-zod-client]): generate a zodios client from an openapi specification
+- [@zodios/plugins](https://github.com/ecyrbe/zodios-plugins) : some plugins for zodios
+- [@zodios/react](https://github.com/ecyrbe/zodios-react) : a react-query wrapper for zodios
 
 # Roadmap
 
