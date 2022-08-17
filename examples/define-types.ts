@@ -44,7 +44,7 @@ const jsonplaceholderApi = asApi([
     description: "Get a user",
     response: userSchema,
   },
-] as const);
+]);
 
 // and then use them in your API
 async function bootstrap() {

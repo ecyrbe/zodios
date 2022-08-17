@@ -1,15 +1,8 @@
 import type {
+  Assert,
   FilterArrayByValue,
-  IfEquals,
   FilterArrayByKey,
 } from "./utils.types";
-
-type Assert<T, U> = IfEquals<
-  T,
-  U,
-  true,
-  { error: "Types are not equal"; type1: T; type2: U }
->;
 
 describe("utils.types", () => {
   describe("FilterArrayByValue", () => {

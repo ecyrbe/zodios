@@ -37,7 +37,7 @@ async function bootstrap() {
       path: "/users/:id",
       alias: "deleteUser",
       description: "Delete a user",
-      response: z.object({}),
+      response: z.void(),
     },
     {
       method: "post",
@@ -53,7 +53,7 @@ async function bootstrap() {
       ],
       response: z.object({ id: z.number(), name: z.string() }),
     },
-  ] as const);
+  ]);
 
   type UserResponseAlias = ResponseByAlias<ApiOf<typeof apiClient>, "getUsers">;
 

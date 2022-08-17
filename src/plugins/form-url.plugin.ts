@@ -48,7 +48,7 @@ const plugin: ZodiosPlugin = {
  *       response: z.object({
  *         id: z.number(),
  *       }),
- *     }] as const,
+ *     }],
  *   );
  *   const id = await apiClient.login({ userName: "user", password: "password" });
  * ```

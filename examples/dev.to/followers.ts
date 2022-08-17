@@ -30,4 +30,4 @@ export const followersApi = asApi([
     ],
     response: devFollowers,
   },
-] as const);
+]);

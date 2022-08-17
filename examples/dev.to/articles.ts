@@ -102,7 +102,7 @@ export const articlesApi = apiBuilder({
     },
   ],
   response: devArticles,
-} as const)
+})
   .addEndpoint({
     method: "get",
     path: "/articles/latest",
@@ -110,28 +110,28 @@ export const articlesApi = apiBuilder({
     description: "Get latest articles",
     parameters: paramPages,
     response: devArticles,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/:id",
     alias: "getArticle",
     description: "Get an article by id",
     response: devArticle,
-  } as const)
+  })
   .addEndpoint({
     method: "put",
     path: "/articles/:id",
     alias: "updateArticle",
     description: "Update an article",
     response: devArticle,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/:username/:slug",
     alias: "getArticleByUsernameAndSlug",
     description: "Get an article by username and slug",
     response: devArticle,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/me",
@@ -139,7 +139,7 @@ export const articlesApi = apiBuilder({
     description: "Get current user's articles",
     parameters: paramPages,
     response: devArticles,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/me/published",
@@ -147,7 +147,7 @@ export const articlesApi = apiBuilder({
     description: "Get current user's published articles",
     parameters: paramPages,
     response: devArticles,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/me/unpublished",
@@ -155,7 +155,7 @@ export const articlesApi = apiBuilder({
     description: "Get current user's unpublished articles",
     parameters: paramPages,
     response: devArticles,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/me/all",
@@ -163,5 +163,5 @@ export const articlesApi = apiBuilder({
     description: "Get current user's all articles",
     parameters: paramPages,
     response: devArticles,
-  } as const)
+  })
   .build();

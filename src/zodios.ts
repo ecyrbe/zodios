@@ -21,7 +21,7 @@ import {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-import { ReadonlyDeep } from "./utils.types";
+import { Narrow, ReadonlyDeep } from "./utils.types";
 
 /**
  * zodios api client based on axios
@@ -57,10 +57,10 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    *       ],
    *       response: z.array(z.object({ id: z.number(), name: z.string() })),
    *     }
-   *   ] as const);
+   *   ]);
    */
-  constructor(api: Api, options?: ZodiosOptions);
-  constructor(baseUrl: string, api: Api, options?: ZodiosOptions);
+  constructor(api: Narrow<Api>, options?: ZodiosOptions);
+  constructor(baseUrl: string, api: Narrow<Api>, options?: ZodiosOptions);
   constructor(...args: unknown[]) {
     if (!args[0]) {
       if (Array.isArray(args[1])) {
@@ -376,12 +376,12 @@ export type ZodiosInstance<Api extends ZodiosEnpointDescriptions> =
 
 export type ZodiosConstructor = {
   new <Api extends ZodiosEnpointDescriptions>(
-    api: Api,
+    api: Narrow<Api>,
     options?: ZodiosOptions
   ): ZodiosInstance<Api>;
   new <Api extends ZodiosEnpointDescriptions>(
     baseUrl: string,
-    api: Api,
+    api: Narrow<Api>,
     options?: ZodiosOptions
   ): ZodiosInstance<Api>;
 };

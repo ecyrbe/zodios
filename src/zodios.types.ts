@@ -16,6 +16,7 @@ import type {
   Merge,
   MergeUnion,
   FilterArrayByKey,
+  MaybeReadonly,
 } from "./utils.types";
 import { z } from "zod";
 
@@ -31,57 +32,48 @@ export type RequestFormat =
   | "text"; // for text data
 
 type MethodApiDescription<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method
 > = FilterArrayByValue<Api, { method: M }>;
 
 export type EndpointApiDescription<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method,
   Path
 > = FilterArrayByValue<Api, { method: M; path: Path }>;
 
 export type AliasEndpointApiDescription<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   Alias extends string
 > = FilterArrayByValue<Api, { alias: Alias }>;
 
 export type Paths<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method
 > = MethodApiDescription<Api, M>[number]["path"];
 
-export type Aliases<Api extends readonly unknown[]> = FilterArrayByKey<
+export type Aliases<Api extends unknown[]> = FilterArrayByKey<
   Api,
   "alias"
 >[number]["alias"];
 
-export type Response<
-  Api extends readonly unknown[],
-  M extends Method,
-  Path
-> = z.infer<EndpointApiDescription<Api, M, Path>[number]["response"]>;
+export type Response<Api extends unknown[], M extends Method, Path> = z.infer<
+  EndpointApiDescription<Api, M, Path>[number]["response"]
+>;
 
 export type ResponseByAlias<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   Alias extends string
 > = z.infer<AliasEndpointApiDescription<Api, Alias>[number]["response"]>;
 
-export type Body<
-  Api extends readonly unknown[],
-  M extends Method,
-  Path
-> = z.input<
+export type Body<Api extends unknown[], M extends Method, Path> = z.input<
   FilterArrayByValue<
     EndpointApiDescription<Api, M, Path>[number]["parameters"],
     { type: "Body" }
   >[number]["schema"]
 >;
 
-export type BodyByAlias<
-  Api extends readonly unknown[],
-  Alias extends string
-> = z.input<
+export type BodyByAlias<Api extends unknown[], Alias extends string> = z.input<
   FilterArrayByValue<
     AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
     { type: "Body" }
@@ -89,7 +81,7 @@ export type BodyByAlias<
 >;
 
 export type QueryParams<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method,
   Path
 > = NeverIfEmpty<
@@ -104,7 +96,7 @@ export type QueryParams<
 >;
 
 export type QueryParamsByAlias<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   Alias extends string
 > = NeverIfEmpty<
   UndefinedToOptional<
@@ -122,7 +114,7 @@ export type PathParams<Path extends string> = NeverIfEmpty<
 >;
 
 export type PathParamByAlias<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   Alias extends string
 > = NeverIfEmpty<
   Record<
@@ -132,7 +124,7 @@ export type PathParamByAlias<
 >;
 
 export type HeaderParams<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method,
   Path
 > = NeverIfEmpty<
@@ -147,7 +139,7 @@ export type HeaderParams<
 >;
 
 export type HeaderParamsByAlias<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   Alias extends string
 > = NeverIfEmpty<
   UndefinedToOptional<
@@ -161,7 +153,7 @@ export type HeaderParamsByAlias<
 >;
 
 export type ZodiosConfigByAlias<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   Alias extends string
 > = Merge<
   SetPropsOptionalIfChildrenAreOptional<
@@ -177,7 +169,7 @@ export type ZodiosConfigByAlias<
   >
 >;
 
-export type ZodiosAliases<Api extends readonly unknown[]> = MergeUnion<
+export type ZodiosAliases<Api extends unknown[]> = MergeUnion<
   Aliases<Api> extends infer Aliases
     ? Aliases extends string
       ? {
@@ -212,7 +204,7 @@ export type AnyZodiosRequestOptions = Merge<
 >;
 
 export type ZodiosMethodOptions<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method,
   Path extends string
 > = Merge<
@@ -230,7 +222,7 @@ export type ZodiosMethodOptions<
 >;
 
 export type ZodiosRequestOptions<
-  Api extends readonly unknown[],
+  Api extends unknown[],
   M extends Method,
   Path extends string
 > = Merge<
@@ -269,10 +261,30 @@ export type ZodiosOptions = {
   axiosConfig?: AxiosRequestConfig;
 };
 
+export type ZodiosEndpointParameter<T = unknown> = {
+  /**
+   * name of the parameter
+   */
+  name: string;
+  /**
+   * optional description of the parameter
+   */
+  description?: string;
+  /**
+   * type of the parameter: Query, Body, Header
+   */
+  type: "Query" | "Body" | "Header";
+  /**
+   * zod schema of the parameter
+   * you can use zod `transform` to transform the value of the parameter before sending it to the server
+   */
+  schema: z.ZodType<T>;
+};
+
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
-export type ZodiosEndpointDescription<R> = {
+export type ZodiosEndpointDescription<R = unknown> = {
   /**
    * http method : get, post, put, patch, delete
    */
@@ -304,25 +316,7 @@ export type ZodiosEndpointDescription<R> = {
   /**
    * optional parameters of the endpoint
    */
-  parameters?: Array<{
-    /**
-     * name of the parameter
-     */
-    name: string;
-    /**
-     * optional description of the parameter
-     */
-    description?: string;
-    /**
-     * type of the parameter: Query, Body, Header
-     */
-    type: "Query" | "Body" | "Header";
-    /**
-     * zod schema of the parameter
-     * you can use zod `transform` to transform the value of the parameter before sending it to the server
-     */
-    schema: z.ZodType<unknown>;
-  }>;
+  parameters?: Array<ZodiosEndpointParameter>;
   /**
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
@@ -330,9 +324,7 @@ export type ZodiosEndpointDescription<R> = {
   response: z.ZodType<R>;
 };
 
-export type ZodiosEnpointDescriptions = ReadonlyDeep<
-  ZodiosEndpointDescription<any>[]
->;
+export type ZodiosEnpointDescriptions = ZodiosEndpointDescription[];
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses

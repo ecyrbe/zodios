@@ -1,9 +1,11 @@
 import { z } from "zod";
+import { asParameters } from "../../src/api";
 
-export const paramPages = [
+export const paramPages = asParameters([
   {
     name: "page",
     type: "Query",
+    description: "Page number",
     schema: z.number().optional(),
   },
   {
@@ -11,4 +13,4 @@ export const paramPages = [
     type: "Query",
     schema: z.number().optional(),
   },
-] as const;
+]);

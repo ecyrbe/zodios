@@ -12,7 +12,7 @@ export const devTo = new Zodios("https://dev.to/api", [
   ...followsApi,
   ...followersApi,
   ...userApi,
-] as const);
+]);
 
 devTo.use(
   pluginApiKey({

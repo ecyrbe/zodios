@@ -57,4 +57,4 @@ export const commentsApi = asApi([
     description: "Get a comment",
     response: devComment,
   },
-] as const);
+]);

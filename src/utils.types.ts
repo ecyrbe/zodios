@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z, ZodType } from "zod";
 
 /**
  * filter an array type by a predicate value
@@ -7,11 +7,11 @@ import { z } from "zod";
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type FilterArrayByValue<
-  T extends readonly unknown[],
+  T extends unknown[],
   C,
   Acc extends unknown[] = []
-> = T extends readonly [infer Head, ...infer Tail]
-  ? Head extends Readonly<C>
+> = T extends [infer Head, ...infer Tail]
+  ? Head extends C
     ? FilterArrayByValue<Tail, C, [...Acc, Head]>
     : FilterArrayByValue<Tail, C, Acc>
   : Acc;
@@ -23,10 +23,10 @@ export type FilterArrayByValue<
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type FilterArrayByKey<
-  T extends readonly unknown[],
+  T extends unknown[],
   K extends string,
   Acc extends unknown[] = []
-> = T extends readonly [infer Head, ...infer Tail]
+> = T extends [infer Head, ...infer Tail]
   ? Head extends { [Key in K]: unknown }
     ? FilterArrayByKey<Tail, K, [...Acc, Head]>
     : FilterArrayByKey<Tail, K, Acc>
@@ -45,6 +45,26 @@ export type DefinedArray<
     ? DefinedArray<Tail, Acc>
     : DefinedArray<Tail, [Head, ...Acc]>
   : Acc;
+
+type Try<A, B, C> = A extends B ? A : C;
+
+type NarrowRaw<T> =
+  | (T extends Function ? T : never)
+  | (T extends string | number | bigint | boolean ? T : never)
+  | (T extends [] ? [] : never)
+  | {
+      [K in keyof T]: K extends "description" ? T[K] : NarrowNotZod<T[K]>;
+    };
+
+type NarrowNotZod<T> = Try<T, ZodType, NarrowRaw<T>>;
+
+/**
+ * Utility to infer the embedded primitive type of any type
+ * Same as `as const` but without setting the object as readonly and without needing the user to use it
+ * @param T - type to infer the embedded type of
+ * @see - thank you tannerlinsley for this idea
+ */
+export type Narrow<T> = Try<T, [], NarrowNotZod<T>>;
 
 /**
  * merge all union types into a single type
@@ -181,19 +201,21 @@ export type ReadonlyDeep<T> = T extends (infer R)[]
   ? DeepReadonlyObject<T>
   : T;
 
+export type MaybeReadonly<T> = T | ReadonlyDeep<T>;
+
 /**
  * Map a type an api description parameter to a zod infer type
  * @param T - array of api description parameters
  * @details -  this is using tail recursion type optimization from typescript 4.5
  */
-export type MapSchemaParameters<T, Acc = {}> = T extends readonly [
+export type MapSchemaParameters<T, Acc = {}> = T extends [
   infer Head,
   ...infer Tail
 ]
-  ? Head extends Readonly<{
+  ? Head extends {
       name: infer Name;
       schema: infer Schema;
-    }>
+    }
     ? Name extends string
       ? MapSchemaParameters<
           Tail,
@@ -223,3 +245,16 @@ export type PathParamNames<
   : Path extends `${string}:${infer Name}`
   ? Name | Acc
   : Acc;
+
+/**
+ * Check if two type are equal else generate a compiler error
+ * @param T - type to check
+ * @param U - type to check against
+ * @returns true if types are equal else a detailed compiler error
+ */
+export type Assert<T, U> = IfEquals<
+  T,
+  U,
+  true,
+  { error: "Types are not equal"; type1: T; type2: U }
+>;

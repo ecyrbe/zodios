@@ -49,4 +49,4 @@ export const userApi = asApi([
     description: "Get a user's profile image",
     response: devProfileImage,
   },
-] as const);
+]);

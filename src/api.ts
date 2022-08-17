@@ -1,10 +1,15 @@
+// @ts-nocheck
+// disable type checking for this file as we need to defer type checking when using these utility types
+// indeed typescript seems to have a bug, where it tries to infer the type of an undecidable generic type
+// but when using the functions, types are inferred correctly
 import {
   ZodiosEndpointDescription,
+  ZodiosEndpointParameter,
   ZodiosEnpointDescriptions,
 } from "./zodios.types";
 import z from "zod";
 import { capitalize } from "./utils";
-import { ReadonlyDeep } from "./utils.types";
+import { Narrow, ReadonlyDeep } from "./utils.types";
 
 /**
  * Simple helper to split your api definitions into multiple files
@@ -12,19 +17,23 @@ import { ReadonlyDeep } from "./utils.types";
  * @param api - api definitions
  * @returns the api definitions
  */
-export function asApi<T extends ZodiosEnpointDescriptions>(api: T): T {
+export function asApi<T extends ZodiosEnpointDescriptions>(api: Narrow<T>) {
   return api;
 }
 
+export function asParameters<T extends ZodiosEndpointParameter[]>(
+  params: Narrow<T>
+) {
+  return params;
+}
+
 export class Builder<T extends ZodiosEnpointDescriptions> {
-  constructor(private readonly endpoints: T) {}
-  addEndpoint<E extends ReadonlyDeep<ZodiosEndpointDescription<any>>>(
-    endpoint: E
-  ) {
-    return new Builder([...this.endpoints, endpoint] as const);
+  constructor(private api: T) {}
+  addEndpoint<E extends ZodiosEndpointDescription>(endpoint: Narrow<E>) {
+    return new Builder<[...T, E]>([...this.api, endpoint]);
   }
-  build(): T {
-    return this.endpoints;
+  build() {
+    return this.api as Narrow<T>;
   }
 }
 
@@ -34,10 +43,10 @@ export class Builder<T extends ZodiosEnpointDescriptions> {
  * @param endpoint
  * @returns - a builder to build your api definitions
  */
-export function apiBuilder<
-  T extends ReadonlyDeep<ZodiosEndpointDescription<any>>
->(endpoint: T): Builder<readonly [T]> {
-  return new Builder([endpoint] as const);
+export function apiBuilder<T extends ZodiosEndpointDescription<any>>(
+  endpoint: Narrow<T>
+) {
+  return new Builder<[T]>([endpoint]);
 }
 
 /**
@@ -123,5 +132,5 @@ export function asCrudApi<T extends string, S extends z.Schema>(
       description: `Delete a ${resource}`,
       response: schema,
     },
-  ] as const);
+  ]);
 }

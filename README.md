@@ -58,6 +58,7 @@ It's an axios compatible API client, with the following features:
   - [Override plugin](#override-plugin)
   - [Plugin execution order](#plugin-execution-order)
   - [Write your own plugin](#write-your-own-plugin)
+- [Migrate to v8](#migrate-to-v8)
 - [Ecosystem](#ecosystem)
 - [Roadmap](#roadmap)
 - [Dependencies](#dependencies)
@@ -100,11 +101,9 @@ const apiClient = new Zodios(
         name: z.string(),
       }),
     },
-  ] as const,
+  ],
 );
 ```
-⚠️ **Be careful** : do not forget to add `const` keywork for each of your API definition array. Else `path` , `alias`, `parameters` and `response` will not be typed and autocompletion will not work.
-
 
 Calling this API is now easy and has builtin autocomplete features :  
   
@@ -166,17 +165,16 @@ export const articlesApi = apiBuilder({
     description: "Get latest articles",
     parameters: paramPages,
     response: devArticles,
-  } as const)
+  })
   .addEndpoint({
     method: "get",
     path: "/articles/:id",
     alias: "getArticle",
     description: "Get an article by id",
     response: devArticle,
-  } as const)
+  })
   .build();
 ```
-⚠️ **Be careful** : do not forget to add `const` keywork for each of your endpoint descriptions. Else `path` , `alias`, `parameters` and `response` will not be typed and autocompletion will not work.
 
 ## Get underlying axios instance
 
@@ -192,7 +190,7 @@ you can instanciate zodios with your own axios intance.
 ```typescript
 const apiClient = new Zodios(
   "https://jsonplaceholder.typicode.com",
-  [ ... ] as const,
+  [ ... ],
   // Optional Axios instance
   {
     axiosIntance: customAxiosInstance
@@ -208,7 +206,7 @@ So if you want to disable zod validation, do not use transformations.
 ```typescript
 const apiClient = new Zodios(
   "https://jsonplaceholder.typicode.com",
-  [ ... ] as const,
+  [ ... ],
   {
     validate: false
   }
@@ -237,7 +235,7 @@ const apiClient = new Zodios(
         lastname: name.split(" ")[1],
       })),
     },
-  ] as const
+  ]
 );
 
 const user = await apiClient.getUser({ params: { id: 7 } });
@@ -275,7 +273,7 @@ const apiClient = new Zodios(
     response: z.object({
       id: z.number(),
     }),
-  }] as const,
+  }],
 );
 const id = await apiClient.upload({ file: document.querySelector('#file').files[0] });
 ```
@@ -302,7 +300,7 @@ const apiClient = new Zodios(
     response: z.object({
       id: z.number(),
     }),
-  }] as const,
+  }],
 );
 const form = new FormData();
 form.append('file', document.querySelector('#file').files[0]);
@@ -335,7 +333,7 @@ Zodios supports application/x-www-form-urlencoded requests with integrated `requ
       response: z.object({
         id: z.number(),
       }),
-    }] as const,
+    }],
   );
   const id = await apiClient.login({ userName: "user", password: "password" });
   ```
@@ -366,7 +364,7 @@ Zodios supports application/x-www-form-urlencoded requests with integrated `requ
       response: z.object({
         id: z.number(),
       }),
-    }] as const,
+    }],
   );
   const id = await apiClient.login({ userName: "user", password: "password" },
     { headers: 
@@ -462,7 +460,7 @@ const apiClient = new Zodios(BASE_URL, [
     description: "Delete a user",
     response: userSchema,
   },
-] as const);
+]);
 ```
 ## React helpers
 
@@ -479,7 +477,7 @@ import { ZodiosHooks } from "@zodios/react";
 import { z } from "zod";
 
 const baseUrl = "https://jsonplaceholder.typicode.com";
-const zodios = new Zodios(baseUrl, [...] as const);
+const zodios = new Zodios(baseUrl, [...]);
 const zodiosHooks = new ZodiosHooks("jsonplaceholder", zodios);
 
 const Users = () => {
@@ -663,6 +661,14 @@ export type ZodiosPlugin = {
   ) => Promise<AxiosResponse>;
 };
 ```
+
+# Migrate to v8
+
+**BREAKING CHANGE** Since version 8 of zodios, `as const` is no more needed nor supported to declare your apis.  
+Zodios can now infer your api definitions by using [generic type narrowing](https://github.com/ecyrbe/zodios/blob/main/src/utils.types.ts#L61).
+To migrate to v8 :
+- Remove the `as const` from your api definitions.  
+- Use the [api creation helpers](#api-creation-helpers) to declare your apis splitted api definitions, since `as const` does not work anymore in V8.
 
 # Ecosystem
 

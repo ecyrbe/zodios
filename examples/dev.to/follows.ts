@@ -20,4 +20,4 @@ export const followsApi = asApi([
     description: "Get all followed tags",
     response: devFollows,
   },
-] as const);
+]);

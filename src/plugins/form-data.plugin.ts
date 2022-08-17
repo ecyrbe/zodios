@@ -47,7 +47,7 @@ const plugin: ZodiosPlugin = {
  *       response: z.object({
  *         id: z.number(),
  *       }),
- *     }] as const,
+ *     }],
  *   );
  *   const id = await apiClient.upload({ file: document.querySelector('#file').files[0] });
  * ```

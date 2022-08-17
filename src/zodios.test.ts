@@ -114,7 +114,7 @@ describe("Zodios", () => {
   });
 
   it("should get base url", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [] as const);
+    const zodios = new Zodios(`http://localhost:${port}`, []);
     expect(zodios.baseURL).toBe(`http://localhost:${port}`);
   });
 
@@ -201,7 +201,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     expect(() =>
       // @ts-ignore
       zodios.use("tests", {
@@ -221,7 +221,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     expect(() =>
       // @ts-ignore
       zodios.use("get", "/test/:id", {
@@ -243,7 +243,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     zodios.use("get", "/:id", {
       request: async (_, config) => config,
     });
@@ -262,7 +262,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     zodios.use("test", {
       request: async (_, config) => config,
     });
@@ -290,7 +290,7 @@ describe("Zodios", () => {
           })
         ),
       },
-    ] as const);
+    ]);
     const response = await zodios.request({
       method: "get",
       url: "/:id",
@@ -308,7 +308,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.get("/:id", { params: { id: 7 } });
     expect(response).toEqual({ id: 7, name: "test" });
   });
@@ -324,7 +324,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.getById({ params: { id: 7 } });
     expect(response).toEqual({ id: 7, name: "test" });
   });
@@ -338,7 +338,7 @@ describe("Zodios", () => {
         id: z.number(),
         name: z.string(),
       }),
-    } as const).build();
+    }).build();
     const zodios = new Zodios(`http://localhost:${port}`, api);
     const response = await zodios.getById({ params: { id: 7 } });
     expect(response).toEqual({ id: 7, name: "test" });
@@ -354,7 +354,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     try {
       await zodios.get("/:id");
     } catch (e) {
@@ -372,7 +372,7 @@ describe("Zodios", () => {
           address: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.get("/:id/address/:address", {
       params: { id: 7, address: "address" },
     });
@@ -398,7 +398,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.post("/", { name: "post" });
     expect(response).toEqual({ id: 3, name: "post" });
   });
@@ -427,7 +427,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const config = {
       method: "post",
       url: "/",
@@ -465,7 +465,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     let response;
     let error: ZodiosError | undefined;
     try {
@@ -501,7 +501,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.create({ name: "post" });
     expect(response).toEqual({ id: 3, name: "post" });
   });
@@ -526,7 +526,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.put("/", { id: 5, name: "put" });
     expect(response).toEqual({ id: 5, name: "put" });
   });
@@ -552,7 +552,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.update({ id: 5, name: "put" });
     expect(response).toEqual({ id: 5, name: "put" });
   });
@@ -577,7 +577,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.patch("/", { id: 4, name: "patch" });
     expect(response).toEqual({ id: 4, name: "patch" });
   });
@@ -603,7 +603,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.update({ id: 4, name: "patch" });
     expect(response).toEqual({ id: 4, name: "patch" });
   });
@@ -617,7 +617,7 @@ describe("Zodios", () => {
           id: z.number(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.delete("/:id", undefined, {
       params: { id: 6 },
     });
@@ -634,7 +634,7 @@ describe("Zodios", () => {
           id: z.number(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.remove(undefined, {
       params: { id: 6 },
     });
@@ -652,7 +652,7 @@ describe("Zodios", () => {
           more: z.string(),
         }),
       },
-    ] as const);
+    ]);
     try {
       await zodios.get("/:id", { params: { id: 1 } });
     } catch (e) {
@@ -684,7 +684,7 @@ describe("Zodios", () => {
             more: z.string(),
           }),
         },
-      ] as const,
+      ],
       { validateResponse: false }
     );
     const response = await zodios.get("/:id", { params: { id: 1 } });
@@ -704,7 +704,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     try {
       await zodios.get("/error502");
     } catch (e) {
@@ -737,7 +737,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.post("/form-data", { id: 4, name: "post" });
     expect(response).toEqual({ id: "4", name: "post" });
   });
@@ -763,7 +763,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.post("/form-data", { id: 4, name: "post" });
     expect(response).toEqual({ id: "4", name: "post" });
   }, 100);
@@ -783,7 +783,7 @@ describe("Zodios", () => {
         ],
         response: z.string(),
       },
-    ] as const);
+    ]);
     let error: Error | undefined;
     let response: string | undefined;
     try {
@@ -819,7 +819,7 @@ describe("Zodios", () => {
           name: z.string(),
         }),
       },
-    ] as const);
+    ]);
     const response = await zodios.post("/form-url", { id: 4, name: "post" });
     expect(response).toEqual({ id: "4", name: "post" });
   });
@@ -839,7 +839,7 @@ describe("Zodios", () => {
         ],
         response: z.string(),
       },
-    ] as const);
+    ]);
     let error: Error | undefined;
     let response: string | undefined;
     try {
@@ -869,7 +869,7 @@ describe("Zodios", () => {
         ],
         response: z.string(),
       },
-    ] as const);
+    ]);
     const response = await zodios.post("/text", "test");
     expect(response).toEqual("test");
   });

@@ -2,6 +2,7 @@ import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";
 import { asCrudApi, Zodios } from "./index";
+import { Assert } from "./utils.types";
 
 const userSchema = z.object({
   id: z.number(),
@@ -44,6 +45,20 @@ describe("asCrudApi", () => {
 
   it("should create a CRUD api definition", () => {
     const api = asCrudApi("user", userSchema);
+
+    const usersSchema = z.array(userSchema);
+
+    type ExpectedGetEndpoint = {
+      method: "get";
+      path: "/users";
+      alias: "getUsers";
+      description: "Get all users";
+      response: typeof usersSchema;
+    };
+
+    // check narrowing works
+    const testGet: Assert<typeof api[0], ExpectedGetEndpoint> = true;
+
     expect(JSON.stringify(api)).toEqual(
       JSON.stringify([
         {
