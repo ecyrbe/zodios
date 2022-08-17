@@ -17,13 +17,13 @@ import { Narrow, ReadonlyDeep } from "./utils.types";
  * @param api - api definitions
  * @returns the api definitions
  */
-export function asApi<T extends ZodiosEnpointDescriptions>(api: Narrow<T>) {
+export function asApi<T extends ZodiosEnpointDescriptions>(api: Narrow<T>): T {
   return api;
 }
 
 export function asParameters<T extends ZodiosEndpointParameter[]>(
   params: Narrow<T>
-) {
+): T {
   return params;
 }
 
@@ -32,8 +32,8 @@ export class Builder<T extends ZodiosEnpointDescriptions> {
   addEndpoint<E extends ZodiosEndpointDescription>(endpoint: Narrow<E>) {
     return new Builder<[...T, E]>([...this.api, endpoint]);
   }
-  build() {
-    return this.api as Narrow<T>;
+  build(): T {
+    return this.api;
   }
 }
 
@@ -45,8 +45,8 @@ export class Builder<T extends ZodiosEnpointDescriptions> {
  */
 export function apiBuilder<T extends ZodiosEndpointDescription<any>>(
   endpoint: Narrow<T>
-) {
-  return new Builder<[T]>([endpoint]);
+): Builder<[T]> {
+  return new Builder([endpoint]);
 }
 
 /**
