@@ -152,6 +152,7 @@ Defining your API is easy with zodios, as definitions are just plain objects.
 But typescript error messages can be cryptic and hard to understand. So zodios provides some helpers to make your life easier.
 
 - `asApi()` : simple helper to create splitted API definition from an array of endpoint descriptions.
+- `asParameters()` : simple helper to create splitted parameters definition to share between your endpoints.
 - `asCrudApi()` : [helper](#crud-helper) to create a CRUD API definition from a resource name and a resource schema.
 - `apiBuilder()`: advanced helper to create splitted API definition endpoint by endpoint. It's the one with the better user experience.
 

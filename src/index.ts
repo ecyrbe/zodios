@@ -12,6 +12,8 @@ export type {
   ResponseByAlias,
   ZodiosEndpointDescription,
   ZodiosEnpointDescriptions,
+  ZodiosEndpointParameter,
+  ZodiosEndpointParameters,
   ZodiosOptions,
   ZodiosRequestOptions,
   ZodiosMethodOptions,
@@ -24,4 +26,4 @@ export type {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-export { asApi, asCrudApi, apiBuilder } from "./api";
+export { asApi, asCrudApi, apiBuilder, asParameters } from "./api";

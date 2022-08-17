@@ -281,6 +281,8 @@ export type ZodiosEndpointParameter<T = unknown> = {
   schema: z.ZodType<T>;
 };
 
+export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
+
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
