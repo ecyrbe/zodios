@@ -1592,13 +1592,13 @@ form-data@^4.0.0:
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
-formdata-node@4.3.3:
-  version "4.3.3"
-  resolved "https://registry.yarnpkg.com/formdata-node/-/formdata-node-4.3.3.tgz#21415225be66e2c87a917bfc0fedab30a119c23c"
-  integrity sha512-coTew7WODO2vF+XhpUdmYz4UBvlsiTMSNaFYZlrXIqYbFd4W7bMwnoALNLE6uvNgzTg2j1JDF0ZImEfF06VPAA==
+formdata-node@4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/formdata-node/-/formdata-node-4.4.0.tgz#7dda5b9c2959c8c312fd69ef2b10a9c7ea40ca29"
+  integrity sha512-Q1LZsZggMqcmiAv1VIf4qSo1jxROFYUtuwNbJxman4UurKp3kdcDhtIK2+rKKqa0Xgqlga0qea3s+qH4I4v5kw==
   dependencies:
     node-domexception "1.0.0"
-    web-streams-polyfill "4.0.0-beta.1"
+    web-streams-polyfill "4.0.0-beta.2"
 
 forwarded@0.2.0:
   version "0.2.0"
@@ -3092,10 +3092,10 @@ walker@^1.0.8:
   dependencies:
     makeerror "1.0.12"
 
-web-streams-polyfill@4.0.0-beta.1:
-  version "4.0.0-beta.1"
-  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-4.0.0-beta.1.tgz#3b19b9817374b7cee06d374ba7eeb3aeb80e8c95"
-  integrity sha512-3ux37gEX670UUphBF9AMCq8XM6iQ8Ac6A+DSRRjDoRBm1ufCkaCDdNVbaqq60PsEkdNlLKrGtv/YBP4EJXqNtQ==
+web-streams-polyfill@4.0.0-beta.2:
+  version "4.0.0-beta.2"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-4.0.0-beta.2.tgz#a534d1a8a4bbbb8d2bba07eb27722fde8ee8d077"
+  integrity sha512-UHhhnoe2M40uh2r0KVdJTN7qjFytm6o0Yp3VcjwV3bfo6rz8uqvxNoE5yNmGF0y3eFfXaFeb6M09MDSwwLmq4w==
 
 which@^2.0.1:
   version "2.0.2"
