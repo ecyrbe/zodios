@@ -30,7 +30,6 @@ describe("Zodios", () => {
       res.status(502).json({ error: { message: "bad gateway" } });
     });
     app.get("/queries", (req, res) => {
-      console.log(req.url);
       res.status(200).json({
         queries: req.query.id,
       });
@@ -306,26 +305,22 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with standard query arrays", async () => {
-    const zodios = new Zodios(
-      `http://localhost:${port}`,
-      [
-        {
-          method: "get",
-          path: "/queries",
-          parameters: [
-            {
-              name: "id",
-              type: "Query",
-              schema: z.array(z.number()),
-            },
-          ],
-          response: z.object({
-            queries: z.array(z.number()),
-          }),
-        },
-      ],
-      { validate: false }
-    );
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/queries",
+        parameters: [
+          {
+            name: "id",
+            type: "Query",
+            schema: z.array(z.number()),
+          },
+        ],
+        response: z.object({
+          queries: z.array(z.string()),
+        }),
+      },
+    ]);
     const response = await zodios.get("/queries", { queries: { id: [1, 2] } });
     expect(response).toEqual({ queries: ["1", "2"] });
   });
