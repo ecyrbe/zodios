@@ -143,6 +143,11 @@ type ZodiosEndpointDescriptions = Array<{
     schema: ZodSchema; // you can use zod `transform` to transform the value of the parameter before sending it to the server
   }>;
   response: ZodSchema; // you can use zod `transform` to transform the value of the response before returning it
+  errors?: Array<{
+    status: number | 'default';
+    description?: string;
+    schema: ZodSchema; // transformations are not supported on error schemas
+  }>;
 }>;
 ```
 

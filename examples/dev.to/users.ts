@@ -34,6 +34,18 @@ export const userApi = asApi([
     alias: "getUser",
     description: "Get a user",
     response: devUser,
+    errors: [
+      {
+        status: "default",
+        description: "Default error",
+        schema: z.object({
+          error: z.object({
+            code: z.string(),
+            message: z.string(),
+          }),
+        }),
+      },
+    ],
   },
   {
     method: "get",

@@ -10,10 +10,14 @@ export type {
   Paths,
   Response,
   ResponseByAlias,
+  EndpointError,
+  EndpointErrorByAlias,
   ZodiosEndpointDescription,
   ZodiosEnpointDescriptions,
   ZodiosEndpointParameter,
   ZodiosEndpointParameters,
+  ZodiosEndpointError,
+  ZodiosEndpointErrors,
   ZodiosOptions,
   ZodiosRequestOptions,
   ZodiosMethodOptions,
@@ -26,4 +30,4 @@ export type {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-export { asApi, asCrudApi, apiBuilder, asParameters } from "./api";
+export { asApi, asCrudApi, apiBuilder, asParameters, asErrors } from "./api";

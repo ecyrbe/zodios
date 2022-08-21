@@ -6,10 +6,11 @@ import {
   ZodiosEndpointDescription,
   ZodiosEndpointParameter,
   ZodiosEnpointDescriptions,
+  ZodiosEndpointError,
 } from "./zodios.types";
 import z from "zod";
 import { capitalize } from "./utils";
-import { Narrow, ReadonlyDeep } from "./utils.types";
+import { Narrow } from "./utils.types";
 
 /**
  * Simple helper to split your api definitions into multiple files
@@ -25,6 +26,12 @@ export function asParameters<T extends ZodiosEndpointParameter[]>(
   params: Narrow<T>
 ): T {
   return params;
+}
+
+export function asErrors<T extends ZodiosEndpointError[]>(
+  errors: Narrow<T>
+): T {
+  return errors;
 }
 
 export class Builder<T extends ZodiosEnpointDescriptions> {

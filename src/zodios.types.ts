@@ -17,8 +17,10 @@ import type {
   MergeUnion,
   FilterArrayByKey,
   MaybeReadonly,
+  IfEquals,
 } from "./utils.types";
 import { z } from "zod";
+import { ApiKeyPluginConfig } from "../examples/dev.to/api-key-plugin";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
@@ -65,6 +67,62 @@ export type ResponseByAlias<
   Api extends unknown[],
   Alias extends string
 > = z.infer<AliasEndpointApiDescription<Api, Alias>[number]["response"]>;
+
+type DefaultError<
+  Api extends unknown[],
+  M extends Method,
+  Path
+> = FilterArrayByValue<
+  EndpointApiDescription<Api, M, Path>[number]["errors"],
+  {
+    status: "default";
+  }
+>[number]["schema"];
+
+type DefaultErrorByAlias<
+  Api extends unknown[],
+  Alias extends string
+> = FilterArrayByValue<
+  AliasEndpointApiDescription<Api, Alias>[number]["errors"],
+  {
+    status: "default";
+  }
+>[number]["schema"];
+
+type IfNever<E, A> = IfEquals<E, never, A, E>;
+
+export type EndpointError<
+  Api extends unknown[],
+  M extends Method,
+  Path,
+  Status extends number
+> = z.input<
+  IfNever<
+    FilterArrayByValue<
+      EndpointApiDescription<Api, M, Path>[number]["errors"],
+      {
+        status: Status;
+      }
+    >[number]["schema"],
+    DefaultError<Api, M, Path>
+  >
+>;
+
+export type EndpointErrorByAlias<
+  Api extends unknown[],
+  Alias extends string,
+  Status extends number
+> = z.input<
+  IfNever<
+    FilterArrayByValue<
+      AliasEndpointApiDescription<Api, Alias>[number]["errors"],
+      {
+        status: Status;
+      }
+    >[number]["schema"],
+    DefaultErrorByAlias<Api, Alias>
+  >
+>;
 
 export type Body<Api extends unknown[], M extends Method, Path> = z.input<
   FilterArrayByValue<
@@ -283,6 +341,24 @@ export type ZodiosEndpointParameter<T = unknown> = {
 
 export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
 
+export type ZodiosEndpointError<T = unknown> = {
+  /**
+   * status code of the error
+   * use 'default' to declare a default error
+   */
+  status: number | "default";
+  /**
+   * description of the error - used to generate the openapi error description
+   */
+  description?: string;
+  /**
+   * schema of the error
+   */
+  schema: z.ZodType<T>;
+};
+
+export type ZodiosEndpointErrors = ZodiosEndpointError[];
+
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
@@ -324,6 +400,10 @@ export type ZodiosEndpointDescription<R = unknown> = {
    * you can use zod `transform` to transform the value of the response before returning it
    */
   response: z.ZodType<R>;
+  /**
+   * optional errors of the endpoint - only usefull when using @zodios/express
+   */
+  errors?: Array<ZodiosEndpointError>;
 };
 
 export type ZodiosEnpointDescriptions = ZodiosEndpointDescription[];
