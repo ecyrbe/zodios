@@ -59,6 +59,7 @@ It's an axios compatible API client, with the following features:
   - [Plugin execution order](#plugin-execution-order)
   - [Write your own plugin](#write-your-own-plugin)
 - [Migrate to v8](#migrate-to-v8)
+- [Full end to end typesafety](#full-end-to-end-typesafety)
 - [Ecosystem](#ecosystem)
 - [Roadmap](#roadmap)
 - [Dependencies](#dependencies)
@@ -676,6 +677,70 @@ To migrate to v8 :
 - Remove the `as const` from your api definitions.  
 - Use the [api creation helpers](#api-creation-helpers) to declare your apis splitted api definitions, since `as const` does not work anymore in V8.
 
+# Full end to end typesafety
+
+If you have a fullstack control over your application, you can also use [@zodios/express](https://github.com/ecyrbe/zodios-express).
+
+Here is an example of full end to end typesafety with zodios.
+  
+in a common directory (ex: `src/common/api.ts`) :
+
+```typescript
+import { asApi } from "@zodios/core";
+import { z } from "zod";
+
+const userApi = asApi([
+  {
+    method: "get",
+    path: "/users/:id", // auto detect :id and ask for it in apiClient get params
+    alias: "getUser", // optionnal alias to call this endpoint with it
+    description: "Get a user",
+    response: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
+]);
+```
+
+in your frontend (ex: `src/client/api.ts`) :
+
+```typescript
+import { Zodios } from "@zodios/core";
+import { userApi } from "../../common/api";
+
+const apiClient = new Zodios(
+  'http://localhost:3000', // base url
+  userApi
+);
+
+//   typed                     alias   auto-complete params
+//     ▼                        ▼                   ▼
+const user = await apiClient.getUser({ params: { id: 1 } });
+```
+
+in your backend (ex: `src/server/router.ts`) :
+```typescript
+import { zodiosApp } from "@zodios/express";
+import { userApi } from "../../common/api";
+
+// just an express adapter that is aware of  your api, app is just an express app with type annotations and validation middlewares
+const app = zodiosApp(userApi);
+
+//  auto-complete path  fully typed and validated input params (body, query, path, header)
+//          ▼           ▼    ▼
+app.get("/users/:id", (req, res) => {
+  // res.json is typed thanks to zod
+  res.json({
+    //   auto-complete req.params.id
+    //              ▼
+    id: req.params.id,
+    name: "John Doe",
+  });
+})
+
+app.listen(3000);
+```
 # Ecosystem
 
 - [openapi-zod-client](https://github.com/astahmer/openapi-zod-client]): generate a zodios client from an openapi specification
