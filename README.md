@@ -744,13 +744,13 @@ app.listen(3000);
 # Ecosystem
 
 - [openapi-zod-client](https://github.com/astahmer/openapi-zod-client]): generate a zodios client from an openapi specification
+- [@zodios/express](https://github.com/ecyrbe/zodios-express): full end to end type safety like tRPC, but for REST APIs
 - [@zodios/plugins](https://github.com/ecyrbe/zodios-plugins) : some plugins for zodios
 - [@zodios/react](https://github.com/ecyrbe/zodios-react) : a react-query wrapper for zodios
 
 # Roadmap
 
 The following will need investigation to check if it's doable :
-- implement `@zodios/express` to define your API endpoints with express and share it with your frontend (like tRPC)
 - implement `@zodios/nestjs` to define your API endpoints with nestjs and share it with your frontend (like tRPC)
 - generate openAPI json from your API endpoints
 
