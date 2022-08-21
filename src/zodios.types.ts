@@ -20,7 +20,6 @@ import type {
   IfEquals,
 } from "./utils.types";
 import { z } from "zod";
-import { ApiKeyPluginConfig } from "../examples/dev.to/api-key-plugin";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
