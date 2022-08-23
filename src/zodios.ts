@@ -242,12 +242,12 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   async request<
     M extends Method,
     Path extends Paths<Api, M>,
-    Config extends ZodiosRequestOptions<Api, M, Path>
-  >(config: Config): Promise<Response<Api, M, Path>> {
+    TConfig = ReadonlyDeep<ZodiosRequestOptions<Api, M, Path>>
+  >(config: TConfig): Promise<Response<Api, M, Path>> {
     let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
     const anyPlugin = this.getAnyEndpointPlugins()!;
+    const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
     conf = await anyPlugin.interceptRequest(this.api, conf);
-    const endpointPlugin = this.findEnpointPlugins(config.method, config.url);
     if (endpointPlugin) {
       conf = await endpointPlugin.interceptRequest(this.api, conf);
     }
@@ -272,13 +272,16 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   async get<
     Path extends Paths<Api, "get">,
-    Config extends ZodiosMethodOptions<Api, "get", Path>
-  >(path: Path, config?: Config): Promise<Response<Api, "get", Path>> {
+    TConfig extends ZodiosMethodOptions<Api, "get", Path>
+  >(
+    path: Path,
+    config?: ReadonlyDeep<TConfig>
+  ): Promise<Response<Api, "get", Path>> {
     return this.request({
       ...config,
       method: "get",
       url: path,
-    } as unknown as ZodiosRequestOptions<Api, "get", Path>);
+    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "get", Path>>);
   }
 
   /**
@@ -290,18 +293,19 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   async post<
     Path extends Paths<Api, "post">,
-    Config extends ZodiosMethodOptions<Api, "post", Path>
+    TBody extends ReadonlyDeep<Body<Api, "post", Path>>,
+    TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "post", Path>>
   >(
     path: Path,
-    data?: Body<Api, "post", Path>,
-    config?: Config
+    data?: TBody,
+    config?: TConfig
   ): Promise<Response<Api, "post", Path>> {
     return this.request({
       ...config,
       method: "post",
       url: path,
       data,
-    } as unknown as ZodiosRequestOptions<Api, "post", Path>);
+    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "post", Path>>);
   }
 
   /**
@@ -313,18 +317,19 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   async put<
     Path extends Paths<Api, "put">,
-    Config extends ZodiosMethodOptions<Api, "put", Path>
+    TBody extends ReadonlyDeep<Body<Api, "put", Path>>,
+    TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "put", Path>>
   >(
     path: Path,
-    data?: Body<Api, "put", Path>,
-    config?: Config
+    data?: TBody,
+    config?: TConfig
   ): Promise<Response<Api, "put", Path>> {
     return this.request({
       ...config,
       method: "put",
       url: path,
       data,
-    } as unknown as ZodiosRequestOptions<Api, "put", Path>);
+    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "put", Path>>);
   }
 
   /**
@@ -336,18 +341,19 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   async patch<
     Path extends Paths<Api, "patch">,
-    Config extends ZodiosMethodOptions<Api, "patch", Path>
+    TBody extends ReadonlyDeep<Body<Api, "patch", Path>>,
+    TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "patch", Path>>
   >(
     path: Path,
-    data?: Body<Api, "patch", Path>,
-    config?: Config
+    data?: TBody,
+    config?: TConfig
   ): Promise<Response<Api, "patch", Path>> {
     return this.request({
       ...config,
       method: "patch",
       url: path,
       data,
-    } as unknown as ZodiosRequestOptions<Api, "patch", Path>);
+    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "patch", Path>>);
   }
 
   /**
@@ -358,18 +364,19 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   async delete<
     Path extends Paths<Api, "delete">,
-    Config extends ZodiosMethodOptions<Api, "delete", Path>
+    TBody extends ReadonlyDeep<Body<Api, "delete", Path>>,
+    TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "delete", Path>>
   >(
     path: Path,
-    data?: Body<Api, "patch", Path>,
-    config?: Config
+    data?: TBody,
+    config?: TConfig
   ): Promise<Response<Api, "delete", Path>> {
     return this.request({
       ...config,
       method: "delete",
       url: path,
       data,
-    } as unknown as ZodiosRequestOptions<Api, "delete", Path>);
+    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "delete", Path>>);
   }
 }
 

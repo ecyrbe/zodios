@@ -235,11 +235,11 @@ export type ZodiosAliases<Api extends unknown[]> = MergeUnion<
             Alias
           >[number]["method"] extends MutationMethod
             ? (
-                data?: BodyByAlias<Api, Alias>,
-                configOptions?: ZodiosConfigByAlias<Api, Alias>
+                data?: ReadonlyDeep<BodyByAlias<Api, Alias>>,
+                configOptions?: ReadonlyDeep<ZodiosConfigByAlias<Api, Alias>>
               ) => Promise<ResponseByAlias<Api, Alias>>
             : (
-                configOptions?: ZodiosConfigByAlias<Api, Alias>
+                configOptions?: ReadonlyDeep<ZodiosConfigByAlias<Api, Alias>>
               ) => Promise<ResponseByAlias<Api, Alias>>;
         }
       : never
