@@ -13,12 +13,30 @@ import { capitalize } from "./utils";
 import { Narrow } from "./utils.types";
 
 /**
+ * check api for non unique paths
+ * @param api - api to check
+ * @return - nothing
+ * @throws - error if api has non unique paths
+ */
+export function checkApi<T extends ZodiosEnpointDescriptions>(api: T) {
+  const paths = new Set<string>();
+  for (let endpoint of api) {
+    const fullpath = `${endpoint.method} ${endpoint.path}`;
+    if (paths.has(fullpath)) {
+      throw new Error(`Zodios: Duplicate path '${fullpath}'`);
+    }
+    paths.add(fullpath);
+  }
+}
+
+/**
  * Simple helper to split your api definitions into multiple files
  * By just providing autocompletions for the endpoint descriptions
  * @param api - api definitions
  * @returns the api definitions
  */
 export function asApi<T extends ZodiosEnpointDescriptions>(api: Narrow<T>): T {
+  checkApi(api);
   return api;
 }
 
@@ -40,6 +58,7 @@ export class Builder<T extends ZodiosEnpointDescriptions> {
     return new Builder<[...T, E]>([...this.api, endpoint]);
   }
   build(): T {
+    checkApi(this.api);
     return this.api;
   }
 }

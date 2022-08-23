@@ -30,4 +30,11 @@ export type {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-export { asApi, asCrudApi, apiBuilder, asParameters, asErrors } from "./api";
+export {
+  asApi,
+  asCrudApi,
+  apiBuilder,
+  asParameters,
+  asErrors,
+  checkApi,
+} from "./api";

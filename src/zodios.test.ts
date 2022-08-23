@@ -118,6 +118,30 @@ describe("Zodios", () => {
     expect(zodios).toBeDefined();
   });
 
+  it("should should throw with duplicate api endpoints", () => {
+    expect(
+      () =>
+        new Zodios(`http://localhost:${port}`, [
+          {
+            method: "get",
+            path: "/:id",
+            response: z.object({
+              id: z.number(),
+              name: z.string(),
+            }),
+          },
+          {
+            method: "get",
+            path: "/:id",
+            response: z.object({
+              id: z.number(),
+              name: z.string(),
+            }),
+          },
+        ])
+    ).toThrowError("Zodios: Duplicate path 'get /:id'");
+  });
+
   it("should get base url", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     expect(zodios.baseURL).toBe(`http://localhost:${port}`);
