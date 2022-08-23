@@ -22,6 +22,7 @@ import {
   headerPlugin,
 } from "./plugins";
 import { Narrow, ReadonlyDeep } from "./utils.types";
+import { checkApi } from "./api";
 
 /**
  * zodios api client based on axios
@@ -77,6 +78,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     if (!Array.isArray(this.api)) {
       throw new Error("Zodios: api must be an array");
     }
+    checkApi(this.api);
 
     this.options = {
       validate: true,
