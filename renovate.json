@@ -1,4 +1,4 @@
 {
   "extends": ["config:base"],
-  "ignoreDeps": ["form-data-encoder"]
+  "ignoreDeps": ["form-data-encoder", "formdata-node"]
 }
