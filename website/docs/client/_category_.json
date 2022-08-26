@@ -1,0 +1,8 @@
+{
+  "label": "Zodios client",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "Api definitions and client"
+  }
+}

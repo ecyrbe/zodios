@@ -8,6 +8,7 @@
     "node_modules",
     "lib",
     "examples",
+    "website",
     "**/*.config.ts",
     "**/*.spec.ts",
     "**/*.test.ts",
