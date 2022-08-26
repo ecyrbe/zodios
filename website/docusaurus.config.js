@@ -8,7 +8,7 @@ const darkCodeTheme = require("prism-react-renderer/themes/dracula");
 const config = {
   title: "Zodios",
   tagline: "End-to-end typesafe REST API toolbox",
-  url: "https://zodios.org",
+  url: "https://www.zodios.org",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
