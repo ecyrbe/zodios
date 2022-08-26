@@ -4,6 +4,10 @@ sidebar_position: 2
 
 # API definition helpers
 
+Usually, you'll want to define your API definition in a separate file and import it in your server and client code.
+For this use case, Zodios provides some helpers to make your life easier and still keep your API definition correctly inferred without needing to use Typescript `as const`.  
+These helpers, allow your API definitions to be correctly inferred in both pure Javascript and Typescript.
+
 ## asApi
 
 `asApi` is a helper to narrow your api definitions and make some runtime checks.
