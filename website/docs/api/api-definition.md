@@ -2,7 +2,7 @@
 sidebar_position: 1
 ---
 
-# API Definition
+# API definition
 
 Zodios uses a centralised definition to declare your REST API endpoints.
 
