@@ -4,6 +4,11 @@ sidebar_position: 2
 
 # Installation
 
+:::info
+Zodios packages can be installed using your preferred package manager.  
+We only show npm and yarn as they are the most popular.
+:::
+
 ## Frontend installation
 
 ```bash npm2yarn

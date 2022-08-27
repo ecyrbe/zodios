@@ -9,9 +9,18 @@ It allows you to create a REST API with a clean, intuitive and declarative synta
 
 It's best used with [TypeScript](https://www.typescriptlang.org/), but it's also usable with pure [JavaScript](https://www.javascript.com/).
 
-It's composed of multiple components:
-- `@zodios/core` - the core library that contains an API client. You can use it independently of the other components.
-- `@zodios/react` - react hooks for the client based on [tanstack-query](https://tanstack.com/query).
-- `@zodios/plugins` - a set of plugins for the API client.
-- `@zodios/express` - a simple wrapper over [Express](https://expressjs.com/) but with full typesafety and autocompletion.
-- `@zodios/openapi` - openapi helper that generates openapi specs from Zodios API declaration and allows you to easily generate swagger ui.
+It's composed of multiple packages. 
+
+:::tip It's worth noting that frontend and backend packages can be used as standalone packages.
+Meaning that you don't need to use Zodios Backend to use Zodios Frontend packages and vice-versa. Allowing you to scale the developpement of your API between frontend and backend teams.  
+  
+You only need to share the API definition between the two teams.
+:::
+
+| Package           | Type             | Description                                                                                                                                                       |
+| ----------------- | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@zodios/core`    | Frontend Backend | The core library that contains an API client with full typesafety and autocompletion.<br/> You can use it as a standalone API client without using other modules. |
+| `@zodios/react`   | Frontend         | React hooks for the client based on [tanstack-query](https://tanstack.com/query).                                                                                 |
+| `@zodios/plugins` | Frontend Backend | A set of plugins for the API client.                                                                                                                              |
+| `@zodios/express` | Backend          | A simple adapter for [Express](https://expressjs.com/) but with full typesafety and autocompletion.                                                               |
+| `@zodios/openapi` | Backend          | 🚧 Not released yet 🚧<br/> Helper that generates OpenAPI specs from Zodios [API definitions](api/api-definition.md) and allows you to easily generate swagger ui.  |

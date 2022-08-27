@@ -29,7 +29,7 @@ function HomepageHeader() {
               </a>
             </li>
             <li>
-              Typesafe API client based on{" "}
+              Standalone typesafe API client based on{" "}
               <a
                 href="https://axios-http.com/"
                 style={{ color: "white", textDecoration: "underline" }}
