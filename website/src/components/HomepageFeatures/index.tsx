@@ -26,7 +26,7 @@ const FeatureList: FeatureItem[] = [
     title: "API definition",
     Icon: <TbApi size={50} />,
     descriptions: [
-      "simple centralized api definition",
+      "shared api definition",
       "schema declaration with zod",
       "openpi generator and swagger ui",
     ],
@@ -38,6 +38,7 @@ const FeatureList: FeatureItem[] = [
       "autocompletion even in pure javascript",
       "network inputs validation",
       "100% compatibility with express",
+      "easy integration with NextJS",
     ],
   },
 ];

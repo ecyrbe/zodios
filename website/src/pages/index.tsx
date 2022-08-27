@@ -20,7 +20,7 @@ function HomepageHeader() {
         <p>
           <ul style={{ listStyleType: "none" }}>
             <li>
-              Scalable, centralised API definitions based on{" "}
+              Shared API definitions based on{" "}
               <a
                 href="https://zod.dev/"
                 style={{ color: "white", textDecoration: "underline" }}
