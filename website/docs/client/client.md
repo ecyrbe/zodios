@@ -142,7 +142,8 @@ function [alias](config?: ZodiosRequestOptions): Promise<Response>;
 
 **example**:
 ```ts
-const users = await api.getUsers(); // identical to api.get("/users")
+// identical to api.get("/users")
+const users = await api.getUsers();
 ```
 
 #### mutation alias 
@@ -154,7 +155,8 @@ function [alias](body: BodyParam, config?: ZodiosRequestOptions): Promise<Respon
 
 **example**:
 ```ts
-const user = await api.createUser({ name: "John" }); // identical to api.post("/users", { name: "John" })
+// identical to api.post("/users", { name: "John" })
+const user = await api.createUser({ name: "John" });
 ```
 
 ### `zodios.request`
@@ -226,7 +228,7 @@ delete(path: string, body: BodyParam, config?: ZodiosRequestOptions): Promise<Re
 
 **Example**:
 ```ts
-const user = await api.delete("/users/:id", {id: 1 });
+const user = await api.delete("/users/:id", {params: {id: 1}});
 ```
 
 ## Request Options
