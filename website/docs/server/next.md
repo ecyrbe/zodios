@@ -29,7 +29,7 @@ To integrate zodios to NextJS, you need to create a `slug` file named `[...zodio
 │   │   │   └── [..]
 └── [..]
 ```
-:::tip It's recommended to use the example above to bootstrap your NextJS application.
+:::tip It's recommended to use the example below to bootstrap your NextJS application.
   [Example project](https://github.com/ecyrbe/zodios-express/tree/main/examples/next)
 :::
 

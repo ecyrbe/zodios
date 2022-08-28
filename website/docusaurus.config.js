@@ -66,6 +66,12 @@ const config = {
             label: "Documentation",
           },
           {
+            type: "doc",
+            docId: "server/next",
+            position: "left",
+            label: "NextJS Integration",
+          },
+          {
             href: "https://github.com/ecyrbe/zodios",
             label: "GitHub",
             position: "right",
