@@ -4,8 +4,11 @@ sidebar_position: 3
 
 # Next integration
 
-Next integration is easy, with end-to-end typesafe developper experience, where you can combine the powwer of all the Zodios packages into one single codebase.  
+Next integration is easy, with end-to-end typesafe developper experience, where you can combine the power of all the Zodios packages into one single codebase.  
 
+:::info
+For more information about the Next framework, check out the [Next documentation](https://nextjs.org/docs)
+:::
 
 ## File structure
 
