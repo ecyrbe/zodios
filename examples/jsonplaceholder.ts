@@ -1,5 +1,6 @@
 import { ApiOf, ResponseByAlias, Zodios } from "../src/index";
 import { z } from "zod";
+import { HeaderParamsByAlias } from "../src/zodios.types";
 
 async function bootstrap() {
   const apiClient = new Zodios("https://jsonplaceholder.typicode.com", [
@@ -50,6 +51,11 @@ async function bootstrap() {
           type: "Body",
           schema: z.object({ name: z.string() }),
         },
+        {
+          name: "Content-Type",
+          type: "Header",
+          schema: z.string(),
+        },
       ],
       response: z.object({ id: z.number(), name: z.string() }),
     },
@@ -57,13 +63,23 @@ async function bootstrap() {
 
   type UserResponseAlias = ResponseByAlias<ApiOf<typeof apiClient>, "getUsers">;
 
+  type Test = HeaderParamsByAlias<ApiOf<typeof apiClient>, "createUser">;
+
   const users: UserResponseAlias = await apiClient.getUsers({
     queries: { q: "Nicholas" },
   });
   console.log(users);
   const user = await apiClient.getUser({ params: { id: 7 } });
   console.log(user);
-  const createdUser = await apiClient.createUser({ name: "john doe" });
+  const createdUser = await apiClient.createUser(
+    { name: "john doe" },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    }
+  );
   console.log(createdUser);
   const deletedUser = await apiClient.deleteUser(undefined, {
     params: { id: 7 },

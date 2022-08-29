@@ -1,9 +1,4 @@
-import {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
+import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 import type {
   FilterArrayByValue,
   MapSchemaParameters,
@@ -16,10 +11,9 @@ import type {
   Merge,
   MergeUnion,
   FilterArrayByKey,
-  MaybeReadonly,
   IfEquals,
 } from "./utils.types";
-import { z } from "zod";
+import z from "zod";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
@@ -220,10 +214,7 @@ export type ZodiosConfigByAlias<
       headers: HeaderParamsByAlias<Api, Alias>;
     }>
   >,
-  Omit<
-    AxiosRequestConfig,
-    "params" | "headers" | "baseURL" | "data" | "method" | "url"
-  >
+  Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
 >;
 
 export type ZodiosAliases<Api extends unknown[]> = MergeUnion<
@@ -272,10 +263,7 @@ export type ZodiosMethodOptions<
       headers: HeaderParams<Api, M, Path>;
     }>
   >,
-  Omit<
-    AxiosRequestConfig,
-    "params" | "headers" | "baseURL" | "data" | "method" | "url"
-  >
+  Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
 >;
 
 export type ZodiosRequestOptions<
