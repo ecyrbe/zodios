@@ -30,6 +30,7 @@ To integrate zodios to NextJS, you need to create a `slug` file named `[...zodio
 │   │   │   ├── app.ts   # import your API definition and export your main app router here
 │   │   │   ├── users.ts  # sub routers
 │   │   │   └── [..]
+│   │   ├── context.ts # export your main app context here
 └── [..]
 ```
 :::tip It's recommended to use the example below to bootstrap your NextJS application.
@@ -48,7 +49,7 @@ export default app;
 
 ### Declare your main router
 
-Use `zodiosNextApp` to create your main app router.
+Use `zodiosNextApp` or `ctx.nextApp` to create your main app router.
 
 ```typescript title="/src/server/routers/app.ts"
 import { zodiosNextApp } from "@zodios/express";
@@ -60,7 +61,7 @@ app.use("/api", userRouter);
 
 ### Declare your sub routers
 
-Use `zodiosRouter` to create your sub routers.
+Use `zodiosRouter` or `ctx.router` to create your sub routers.
 
 ```typescript title="/src/server/routers/users.ts"
 import { zodiosRouter } from "@zodios/express";
