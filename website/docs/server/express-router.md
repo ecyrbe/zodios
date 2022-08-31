@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 ---
 
 # Zodios Router
@@ -18,7 +18,15 @@ To upgrade an existing express router with typesafety, replace your `express.Rou
 function zodiosRouter(api?: ZodiosEndpointDescriptions, options?: ZodiosRouterOptions): ZodiosRouter
 ```
 
-### Options
+## `ctx.router`
+
+You can also create a context aware express router with `ctx.router`:
+
+```ts
+Context.router(api?: ZodiosEndpointDescriptions, options?: ZodiosRouterOptions): ZodiosRouter
+```
+
+## Options
 
 | Property             | Type           | Description                                            |
 | -------------------- | -------------- | ------------------------------------------------------ |
@@ -30,9 +38,35 @@ function zodiosRouter(api?: ZodiosEndpointDescriptions, options?: ZodiosRouterOp
 | strict               | boolean        | enable strict path matching - default to false         |
 
 
-### Example
+## Examples
 
-```typescript
+
+### Express Router from context
+
+```ts
+
+import { zodiosContext } from "@zodios/express";
+import z from "zod";
+import { userApi } from "../../common/api";
+import { userMiddleware } from "./userMiddleware";
+
+const ctx = zodiosContext({
+  user: z.object({
+    id: z.number(),
+    name: z.string(),
+    isAdmin: z.boolean(),
+  }),
+});
+
+const router = ctx.router();
+
+// middleware that adds the user to the context
+router.use(userMiddleware);
+```
+
+### Merge multiple routers
+
+```ts
 import { zodiosApp, zodiosRouter } from "@zodios/express";
 
 const app = zodiosApp(); // just an axpess app with type annotations
@@ -40,6 +74,28 @@ const userRouter = zodiosRouter(userApi); // just an express router with type an
 const adminRouter = zodiosRouter(adminApi); // just an express router with type annotations and validation middlewares
 
 const app.use(userRouter,adminRouter);
+
+app.listen(3000);
+```
+
+or context aware
+
+```ts
+import { zodiosContext } from "@zodios/express";
+
+const ctx = zodiosContext({
+  user: z.object({
+    id: z.number(),
+    name: z.string(),
+    isAdmin: z.boolean(),
+  }),
+});
+
+const app = ctx.app();
+const userRouter = ctx.router(userApi);
+const adminRouter = ctx.router(adminApi);
+
+app.use(userRouter,adminRouter);
 
 app.listen(3000);
 ```
