@@ -28,7 +28,7 @@ const FeatureList: FeatureItem[] = [
     descriptions: [
       "shared api definition",
       "schema declaration with zod",
-      "openpi generator and swagger ui",
+      "openapi generator and swagger ui",
     ],
   },
   {
