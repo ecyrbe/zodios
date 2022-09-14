@@ -274,3 +274,254 @@ type ZodiosRequestOptions ={
   decompress?: boolean; // default to true
 }
 ```
+
+## Advanced examples
+### Use zod transformations
+
+Since Zodios is using zod, you can use zod transformations.
+
+```typescript
+const apiClient = new Zodios(
+  "https://jsonplaceholder.typicode.com",
+  [
+    {
+      method: "get",
+      path: "/users/:id",
+      alias: "getUser",
+      description: "Get a user",
+      response: z.object({
+        id: z.number(),
+        name: z.string(),
+      }).transform(({ name,...rest }) => ({
+        ...rest,
+        firstname: name.split(" ")[0],
+        lastname: name.split(" ")[1],
+      })),
+    },
+  ]
+);
+
+const user = await apiClient.getUser({ params: { id: 7 } });
+
+console.log(user);
+```
+It should output  
+  
+```js
+{ id: 7, firstname: 'Kurtis', lastname: 'Weissnat' }
+```
+
+### Send multipart/form-data requests
+
+Zodios supports multipart/form-data requests with integrated `requestFormat`. Zodios is using `formdata-node` internally on NodeJs as it's the most up to date library for node.
+
+```typescript
+const apiClient = new Zodios(
+  "https://mywebsite.com",
+  [{
+    method: "post",
+    path: "/upload",
+    alias: "upload",
+    description: "Upload a file",
+    requestFormat: "form-data",
+    parameters:[
+      {
+        name: "body",
+        type: "Body",
+        schema: z.object({
+          file: z.instanceof(File),
+        }),
+      }
+    ],
+    response: z.object({
+      id: z.number(),
+    }),
+  }],
+);
+const id = await apiClient.upload({ file: document.querySelector('#file').files[0] });
+```
+
+But you can also use your own multipart/form-data library, for example with `form-data` library on node.
+
+```typescript
+import FormData from 'form-data';
+
+const apiClient = new Zodios(
+  "https://mywebsite.com",
+  [{
+    method: "post",
+    path: "/upload",
+    alias: "upload",
+    description: "Upload a file",
+    parameters:[
+      {
+        name: "body",
+        type: "Body",
+        schema: z.instanceof(FormData),
+      }
+    ],
+    response: z.object({
+      id: z.number(),
+    }),
+  }],
+);
+const form = new FormData();
+form.append('file', document.querySelector('#file').files[0]);
+const id = await apiClient.upload(form, { headers: form.getHeaders() });
+```
+
+### Send application/x-www-form-urlencoded requests
+
+Zodios supports application/x-www-form-urlencoded requests with integrated `requestFormat`. Zodios is using URLSearchParams internally on both browser and node. (If you need IE support, see next example)
+    
+  ```typescript
+  const apiClient = new Zodios(
+    "https://mywebsite.com",
+    [{
+      method: "post",
+      path: "/login",
+      alias: "login",
+      description: "Submit a form",
+      requestFormat: "form-url",
+      parameters:[
+        {
+          name: "body",
+          type: "Body",
+          schema: z.object({
+            userName: z.string(),
+            password: z.string(),
+          }),
+        }
+      ],
+      response: z.object({
+        id: z.number(),
+      }),
+    }],
+  );
+  const id = await apiClient.login({ userName: "user", password: "password" });
+  ```
+
+  But you can also use custom code to support for application/x-www-form-urlencoded requests.
+  For example with `qs` library on IE :
+    
+  ```typescript
+  import qs from 'qs';
+
+  const apiClient = new Zodios(
+    "https://mywebsite.com",
+    [{
+      method: "post",
+      path: "/login",
+      alias: "login",
+      description: "Submit a form",
+      parameters:[
+        {
+          name: "body",
+          type: "Body",
+          schema: z.object({
+            userName: z.string(),
+            password: z.string(),
+          }).transform(data=> qs.stringify(data)),
+        }
+      ],
+      response: z.object({
+        id: z.number(),
+      }),
+    }],
+  );
+  const id = await apiClient.login({ userName: "user", password: "password" },
+    { headers: 
+        { 
+          'Content-Type': 'application/x-www-form-urlencoded' 
+        }
+    });
+  ```
+
+### CRUD helper
+
+Zodios has a helper to generate basic CRUD API. It will generate all the api definitions for you :  
+  
+```typescript
+import { Zodios, asCrudApi } from '@zodios/core';
+
+const apiClient = new Zodios(BASE_URL,
+  asCrudApi(
+    'user',
+    z.object({
+      id: z.number(),
+      name: z.string(),
+    })
+  ));
+```
+
+Is the same as :
+```typescript
+const apiClient = new Zodios(BASE_URL, [
+  {
+    method: "get",
+    path: "/users",
+    alias: "getUsers",
+    description: "Get all users",
+    response: z.array(userSchema),
+  },
+  {
+    method: "get",
+    path: "/users/:id",
+    alias: "getUser",
+    description: "Get a user",
+    response: userSchema,
+  },
+  {
+    method: "post",
+    path: "/users",
+    alias: "createUser",
+    description: "Create a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        description: "The object to create",
+        schema: userSchema.partial(),
+      },
+    ],
+    response: userSchema,
+  },
+  {
+    method: "put",
+    path: "/users/:id",
+    alias: "updateUser",
+    description: "Update a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        description: "The object to update",
+        schema: userSchema,
+      },
+    ],
+    response: userSchema,
+  },
+  {
+    method: "patch",
+    path: "/users/:id",
+    alias: "patchUser",
+    description: "Patch a user",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        description: "The object to patch",
+        schema: userSchema.partial(),
+      },
+    ],
+    response: userSchema,
+  },
+  {
+    method: "delete",
+    path: "/users/:id",
+    alias: "deleteUser",
+    description: "Delete a user",
+    response: userSchema,
+  },
+]);
+```
