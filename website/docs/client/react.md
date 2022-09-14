@@ -73,7 +73,7 @@ const { data: users, isLoading, isError } = hooks.useQuery('/users');
 check [react-query documentation](https://react-query.tanstack.com/reference/useQuery) for more informations on `QueryResult` and `QueryOptions`.
 :::
 
-### `zodios.useInfinteQuery`
+### `zodios.useInfiniteQuery`
 
 Generic request method that allows to load pages indefinitly.
 
