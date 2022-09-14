@@ -5,9 +5,10 @@ sidebar_position: 3
 # React hooks
 
 Zodios comes with a Query and Mutation hook helper.  
-It's a thin wrapper around React-Query but with zodios auto completion.
+It's a thin wrapper around React-Query but with zodios auto completion and automatic key management.
+No need to remember your keys anymore.
   
-Zodios query hook also returns an invalidation helper to allow you to reset react query cache easily
+Zodios query hook also returns an invalidation helper to allow you to reset react query cache easily.
 
 ## Zodios Hooks instance
 
@@ -32,7 +33,7 @@ You will usually want to use aliases to call your endpoints. You can define them
 
 #### query alias:
 ```ts
-function use[Alias](config?: ZodiosRequestOptions, reactQueryOptions: ReactQueryOptions): ReactQueryResult<Response>;
+function use[Alias](config?: ZodiosRequestOptions, queryOptions: QueryOptions): QueryResult<Response>;
 ```
 
 **example**:
@@ -45,7 +46,7 @@ const { data: users, isLoading, isError } =  hooks.useGetUsers();
 
 Alias for `post`, `put`, `patch`, `delete` endpoints:
 ```ts
-function use[Alias](config?: ZodiosRequestOptions, reactQueryOptions?: ReactQueryOptions): ReactMutationResult<Response>;
+function use[Alias](config?: ZodiosRequestOptions, queryOptions?: QueryOptions): MutationResult<Response>;
 ```
 
 **example**:
@@ -60,13 +61,52 @@ const { mutate } = hooks.useCreateUser();
 Generic request method that allows to do queries (same as useGet).
 
 ```ts
-useQuery(path: string, config?: ZodiosRequestOptions, reactQueryOptions?: ReactQueryOptions): ReactQueryResult<Response>;
+useQuery(path: string, config?: ZodiosRequestOptions, queryOptions?: QueryOptions): QueryResult<Response>;
 ```
 
 **Example**:
 ```ts
 const { data: users, isLoading, isError } = hooks.useQuery('/users');
 ```
+
+:::note
+check [react-query documentation](https://react-query.tanstack.com/reference/useQuery) for more informations on `QueryResult` and `QueryOptions`.
+:::
+
+### `zodios.useInfinteQuery`
+
+Generic request method that allows to load pages indefinitly.
+
+```ts
+useInfinteQuery(path: string, config?: ZodiosRequestOptions, infiniteQueryOptions?: InfiniteQueryOptions): InfiniteQueryResult<Response>;
+```
+
+Compared to native react-query infinite query, you also need to provide a function named `getPageParamList` to tell zodios which parameters will be used to paginate. Indeed, zodios needs to know it to be able to generate the correct query key automatically for you.
+
+**Example**:
+```ts
+  const { data: userPages, isFectching, fetchNextPage } = apiHooks.useInfiniteQuery(
+    "/users",
+    {
+      // request 10 users per page
+      queries: { limit: 10 },
+    },
+    {
+      // tell zodios to not use page as query key to allow infinite loading
+      getPageParamList: () => ["page"],
+      // get next page param has to return the next page as a query or path param
+      getNextPageParam: (lastPage, pages) => lastPage.nextPage ? {
+          queries: {
+            page: lastPage.nextPage,
+          },
+        }: undefined;
+    }
+  );
+```
+
+:::note
+check [react-query infinite query documentation](https://react-query.tanstack.com/reference/useInfiniteQuery) for more informations on `InfiniteQueryResult` and `InfiniteQueryOptions`.
+:::
 
 ### `zodios.useMutation`
 
@@ -80,6 +120,10 @@ useMutation(method: string, path: string, config: ZodiosRequestOptions, reactQue
 ```ts
 const { mutate } = hooks.useMutation('post','/users');
 ```
+
+:::note
+check [react-query documentation](https://react-query.tanstack.com/reference/useMutation) for more informations on `MutationResult` and `MutationOptions`.
+:::
 
 ### `zodios.useGet`
 
