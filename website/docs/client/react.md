@@ -78,7 +78,7 @@ check [react-query documentation](https://react-query.tanstack.com/reference/use
 Generic request method that allows to load pages indefinitly.
 
 ```ts
-useInfinteQuery(path: string, config?: ZodiosRequestOptions, infiniteQueryOptions?: InfiniteQueryOptions): InfiniteQueryResult<Response>;
+useInfiniteQuery(path: string, config?: ZodiosRequestOptions, infiniteQueryOptions?: InfiniteQueryOptions): InfiniteQueryResult<Response>;
 ```
 
 Compared to native react-query infinite query, you also need to provide a function named `getPageParamList` to tell zodios which parameters will be used to paginate. Indeed, zodios needs to know it to be able to generate the correct query key automatically for you.
