@@ -5,7 +5,7 @@
    </a>
  </p>
  <p align="center">
-    Zodios is a typescript api client and and an optional api server with auto-completion features backed by <a href="https://axios-http.com" >axios</a> and <a href="https://github.com/colinhacks/zod">zod</a> and <a href="https://expressjs.com/">express</a>
+    Zodios is a typescript api client and an optional api server with auto-completion features backed by <a href="https://axios-http.com" >axios</a> and <a href="https://github.com/colinhacks/zod">zod</a> and <a href="https://expressjs.com/">express</a>
     <br/>
     <a href="https://www.zodios.org/">Documentation</a>
  </p>
