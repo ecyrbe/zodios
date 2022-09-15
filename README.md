@@ -43,7 +43,9 @@ It's an axios compatible API client and an expressJS compatible API server with 
 
 - [What is it ?](#what-is-it-)
 - [Install](#install)
-- [How to use it ?](#how-to-use-it-)
+  - [Client and api definitions :](#client-and-api-definitions-)
+  - [Server :](#server-)
+- [How to use it on client side ?](#how-to-use-it-on-client-side-)
   - [Declare your API with zodios](#declare-your-api-with-zodios)
   - [API definition format](#api-definition-format)
 - [Full documentation](#full-documentation)
@@ -52,6 +54,8 @@ It's an axios compatible API client and an expressJS compatible API server with 
 - [Dependencies](#dependencies)
 
 # Install
+
+## Client and api definitions :
 
 ```bash
 > npm install @zodios/core
@@ -63,7 +67,19 @@ or
 > yarn add @zodios/core
 ```
 
-# How to use it ?
+## Server :
+  
+```bash
+> npm install @zodios/core @zodios/express
+```
+
+or
+
+```bash
+> yarn add @zodios/core @zodios/express
+```
+
+# How to use it on client side ?
 
 For an almost complete example on how to use zodios and how to split your APIs declarations, take a look at [dev.to](examples/dev.to/) example.
 
@@ -140,7 +156,14 @@ type ZodiosEndpointDescriptions = Array<{
 ```
 # Full documentation
 
-Check out the [full documentation](https://www.zodios.og) at https://www.zodios.og.
+Check out the [full documentation](https://www.zodios.org) or following shortcuts.
+
+- [API definition](https://www.zodios.org/docs/category/zodios-api-definition)
+- [Http client](https://www.zodios.org/docs/category/zodios-client)
+- [React hooks](https://www.zodios.org/docs/client/react)
+- [API server](http://www.zodios.org/docs/category/zodios-server)
+- [Nextjs integration](http://www.zodios.org/docs/server/next)
+
 # Ecosystem
 
 - [openapi-zod-client](https://github.com/astahmer/openapi-zod-client]): generate a zodios client from an openapi specification
