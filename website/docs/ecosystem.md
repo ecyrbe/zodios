@@ -6,6 +6,6 @@ sidebar_position: 3
 
 Outside of zodios own [packages](/docs/intro), you can find the following ones from zodios community:
 
-| Package                                                               | Description                                            |
-| --------------------------------------------------------------------- | ------------------------------------------------------ |
-| [openapi-zod-client](https://github.com/astahmer/openapi-zod-client]) | generate a zodios client from an openapi specification |
+| Package                                                              | Description                                            |
+| -------------------------------------------------------------------- | ------------------------------------------------------ |
+| [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) | generate a zodios client from an openapi specification |
