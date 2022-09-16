@@ -35,6 +35,11 @@ The parameters of an endpoint are an array of parameter descriptions. Each param
 | description | string                      | Optional description of the endpoint. Used for openapi. |
 | schema      | ZodSchema                   | The schema of the parameter using Zod.                  |
 
+:::note Path parameters do not need to be defined in the API definition `parameters` array.
+Indeed, they are automatically deduced from the path and added to the request parameters implicitly.
+:::
+
+
 ### Errors
 
 The errors of an endpoint are an array of error descriptions. Each error description is an object with the following properties:

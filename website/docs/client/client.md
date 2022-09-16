@@ -24,6 +24,8 @@ new Zodios(api: ZodiosEnpointDescriptions, options?: ZodiosOptions)
 
 **Example**
 
+You can predefine some schemas to reuse them in your API definition.
+
 ```ts
 import { Zodios, asErrors } from "@zodios/core";
 import z from "zod";
@@ -46,7 +48,11 @@ const user = z.object({
   age: z.number().positive(),
   email: z.string().email(),
 });
+```
 
+Then you can define your API endpoints directly in the `Zodios` constructor.
+
+```ts
 const apiClient = new Zodios('/api', [
   {
     method: "get",
@@ -77,6 +83,21 @@ const apiClient = new Zodios('/api', [
   },  
 ]);
 ```
+
+And finally you can use it to fetch data from your API.
+
+```ts
+// get all users
+const users = await apiClient.getUsers();
+// get user by id
+const user = await apiClient.getUser({ params: { id: 1 } });
+// create user
+const newUser = await apiCLient.createUser({ name: "John", age: 20, email: "jodn@doe.com"});
+```
+
+:::note Path parameters do not need to be defined in the API definition `parameters` array.
+Indeed, they are automatically deduced from the path and added to the request parameters implicitly.
+:::
 
 ### Options
 
@@ -140,10 +161,28 @@ You will usually want to use aliases to call your endpoints. You can define them
 function [alias](config?: ZodiosRequestOptions): Promise<Response>;
 ```
 
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
 **example**:
 ```ts
 // identical to api.get("/users")
 const users = await api.getUsers();
+```
+
+with path parameters
+```ts
+// identical to api.get("/users", { params: { id: 1 } })
+const user = await api.getUser({ params: { id: 1 } }); // GET /users/1
+```
+with query parameters
+```ts
+// identical to api.get("/users", { queries: { limit: 10 } })
+const users = await api.getUsers({ queries: { limit: 10 } }); // GET /users?limit=10
 ```
 
 #### mutation alias 
@@ -153,12 +192,28 @@ Alias for `post`, `put`, `patch`, `delete` endpoints:
 function [alias](body: BodyParam, config?: ZodiosRequestOptions): Promise<Response>;
 ```
 
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
 **example**:
 ```ts
 // identical to api.post("/users", { name: "John" })
 const user = await api.createUser({ name: "John" });
 ```
 
+Is equivalent to the following HTTP request:
+```http
+POST /users HTTP/1.1
+Content-Type: application/json
+
+{
+  "name": "John"
+}
+```
 ### `zodios.request`
 
 Generic request method that allows to do both query and mutation calls.
@@ -166,6 +221,14 @@ Generic request method that allows to do both query and mutation calls.
 ```ts
 request(config: ZodiosRequestOptions): Promise<Response>;
 ```
+
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
 
 **Example**:
 ```ts
@@ -182,31 +245,83 @@ const user = await api.request({
 get(path: string, config?: ZodiosRequestOptions): Promise<Response>;
 ```
 
-**Example**:
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
+**example**:
 ```ts
-const user = await api.get("/users/:id", { params: { id: 1 } });
+const users = await api.get("/users");
 ```
 
+with path parameters
+```ts
+const user = await api.get("/users/:id", { params: { id: 1 } }); // GET /users/1
+```
+with query parameters
+```ts
+const users = await api.get("/users", { queries: { limit: 10 } }); // GET /users?limit=10
+```
 ### `zodios.post`
 
 ```ts
 post(path: string, body: BodyParam, config?: ZodiosRequestOptions): Promise<Response>;
 ```
 
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
 **Example**:
 ```ts
 const user = await api.post("/users", { name: "John" });
 ```
 
+Is equivalent to the following HTTP request:
+```http
+POST /users HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "John"
+}
+```
 ### `zodios.put`
 
 ```ts
 put(path: string, body: BodyParam, config?: ZodiosRequestOptions): Promise<Response>;
 ```
 
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
+
 **Example**:
 ```ts
 const user = await api.put("/users/:id", {id: 1, name: "John" }, { params: { id: 1 } });
+```
+
+will send the following HTTP request:
+```http
+PUT /users/1 HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "John"
+}
 ```
 
 ### `zodios.patch`
@@ -214,10 +329,27 @@ const user = await api.put("/users/:id", {id: 1, name: "John" }, { params: { id:
 ```ts
 patch(path: string, body: BodyParam, config?: ZodiosRequestOptions): Promise<Response>;
 ```
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
 
 **Example**:
 ```ts
 const user = await api.patch("/users/:id", {name: "John" }, {params: {id: 1}});
+```
+
+will send the following HTTP request:
+```http
+PATCH /users/1 HTTP/1.1
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "John"
+}
 ```
 
 ### `zodios.delete`
@@ -226,9 +358,22 @@ const user = await api.patch("/users/:id", {name: "John" }, {params: {id: 1}});
 delete(path: string, body: BodyParam, config?: ZodiosRequestOptions): Promise<Response>;
 ```
 
+:::note
+For more information about `ZodiosRequestOptions` see [request options](#request-options)
+You don't need to declare path parameters in the `parameters` array of the API definition.
+Just remember you can use `params` to pass path parameters and `queries` to pass query parameters.
+See examples below.
+:::
+
 **Example**:
 ```ts
 const user = await api.delete("/users/:id", {params: {id: 1}});
+```
+
+will send the following HTTP request:
+```http
+DELETE /users/1 HTTP/1.1
+Accept: application/json
 ```
 
 ## Request Options
