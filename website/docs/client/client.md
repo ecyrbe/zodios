@@ -378,47 +378,34 @@ Accept: application/json
 
 ## Request Options
 
-```ts
-type ZodiosRequestOptions ={
-  method: "get" | "post" | "put" | "patch"| "delete";
-  url: string; // path to the endpoint
-  data?: BodyParam, // body param for post, put, patch, delete
-  params?: PathParams; // path parameters
-  queries?: QueryParams; // search string params
-  headers?: HeaderParams; // request headers
-  paramsSerializer?: (params) => string; // default to qs with array brackets
-  timeout: number; // default to 5s
-  withCredentials?: boolean; // default to false
-  adapter?: (config) => Promise<Response>; // internal adapter replacement, you usually don't need to use it, let library authors implement it
-  auth?: {
-    username: string;
-    password: string;
-  },
-  responseType?: 'arraybuffer'| 'blob' | 'document'| 'json'| 'text'| 'stream'; // default to json
-  responseEncoding?: 'utf8'; // only for node
-  xsrfCookieName?: string; // default to XSRF-TOKEN
-  xsrfHeaderName: string; // default to X-XSRF-TOKEN
-  onUploadProgress: (progressEvent) => void; // only for browser with XMLHttpRequest
-  onDownloadProgress: (progressEvent) => void; // only for browser with XMLHttpRequest
-  maxContentLength?: number; // default to 2000
-  maxBodyLength?: number; // default to 2000 - Node only
-  validateStatus?: (status) => boolean; // default to status >= 200 && status < 300
-  maxRedirects?: number; // default to 5
-  httpAgent?: NodeHttpAgent; // only for node
-  httpsAgent?: NodeHttpsAgent; // only for node
-  proxy?: {  // only for node
-    protocol: string; // http or https
-    host: string; // proxy host
-    port: number; // proxy port
-    auth: {
-      username: string;
-      password: string;
-    }
-  };
-
-  decompress?: boolean; // default to true
-}
-```
+| property           | type                                                                                            | description                                              |
+| ------------------ | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| method             | "get" \| "post" \| "put" \| "patch" \| "delete"                                                 | HTTP method                                              |
+| url                | string                                                                                          | path to the endpoint                                     |
+| data               | BodyParam                                                                                       | optional request body                                    |
+| params             | Record<string, string \| number>                                                                | optional path parameters                                 |
+| queries            | Record<string, string \| number \| string[] \| number[]>                                        | optional query parameters                                |
+| headers            | Record<string, string>                                                                          | optional request headers                                 |
+| signal             | AbortSignal                                                                                     | optional AbortSignal                                     |
+| paramsSerializer   | (params: QueryParams) => string                                                                 | optional function to serialize query parameters          |
+| timeout            | number                                                                                          | request timeout, default is 0, no timeout                |
+| withCredentials    | boolean                                                                                         | flag to enable credentials, default is false             |
+| adapter            | AxiosAdapter                                                                                    | optional custom adapter, let libray authors implement it |
+| auth               | { username: string; password: string }                                                          | optional basic auth                                      |
+| responseType       | "arraybuffer" \| "blob" \| "document" \| "json" \| "text" \| "stream"                           | response type, default is "json"                         |
+| responseEncoding   | string                                                                                          | response encoding, default is "utf8" (nodejs only)       |
+| xsrfCookieName     | string                                                                                          | xsrf cookie name, default is "XSRF-TOKEN"                |
+| xsrfHeaderName     | string                                                                                          | xsrf header name, default is "X-XSRF-TOKEN"              |
+| onUploadProgress   | (progressEvent: ProgressEvent) => void                                                          | progress callback (browser only with XMLHttpRequest)     |
+| onDownloadProgress | (progressEvent: ProgressEvent) => void                                                          | progress callback (browser only with XMLHttpRequest)     |
+| maxContentLength   | number                                                                                          | max response content length, default is 2000 bytes       |
+| maxBodyLength      | number                                                                                          | max request body length, default is 2000 bytes           |
+| validateStatus     | (status: number) => boolean                                                                     | optional function to validate status code                |
+| maxRedirects       | number                                                                                          | max number of redirects, default is 5                    |
+| httpAgent          | NodeHttpAgent                                                                                   | optional custom http agent (nodejs only)                 |
+| httpsAgent         | NodeHttpsAgent                                                                                  | optional custom https agent (nodejs only)                |
+| proxy              | { protocol: string; host: string; port: number; auth?: { username: string; password: string } } | optional proxy configuration (nodejs only)               |
+| decompress         | boolean                                                                                         | flag to enable automatic decompression, default is true  |
 
 ## Advanced examples
 ### Use zod transformations
