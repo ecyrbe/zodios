@@ -166,7 +166,7 @@ Check out the [full documentation](https://www.zodios.org) or following shortcut
 
 # Ecosystem
 
-- [openapi-zod-client](https://github.com/astahmer/openapi-zod-client]): generate a zodios client from an openapi specification
+- [openapi-zod-client](https://github.com/astahmer/openapi-zod-client): generate a zodios client from an openapi specification
 - [@zodios/express](https://github.com/ecyrbe/zodios-express): full end to end type safety like tRPC, but for REST APIs
 - [@zodios/plugins](https://github.com/ecyrbe/zodios-plugins) : some plugins for zodios
 - [@zodios/react](https://github.com/ecyrbe/zodios-react) : a react-query wrapper for zodios
