@@ -1,4 +1,3 @@
-// @ts-nocheck
 // disable type checking for this file as we need to defer type checking when using these utility types
 // indeed typescript seems to have a bug, where it tries to infer the type of an undecidable generic type
 // but when using the functions, types are inferred correctly
@@ -37,25 +36,25 @@ export function checkApi<T extends ZodiosEnpointDescriptions>(api: T) {
  */
 export function asApi<T extends ZodiosEnpointDescriptions>(api: Narrow<T>): T {
   checkApi(api);
-  return api;
+  return api as T;
 }
 
 export function asParameters<T extends ZodiosEndpointParameter[]>(
   params: Narrow<T>
 ): T {
-  return params;
+  return params as T;
 }
 
 export function asErrors<T extends ZodiosEndpointError[]>(
   errors: Narrow<T>
 ): T {
-  return errors;
+  return errors as T;
 }
 
 export class Builder<T extends ZodiosEnpointDescriptions> {
   constructor(private api: T) {}
   addEndpoint<E extends ZodiosEndpointDescription>(endpoint: Narrow<E>) {
-    return new Builder<[...T, E]>([...this.api, endpoint]);
+    return new Builder<[...T, E]>([...this.api, endpoint] as [...T, E]);
   }
   build(): T {
     checkApi(this.api);
@@ -72,7 +71,7 @@ export class Builder<T extends ZodiosEnpointDescriptions> {
 export function apiBuilder<T extends ZodiosEndpointDescription<any>>(
   endpoint: Narrow<T>
 ): Builder<[T]> {
-  return new Builder([endpoint]);
+  return new Builder([endpoint] as [T]);
 }
 
 /**
@@ -81,7 +80,7 @@ export function apiBuilder<T extends ZodiosEndpointDescription<any>>(
  * @param schema - the schema of the resource
  * @returns - the api definitions
  */
-export function asCrudApi<T extends string, S extends z.Schema>(
+export function asCrudApi<T extends string, S extends z.ZodObject<any>>(
   resource: T,
   schema: S
 ) {
@@ -90,21 +89,28 @@ export function asCrudApi<T extends string, S extends z.Schema>(
   return asApi([
     {
       method: "get",
+      // @ts-expect-error
       path: `/${resource}s`,
+      // @ts-expect-error
       alias: `get${capitalizedResource}s`,
       description: `Get all ${resource}s`,
       response: z.array(schema),
     },
     {
       method: "get",
+      // @ts-expect-error
       path: `/${resource}s/:id`,
+      // @ts-expect-error
       alias: `get${capitalizedResource}`,
       description: `Get a ${resource}`,
+      // @ts-expect-error
       response: schema,
     },
     {
       method: "post",
+      // @ts-expect-error
       path: `/${resource}s`,
+      // @ts-expect-error
       alias: `create${capitalizedResource}`,
       description: `Create a ${resource}`,
       parameters: [
@@ -112,16 +118,17 @@ export function asCrudApi<T extends string, S extends z.Schema>(
           name: "body",
           type: "Body",
           description: "The object to create",
-          schema: (
-            schema as unknown as z.AnyZodObject
-          ).partial() as unknown as z.Schema<Partial<Schema>>,
+          schema: schema.partial() as z.Schema<Partial<Schema>>,
         },
       ],
+      // @ts-expect-error
       response: schema,
     },
     {
       method: "put",
+      // @ts-expect-error
       path: `/${resource}s/:id`,
+      // @ts-expect-error
       alias: `update${capitalizedResource}`,
       description: `Update a ${resource}`,
       parameters: [
@@ -129,14 +136,18 @@ export function asCrudApi<T extends string, S extends z.Schema>(
           name: "body",
           type: "Body",
           description: "The object to update",
+          // @ts-expect-error
           schema: schema,
         },
       ],
+      // @ts-expect-error
       response: schema,
     },
     {
       method: "patch",
+      // @ts-expect-error
       path: `/${resource}s/:id`,
+      // @ts-expect-error
       alias: `patch${capitalizedResource}`,
       description: `Patch a ${resource}`,
       parameters: [
@@ -144,18 +155,20 @@ export function asCrudApi<T extends string, S extends z.Schema>(
           name: "body",
           type: "Body",
           description: "The object to patch",
-          schema: (
-            schema as unknown as z.AnyZodObject
-          ).partial() as unknown as z.Schema<Partial<Schema>>,
+          schema: schema.partial() as z.Schema<Partial<Schema>>,
         },
       ],
+      // @ts-expect-error
       response: schema,
     },
     {
       method: "delete",
+      // @ts-expect-error
       path: `/${resource}s/:id`,
+      // @ts-expect-error
       alias: `delete${capitalizedResource}`,
       description: `Delete a ${resource}`,
+      // @ts-expect-error
       response: schema,
     },
   ]);
