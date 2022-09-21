@@ -60,7 +60,11 @@ const plugin: ZodiosPlugin = {
       const parsed = endpoint.response.safeParse(response.data);
       if (!parsed.success) {
         throw new ZodiosError(
-          "Zodios: Invalid response",
+          `Zodios: Invalid response from endpoint '${endpoint.method} ${
+            endpoint.path
+          }'\nstatus: ${response.status} ${response.statusText}\ncause:\n${
+            parsed.error.message
+          }\nreceived:\n${JSON.stringify(response.data, null, 2)}`,
           config,
           response.data,
           parsed.error

@@ -709,7 +709,26 @@ describe("Zodios", () => {
     } catch (e) {
       expect(e).toBeInstanceOf(ZodiosError);
       expect((e as ZodiosError).cause).toBeInstanceOf(ZodError);
-      expect((e as ZodiosError).message).toBe("Zodios: Invalid response");
+      expect((e as ZodiosError).message)
+        .toBe(`Zodios: Invalid response from endpoint 'get /:id'
+status: 200 OK
+cause:
+[
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "more"
+    ],
+    "message": "Required"
+  }
+]
+received:
+{
+  "id": 1,
+  "name": "test"
+}`);
       expect((e as ZodiosError).data).toEqual({
         id: 1,
         name: "test",
