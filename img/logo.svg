@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   class="svg-icon"
+   style="width: 1.125em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;"
+   viewBox="0 0 1152 1024"
+   version="1.1"
+   id="svg4"
+   sodipodi:docname="zodios.svg"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs8" />
+  <sodipodi:namedview
+     id="namedview6"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.70996094"
+     inkscape:cx="1052.1706"
+     inkscape:cy="510.59147"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4" />
+  <path
+     d="M971 0L1152 320H949.8L811.4 0h159.6z m-256 0l138.4 320H298.6L437 0h278z m-534 0h159.6l-138.4 320H0L181 0zM0 384h201.4l246 503.4c3 6.2-5.4 11.8-10 6.6L0 384z m296.4 0h559.2l-274 636.4c-2 4.8-9 4.8-11 0L296.4 384z m408.2 503.4l246-503.4H1152L714.6 893.8c-4.6 5.4-13-0.2-10-6.4z"
+     fill=""
+     id="path2"
+     style="fill:#613583" />
+</svg>
