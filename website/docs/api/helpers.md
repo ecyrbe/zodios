@@ -8,7 +8,7 @@ Usually, you'll want to define your API definition in a separate file and import
 For this use case, Zodios provides some helpers to make your life easier and still keep your API definition correctly inferred without needing to use Typescript `as const`.  
 
 :::caution
-These helpers, are mandatory to be used when declaring them outside of `Zodios` constructor to allow your API definitions to be correctly inferred in both pure Javascript and Typescript.
+These helpers, are mandatory to be used when declaring your definitions outside of `Zodios` constructor to allow your API definitions to be correctly inferred in both pure Javascript and Typescript.
 :::
 
 ## makeApi
