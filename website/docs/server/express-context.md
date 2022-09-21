@@ -16,12 +16,12 @@ To create a context, you need to use the `zodiosContext` function.
 import { zodiosContext } from "@zodios/express";
 import z from "zod";
 
-const ctx = zodiosContext({
+const ctx = zodiosContext(z.object({
   user: z.object({
     id: z.number(),
     name: z.string(),
   }),
-});
+}));
 ```
 
 ## Creating a context-aware app
