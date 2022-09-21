@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { asApi } from "../../src/index";
+import { makeApi } from "../../src/index";
 import { paramPages } from "./params";
 
 const devFollower = z.object({
@@ -14,7 +14,7 @@ const devFollower = z.object({
 
 const devFollowers = z.array(devFollower);
 
-export const followersApi = asApi([
+export const followersApi = makeApi([
   {
     method: "get",
     path: "/followers/users",

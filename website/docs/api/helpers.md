@@ -6,21 +6,24 @@ sidebar_position: 2
 
 Usually, you'll want to define your API definition in a separate file and import it in your server and client code.
 For this use case, Zodios provides some helpers to make your life easier and still keep your API definition correctly inferred without needing to use Typescript `as const`.  
-These helpers, allow your API definitions to be correctly inferred in both pure Javascript and Typescript.
 
-## asApi
+:::caution
+These helpers, are mandatory to be used when declaring them outside of `Zodios` constructor to allow your API definitions to be correctly inferred in both pure Javascript and Typescript.
+:::
 
-`asApi` is a helper to narrow your api definitions and make some runtime checks.
+## makeApi
+
+`makeApi` is a helper to narrow your api definitions and make some runtime checks.
 
 ```ts
-function asAPI(api: ZodiosEndpointDescriptions): ZodiosEndpointDescriptions;
+function makeApi(api: ZodiosEndpointDescriptions): ZodiosEndpointDescriptions;
 ```
 
 **Example**
 ```ts
-import { asApi } from "@zodios/core";
+import { makeApi } from "@zodios/core";
 
-const api = asApi([
+const api = makeApi([
   {
     method: "GET",
     path: "/users/:id",
@@ -38,19 +41,19 @@ const api = asApi([
 ]);
 ```
 
-## asParameters
+## makeParameters
 
-`asParameters` is a helper to narrow your parameter definitions.
+`makeParameters` is a helper to narrow your parameter definitions.
 
 ```ts
-function asParameters(params: ZodiosEndpointParameters): ZodiosEndpointParameters;
+function makeParameters(params: ZodiosEndpointParameters): ZodiosEndpointParameters;
 ```
 
 **Example**
 ```ts
-import { asParameters } from "@zodios/core";
+import { makeParameters } from "@zodios/core";
 
-const params = asParameters([
+const params = makeParameters([
   {
     name: "limit",
     description: "Limit",
@@ -64,19 +67,19 @@ const params = asParameters([
 ]);
 ```
 
-## asErrors
+## makeErrors
 
-`asErrors` is a helper to narrow your error definitions.
+`makeErrors` is a helper to narrow your error definitions.
 
 ```ts
-function asErrors(errors: ZodiosEndpointErrors): ZodiosEndpointErrors;
+function makeErrors(errors: ZodiosEndpointErrors): ZodiosEndpointErrors;
 ```
 
 **Example**
 ```ts
-import { asErrors } from "@zodios/core";
+import { makeErrors } from "@zodios/core";
 
-const errors = asErrors([
+const errors = makeErrors([
   {
     status: 404,
     description: "User not found",

@@ -1,4 +1,4 @@
-import { asApi } from "../../src/index";
+import { makeApi } from "../../src/index";
 import { z } from "zod";
 import { devUser, User } from "./users";
 
@@ -28,7 +28,7 @@ export const devComments = z.array(devComment);
 
 export type Comments = z.infer<typeof devComments>;
 
-export const commentsApi = asApi([
+export const commentsApi = makeApi([
   {
     method: "get",
     path: "/comments",

@@ -14,7 +14,7 @@ Here is an example of API definition for [dev.to](https://dev.to) user API.
 
 ```ts
 import { z } from "zod";
-import { asApi, asErrors } from "@zodios/core";
+import { makeApi, makeErrors } from "@zodios/core";
 
 export const devUser = z.object({
   id: z.number(),
@@ -40,7 +40,7 @@ export const devProfileImage = z.object({
   profile_image_90: z.string(),
 });
 
-export const userErrors = asErrors([
+export const userErrors = makeErrors([
   {
     status: 404,
     description: "User not found",
@@ -66,7 +66,7 @@ export const userErrors = asErrors([
 
 export type ProfileImage = z.infer<typeof devProfileImage>;
 
-export const userApi = asApi([
+export const userApi = makeApi([
   {
     method: "get",
     path: "/users/:id",

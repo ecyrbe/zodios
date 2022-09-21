@@ -27,10 +27,10 @@ new Zodios(api: ZodiosEnpointDescriptions, options?: ZodiosOptions)
 You can predefine some schemas to reuse them in your API definition.
 
 ```ts
-import { Zodios, asErrors } from "@zodios/core";
+import { Zodios, makeErrors } from "@zodios/core";
 import z from "zod";
 
-const errors = asErrors([
+const errors = makeErrors([
   {
     status: "default",
     schema: z.object({
@@ -574,10 +574,10 @@ Zodios supports application/x-www-form-urlencoded requests with integrated `requ
 Zodios has a helper to generate basic CRUD API. It will generate all the api definitions for you :  
   
 ```typescript
-import { Zodios, asCrudApi } from '@zodios/core';
+import { Zodios, makeCrudApi } from '@zodios/core';
 
 const apiClient = new Zodios(BASE_URL,
-  asCrudApi(
+  makeCrudApi(
     'user',
     z.object({
       id: z.number(),

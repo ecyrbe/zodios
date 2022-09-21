@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { asApi } from "../../src/index";
+import { makeApi } from "../../src/index";
 
 export const devFollow = z.object({
   id: z.number(),
@@ -12,7 +12,7 @@ export const devFollows = z.array(devFollow);
 export type Follow = z.infer<typeof devFollow>;
 export type Follows = z.infer<typeof devFollows>;
 
-export const followsApi = asApi([
+export const followsApi = makeApi([
   {
     method: "get",
     path: "/follows/tags",

@@ -32,9 +32,13 @@ export type {
 } from "./plugins";
 export {
   asApi,
+  makeApi,
   asCrudApi,
+  makeCrudApi,
   apiBuilder,
   asParameters,
+  makeParameters,
   asErrors,
+  makeErrors,
   checkApi,
 } from "./api";

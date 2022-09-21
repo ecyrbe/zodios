@@ -30,26 +30,73 @@ export function checkApi<T extends ZodiosEnpointDescriptions>(api: T) {
 
 /**
  * Simple helper to split your api definitions into multiple files
- * By just providing autocompletions for the endpoint descriptions
+ * Mandatory to be used when declaring your endpoint definitions outside zodios constructor
+ * to enable type inferrence and autocompletion
  * @param api - api definitions
  * @returns the api definitions
  */
-export function asApi<T extends ZodiosEnpointDescriptions>(api: Narrow<T>): T {
+export function makeApi<Api extends ZodiosEnpointDescriptions>(
+  api: Narrow<Api>
+): Api {
   checkApi(api);
-  return api as T;
+  return api as Api;
 }
 
-export function asParameters<T extends ZodiosEndpointParameter[]>(
-  params: Narrow<T>
-): T {
-  return params as T;
+/**
+ * Simple helper to split your api definitions into multiple files
+ * Mandatory to be used when declaring your endpoint definitions outside zodios constructor
+ * to enable type inferrence and autocompletion
+ * @param api - api definitions
+ * @returns the api definitions
+ * @deprecated - use makeApi instead
+ */
+export const asApi = makeApi;
+
+/**
+ * Simple helper to split your parameter definitions into multiple files
+ * Mandatory to be used when declaring parameters appart from your endpoint definitions
+ * to enable type inferrence and autocompletion
+ * @param params - api parameter definitions
+ * @returns the api parameter definitions
+ */
+export function makeParameters<
+  ParameterDescriptions extends ZodiosEndpointParameter[]
+>(params: Narrow<ParameterDescriptions>): ParameterDescriptions {
+  return params as ParameterDescriptions;
 }
 
-export function asErrors<T extends ZodiosEndpointError[]>(
-  errors: Narrow<T>
-): T {
-  return errors as T;
+/**
+ * Simple helper to split your parameter definitions into multiple files
+ * Mandatory to be used when declaring parameters appart from your endpoint definitions
+ * to enable type inferrence and autocompletion
+ * @param params - api parameter definitions
+ * @returns the api parameter definitions
+ * @deprecated - use makeParameters instead
+ */
+export const asParameters = makeParameters;
+
+/**
+ * Simple helper to split your error definitions into multiple files
+ * Mandatory to be used when declaring errors appart from your endpoint definitions
+ * to enable type inferrence and autocompletion
+ * @param errors - api error definitions
+ * @returns the error definitions
+ */
+export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
+  errors: Narrow<ErrorDescription>
+): ErrorDescription {
+  return errors as ErrorDescription;
 }
+
+/**
+ * Simple helper to split your error definitions into multiple files
+ * Mandatory to be used when declaring errors appart from your endpoint definitions
+ * to enable type inferrence and autocompletion
+ * @param errors - api error definitions
+ * @returns the error definitions
+ * @deprecated - use makeErrors instead
+ */
+export const asErrors = makeErrors;
 
 export class Builder<T extends ZodiosEnpointDescriptions> {
   constructor(private api: T) {}
@@ -80,13 +127,13 @@ export function apiBuilder<T extends ZodiosEndpointDescription<any>>(
  * @param schema - the schema of the resource
  * @returns - the api definitions
  */
-export function asCrudApi<T extends string, S extends z.ZodObject<any>>(
+export function makeCrudApi<T extends string, S extends z.ZodObject<any>>(
   resource: T,
   schema: S
 ) {
   type Schema = z.infer<S>;
   const capitalizedResource = capitalize(resource);
-  return asApi([
+  return makeApi([
     {
       method: "get",
       // @ts-expect-error
@@ -173,3 +220,12 @@ export function asCrudApi<T extends string, S extends z.ZodObject<any>>(
     },
   ]);
 }
+
+/**
+ * Helper to generate a basic CRUD api for a given resource
+ * @param resource - the resource to generate the api for
+ * @param schema - the schema of the resource
+ * @returns - the api definitions
+ * @deprecated use makeCrudApi instead
+ */
+export const asCrudApi = makeCrudApi;

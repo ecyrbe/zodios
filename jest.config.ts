@@ -9,6 +9,7 @@ const config: Config.InitialOptions = {
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
+  coveragePathIgnorePatterns: ["<rootDir>/node_modules/", "index\\.ts"],
   coverageDirectory: "./coverage",
   coverageThreshold: {
     global: {

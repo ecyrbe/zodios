@@ -1,7 +1,7 @@
 import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";
-import { asCrudApi, Zodios } from "./index";
+import { makeCrudApi, Zodios } from "./index";
 import { Assert } from "./utils.types";
 
 const userSchema = z.object({
@@ -9,7 +9,7 @@ const userSchema = z.object({
   name: z.string(),
 });
 
-describe("asCrudApi", () => {
+describe("makeCrudApi", () => {
   let app: express.Express;
   let server: ReturnType<typeof app.listen>;
   let port: number;
@@ -44,7 +44,7 @@ describe("asCrudApi", () => {
   });
 
   it("should create a CRUD api definition", () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
 
     const usersSchema = z.array(userSchema);
 
@@ -132,28 +132,28 @@ describe("asCrudApi", () => {
   });
 
   it("should get one user", async () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
     const client = new Zodios(`http://localhost:${port}`, api);
     const user = await client.getUser({ params: { id: 1 } });
     expect(user).toEqual({ id: 1, name: "test" });
   });
 
   it("should get all users", async () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
     const client = new Zodios(`http://localhost:${port}`, api);
     const users = await client.getUsers();
     expect(users).toEqual([{ id: 1, name: "test" }]);
   });
 
   it("should create a user", async () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
     const client = new Zodios(`http://localhost:${port}`, api);
     const user = await client.createUser({ name: "test" });
     expect(user).toEqual({ id: 1, name: "test" });
   });
 
   it("should update a user", async () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
     const client = new Zodios(`http://localhost:${port}`, api);
     const user = await client.updateUser(
       { id: 2, name: "test2" },
@@ -163,7 +163,7 @@ describe("asCrudApi", () => {
   });
 
   it("should patch a user", async () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
     const client = new Zodios(`http://localhost:${port}`, api);
     const user = await client.patchUser(
       { name: "test2" },
@@ -173,7 +173,7 @@ describe("asCrudApi", () => {
   });
 
   it("should delete a user", async () => {
-    const api = asCrudApi("user", userSchema);
+    const api = makeCrudApi("user", userSchema);
     const client = new Zodios(`http://localhost:${port}`, api);
     const user = await client.deleteUser(undefined, { params: { id: 2 } });
     expect(user).toEqual({ id: 2, name: "test" });

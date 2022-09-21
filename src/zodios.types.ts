@@ -117,18 +117,29 @@ export type EndpointErrorByAlias<
   >
 >;
 
+export type BodySchema<
+  Api extends unknown[],
+  M extends Method,
+  Path
+> = FilterArrayByValue<
+  EndpointApiDescription<Api, M, Path>[number]["parameters"],
+  { type: "Body" }
+>[number]["schema"];
+
 export type Body<Api extends unknown[], M extends Method, Path> = z.input<
-  FilterArrayByValue<
-    EndpointApiDescription<Api, M, Path>[number]["parameters"],
-    { type: "Body" }
-  >[number]["schema"]
+  BodySchema<Api, M, Path>
 >;
 
+export type BodySchemaByAlias<
+  Api extends unknown[],
+  Alias extends string
+> = FilterArrayByValue<
+  AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
+  { type: "Body" }
+>[number]["schema"];
+
 export type BodyByAlias<Api extends unknown[], Alias extends string> = z.input<
-  FilterArrayByValue<
-    AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
-    { type: "Body" }
-  >[number]["schema"]
+  BodySchemaByAlias<Api, Alias>
 >;
 
 export type QueryParams<

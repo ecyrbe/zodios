@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { asApi } from "../../src/index";
+import { makeApi } from "../../src/index";
 
 export const devUser = z.object({
   id: z.number(),
@@ -27,7 +27,7 @@ export const devProfileImage = z.object({
 
 export type ProfileImage = z.infer<typeof devProfileImage>;
 
-export const userApi = asApi([
+export const userApi = makeApi([
   {
     method: "get",
     path: "/users/:id",

@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { asParameters } from "../../src/api";
+import { makeParameters } from "../../src/api";
 
-export const paramPages = asParameters([
+export const paramPages = makeParameters([
   {
     name: "page",
     type: "Query",
