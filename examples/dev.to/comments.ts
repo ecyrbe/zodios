@@ -1,4 +1,4 @@
-import { makeApi } from "../../src/index";
+import { makeApi, makeEndpoint } from "../../src/index";
 import { z } from "zod";
 import { devUser, User } from "./users";
 
@@ -28,33 +28,34 @@ export const devComments = z.array(devComment);
 
 export type Comments = z.infer<typeof devComments>;
 
-export const commentsApi = makeApi([
-  {
-    method: "get",
-    path: "/comments",
-    alias: "getAllComments",
-    description: "Get all comments",
-    parameters: [
-      {
-        name: "a_id",
-        description: "Article ID",
-        type: "Query",
-        schema: z.number().optional(),
-      },
-      {
-        name: "p_id",
-        description: "Podcast comment ID",
-        type: "Query",
-        schema: z.number().optional(),
-      },
-    ],
-    response: devComments,
-  },
-  {
-    method: "get",
-    path: "/comments/:id",
-    alias: "getComment",
-    description: "Get a comment",
-    response: devComment,
-  },
-]);
+const getAllComments = makeEndpoint({
+  method: "get",
+  path: "/comments",
+  alias: "getAllComments",
+  description: "Get all comments",
+  parameters: [
+    {
+      name: "a_id",
+      description: "Article ID",
+      type: "Query",
+      schema: z.number().optional(),
+    },
+    {
+      name: "p_id",
+      description: "Podcast comment ID",
+      type: "Query",
+      schema: z.number().optional(),
+    },
+  ],
+  response: devComments,
+});
+
+const getComment = makeEndpoint({
+  method: "get",
+  path: "/comments/:id",
+  alias: "getComment",
+  description: "Get a comment",
+  response: devComment,
+});
+
+export const commentsApi = makeApi([getAllComments, getComment]);

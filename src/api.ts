@@ -98,6 +98,11 @@ export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
  */
 export const asErrors = makeErrors;
 
+export function makeEndpoint<T extends ZodiosEndpointDescription<any>>(
+  endpoint: Narrow<T>
+): T {
+  return endpoint as T;
+}
 export class Builder<T extends ZodiosEnpointDescriptions> {
   constructor(private api: T) {}
   addEndpoint<E extends ZodiosEndpointDescription>(endpoint: Narrow<E>) {

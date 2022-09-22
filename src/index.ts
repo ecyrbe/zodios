@@ -38,6 +38,7 @@ export {
   apiBuilder,
   asParameters,
   makeParameters,
+  makeEndpoint,
   asErrors,
   makeErrors,
   checkApi,

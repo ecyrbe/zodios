@@ -41,6 +41,36 @@ const api = makeApi([
 ]);
 ```
 
+## makeEndpoint
+
+`makeEndpoint` is a helper to narrow a signle endpoint definition and make some runtime checks.
+
+```ts
+function makeEndpoint(endpoint: ZodiosEndpointDescription): ZodiosEndpointDescription;
+```
+
+**Example**
+```ts
+import { makeEndpoint } from "@zodios/core";
+
+const getUser = makeEndpoint({
+  method: "GET",
+  path: "/users/:id",
+  response: user,
+  alias: "getUser",
+  description: "Get user",
+});
+```
+
+it can then be combined with `makeApi` to compose a full api description.
+
+```ts
+import { makeApi } from "@zodios/core";
+import { getUser,getUsers } from "./endpoints";
+
+const api = makeApi([getUser, getUsers]);
+```
+
 ## makeParameters
 
 `makeParameters` is a helper to narrow your parameter definitions.
