@@ -36,7 +36,7 @@ const plugin: ZodiosPlugin = {
       const { name, schema, type } = parameter;
       const value = paramsOf[type](name);
       if (value) {
-        const parsed = schema.safeParse(value);
+        const parsed = await schema.safeParseAsync(value);
         if (!parsed.success) {
           throw new ZodiosError(
             `Zodios: Invalid ${type} parameter '${name}'`,
@@ -57,7 +57,7 @@ const plugin: ZodiosPlugin = {
       throw new Error(`No endpoint found for ${config.method} ${config.url}`);
     }
     if (response.headers?.["content-type"]?.includes("application/json")) {
-      const parsed = endpoint.response.safeParse(response.data);
+      const parsed = await endpoint.response.safeParseAsync(response.data);
       if (!parsed.success) {
         throw new ZodiosError(
           `Zodios: Invalid response from endpoint '${endpoint.method} ${
