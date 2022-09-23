@@ -390,6 +390,11 @@ export type ZodiosEndpointDescription<R = unknown> = {
    */
   requestFormat?: RequestFormat;
   /**
+   * optionally mark the endpoint as immutable to allow zodios to cache the response with react-query
+   * use it to mark a 'post' endpoint as immutable
+   */
+  immutable?: boolean;
+  /**
    * optional parameters of the endpoint
    */
   parameters?: Array<ZodiosEndpointParameter>;
