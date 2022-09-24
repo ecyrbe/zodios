@@ -138,6 +138,7 @@ type ZodiosEndpointDescriptions = Array<{
   method: 'get'|'post'|'put'|'patch'|'delete';
   path: string; // example: /posts/:postId/comments/:commentId
   alias?: string; // example: getPostComments
+  immutable?: boolean; // flag a post request as immutable to allow it to be cached with react-query
   description?: string;
   requestFormat?: 'json'|'form-data'|'form-url'|'binary'|'text'; // default to json if not set
   parameters?: Array<{
