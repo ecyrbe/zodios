@@ -38,10 +38,25 @@ function use[Alias](config?: ZodiosRequestOptions, queryOptions: QueryOptions): 
 
 **example**:
 ```ts
-// identical to hooks.useGet("/users")
+// identical to hooks.useQuery("/users")
 const { data: users, isLoading, isError } =  hooks.useGetUsers();
 ```
 
+#### immutable query alias:
+```ts
+function use[Alias](body: Body, config?: ZodiosRequestOptions, queryOptions: QueryOptions): QueryResult<Response>;
+```
+
+**example**:
+```ts
+// identical to hooks.useImmutableQuery("/users/search")
+const { data: users, isLoading, isError } =  hooks.useSearchUsers({ name: "John" });
+```
+
+:::note
+Immutable query aliases are only available for `post` endpoints.
+you also need to set the `immutable` option to `true` in your API definition endpoint if you want alias to use `useImmutableQuery` hook.
+:::
 #### mutation alias 
 
 Alias for `post`, `put`, `patch`, `delete` endpoints:
@@ -73,6 +88,24 @@ const { data: users, isLoading, isError } = hooks.useQuery('/users');
 check [react-query documentation](https://react-query.tanstack.com/reference/useQuery) for more informations on `QueryResult` and `QueryOptions`.
 :::
 
+### `zodios.useImmutableQuery`
+
+Generic request method that allows to do queries on post requests.
+
+```ts
+useImmutableQuery(path: string, body: Body ,config?: ZodiosRequestOptions, queryOptions?: QueryOptions): QueryResult<Response>;
+```
+
+**Example**:
+```ts
+const { data: users, isLoading, isError } = hooks.useImmutableQuery('/users/search', { name: "John" });
+```
+
+:::note
+check [react-query documentation](https://react-query.tanstack.com/reference/useQuery) for more informations on `QueryResult` and `QueryOptions`.
+:::
+
+
 ### `zodios.useInfiniteQuery`
 
 Generic request method that allows to load pages indefinitly.
@@ -97,6 +130,44 @@ Compared to native react-query infinite query, you also need to provide a functi
       // get next page param has to return the next page as a query or path param
       getNextPageParam: (lastPage, pages) => lastPage.nextPage ? {
           queries: {
+            page: lastPage.nextPage,
+          },
+        }: undefined;
+    }
+  );
+```
+
+:::note
+check [react-query infinite query documentation](https://react-query.tanstack.com/reference/useInfiniteQuery) for more informations on `InfiniteQueryResult` and `InfiniteQueryOptions`.
+:::
+
+### `zodios.useImmutableInfiniteQuery`
+
+Generic request method that allows to search pages indefinitly with post requests.
+
+```ts
+useImmutableInfiniteQuery(path: string, body: Body ,config?: ZodiosRequestOptions, infiniteQueryOptions?: InfiniteQueryOptions): InfiniteQueryResult<Response>;
+```
+
+Compared to native react-query infinite query, you also need to provide a function named `getPageParamList` to tell zodios which parameters will be used to paginate. Indeed, zodios needs to know it to be able to generate the correct query key automatically for you.
+
+**Example**:
+```ts
+  const { data: userPages, isFectching, fetchNextPage } = apiHooks.useImmutableInfiniteQuery(
+    "/users/search",
+    {
+      // search for users named John
+      name: "John",
+      // request 10 users per page
+      limit: 10,
+    },
+    undefined,
+    {
+      // tell zodios to not use page as query key to allow infinite loading
+      getPageParamList: () => ["page"],
+      // get next page param has to return the next page as a query or path param
+      getNextPageParam: (lastPage, pages) => lastPage.nextPage ? {
+          body: {
             page: lastPage.nextPage,
           },
         }: undefined;
