@@ -16,6 +16,7 @@ It's composed of multiple packages :
 | `@zodios/core`    | Frontend Backend | The core library that contains an API client with full typesafety and autocompletion.<br/> You can use it as a standalone API client without using other modules. |
 | `@zodios/plugins` | Frontend Backend | A set of plugins for the API client.                                                                                                                              |
 | `@zodios/react`   | Frontend         | React hooks for the client based on [tanstack-query](https://tanstack.com/query).                                                                                 |
+| `@zodios/solid`   | Frontend         | Solid hooks for the client based on [tanstack-query](https://tanstack.com/query).                                                                                 |
 | `@zodios/express` | Backend          | A simple adapter for [Express](https://expressjs.com/) but with full typesafety and autocompletion.                                                               |
 | `@zodios/openapi` | Backend          | 🚧 Not released yet 🚧<br/> Helper that generates OpenAPI specs from Zodios [API definitions](api/api-definition.md) and allows you to easily generate swagger ui.  |
 
