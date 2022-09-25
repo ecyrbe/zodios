@@ -25,14 +25,20 @@ npm install react-query @zodios/core @zodios/react axios react react-dom zod
 @zodios/react is using react-query v3, in future next major version we will upgrade to react-query v4
 :::
 
+### With Solid
+
+if you want to use the solid hooks, you need to install the following packages:
+
+```bash npm2yarn
+npm install @tanstack/solid-query @zodios/core @zodios/solid axios solid-js zod
+```
 ### Install type definitions
 
 install those even in javascript projects.
 
 ```bash npm2yarn
-npm install --dev @types/axios 
 // if you use react
-npm install --dev @types/axios @types/react @types/react-dom
+npm install --dev @types/react @types/react-dom
 ```
 
 ## Backend installation
