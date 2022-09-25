@@ -19,7 +19,7 @@ const FeatureList: FeatureItem[] = [
       "typed parameters and response",
       "parameters and response validation",
       "powerfull plugin system",
-      "react hooks based on react-query",
+      "react and solid hooks based on tanstack-query",
     ],
   },
   {
