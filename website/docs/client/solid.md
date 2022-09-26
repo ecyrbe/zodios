@@ -36,6 +36,12 @@ and when passing reactives states to the hook, you should always use a `get mydP
 You will usually want to use aliases to call your endpoints. You can define them in the `alias` option in your API definition endpoint.
 
 #### query alias:
+
+Query alias hooks will return a `QueryResult` object from `solid-query` with:
+- the response data and all solid-query result properties
+- the generated `key`
+- the `invalidate` helper.
+
 ```ts
 function create[Alias](config?: ZodiosRequestOptions, queryOptions: CreateQueryOptions): CreateQueryResult<Response>;
 ```
@@ -78,6 +84,10 @@ const state = hooks.useCreateUser();
 ### `zodios.createQuery`
 
 Generic request method that allows to do queries (same as useGet).
+Query hooks will return a `QueryResult` object from `solid-query` with:
+- the response data and all solid-query result properties
+- the generated `key`
+- the `invalidate` helper.
 
 ```ts
 createQuery(path: string, config?: ZodiosRequestOptions, queryOptions?: CreateQueryOptions): CreateQueryResult<Response>;
@@ -201,6 +211,11 @@ check [solid-query documentation](https://tanstack.com/query/v4/docs/adapters/so
 :::
 
 ### `zodios.createGet`
+
+Query hooks will return a `QueryResult` object from `solid-query` with:
+- the response data and all solid-query result properties
+- the generated `key`
+- the `invalidate` helper.
 
 ```ts
 createGet(path: string, config?: ZodiosRequestOptions, queryOptions?: CreateQueryOptions): CreateQueryResult<Response>;

@@ -30,6 +30,12 @@ const apiHooks = new ZodiosHooks("myAPI", apiClient);
 You will usually want to use aliases to call your endpoints. You can define them in the `alias` option in your API definition endpoint.
 
 #### query alias:
+
+Query alias hooks will return a `QueryResult` object from `react-query` with:
+- the response data and all react-query result properties
+- the generated `key`
+- the `invalidate` helper.
+
 ```ts
 function use[Alias](config?: ZodiosRequestOptions, queryOptions: QueryOptions): QueryResult<Response>;
 ```
@@ -37,7 +43,7 @@ function use[Alias](config?: ZodiosRequestOptions, queryOptions: QueryOptions): 
 **example**:
 ```ts
 // identical to hooks.useQuery("/users")
-const { data: users, isLoading, isError } =  hooks.useGetUsers();
+const { data: users, isLoading, isError, invalidate, key } =  hooks.useGetUsers();
 ```
 
 #### immutable query alias:
@@ -72,6 +78,10 @@ const { mutate } = hooks.useCreateUser();
 ### `zodios.useQuery`
 
 Generic request method that allows to do queries (same as useGet).
+Query hooks will return a `QueryResult` object from `react-query` with:
+- the response data and all react-query result properties
+- the generated `key`
+- the `invalidate` helper.
 
 ```ts
 useQuery(path: string, config?: ZodiosRequestOptions, queryOptions?: QueryOptions): QueryResult<Response>;
@@ -196,13 +206,18 @@ check [react-query documentation](https://react-query.tanstack.com/reference/use
 
 ### `zodios.useGet`
 
+Query hooks will return a `QueryResult` object from `react-query` with:
+- the response data and all react-query result properties
+- the generated `key`
+- the `invalidate` helper.
+
 ```ts
 useGet(path: string, config?: ZodiosRequestOptions, reactQueryOptions?: ReactQueryOptions): ReactQueryResult<Response>;
 ```
 
 **Example**:
 ```ts
-const { data: user, isLoading, isError } = hooks.useGet("/users/:id", { params: { id: 1 } });
+const { data: user, isLoading, isError, invalidate, key } = hooks.useGet("/users/:id", { params: { id: 1 } });
 ```
 
 ### `zodios.usePost`
@@ -308,6 +323,7 @@ const Users = () => {
     isLoading,
     error,
     invalidate: invalidateUsers, // zodios also provides invalidation helpers
+    key // zodios alo returns the generated key
   } = zodiosHooks.useQuery("/users"); // or useGetUsers();
   const { mutate } = zodiosHooks.useMutation("post", "/users", undefined, {
     onSuccess: () => invalidateUsers(),
