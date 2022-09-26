@@ -29,7 +29,7 @@ if you want to keep reactivity, you should never destructure the hook results.
 and when passing reactives states to the hook, you should always use a `get mydParam()` access to make parameters reactive.
 :::
 
-## Zodios methods
+## Zodios hooks methods
 
 ### `hooks.create[Alias]`
 
@@ -267,6 +267,48 @@ const [id, setId] = createSignal(1);
 const state = hooks.createDelete("/users/:id", { params: { get id() { return id()} } });
 ```
 
+## Zodios key helpers
+
+Zodios provides some helpers to generate query keys to be used to invalidate cache or to get it directly from cache with 'QueryClient.getQueryData(key)'.
+
+### `zodios.getKeyByPath`
+
+```ts
+getKeyByPath(method: string, path: string, config?: ZodiosRequestOptions): QueryKey;
+```
+
+**Examples**:
+
+To get a key for a path endpoint with parameters:
+```ts
+const key = zodios.getKeyByPath('get', '/users/:id', { params: { id: 1 } });
+const user = queryClient.getQueryData<User>(key);
+```
+
+To get a key to invalidate a path endpoint for all possible parameters:
+```ts
+const key = zodios.getKeyByPath('get', '/users/:id');
+queryClient.invalidateQueries(key);
+```
+
+### `zodios.getKeyByAlias`
+
+```ts
+getKeyByAlias(alias: string, config?: ZodiosRequestOptions): QueryKey;
+```
+
+**Examples**:
+
+To get a key for an alias endpoint with parameters:
+```ts
+const key = zodios.getKeyByAlias('getUser', { params: { id: 1 } });
+const user = queryClient.getQueryData<User>(key);
+```
+To get a key to invalidate an alias endpoint for all possible parameters:
+```ts
+const key = zodios.getKeyByAlias('getUser');
+queryClient.invalidateQueries(key);
+```
 ## Example
 
 ```tsx title="users.tsx"
