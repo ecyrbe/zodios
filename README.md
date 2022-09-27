@@ -181,7 +181,12 @@ The following will need investigation to check if it's doable :
 You have other ideas ? [Let me know !](https://github.com/ecyrbe/zodios/discussions)
 # Dependencies
 
-Zodios do not embed any dependency. It's your Job to install the peer dependencies you need.  
+Zodios even when working in pure Javascript is better suited to be working with Typescript server to handle autocompletion.
+So you should at least use the one provided by your IDE (vscode integrates a typescript server)
+However, we will only support fixing bugs related to typings for versions of Typescript Language v4.5
+Earlier versions should work, but do not have TS tail recusion optimisation that impact the size of the API you can declare.
+
+Also note that Zodios do not embed any dependency. It's your Job to install the peer dependencies you need.  
   
 Internally Zodios uses these libraries on all platforms :
 - zod
