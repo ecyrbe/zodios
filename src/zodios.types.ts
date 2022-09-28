@@ -228,25 +228,19 @@ export type ZodiosConfigByAlias<
   Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
 >;
 
-export type ZodiosAliases<Api extends unknown[]> = MergeUnion<
-  Aliases<Api> extends infer Aliases
-    ? Aliases extends string
-      ? {
-          [Alias in Aliases]: AliasEndpointApiDescription<
-            Api,
-            Alias
-          >[number]["method"] extends MutationMethod
-            ? (
-                data?: ReadonlyDeep<BodyByAlias<Api, Alias>>,
-                configOptions?: ReadonlyDeep<ZodiosConfigByAlias<Api, Alias>>
-              ) => Promise<ResponseByAlias<Api, Alias>>
-            : (
-                configOptions?: ReadonlyDeep<ZodiosConfigByAlias<Api, Alias>>
-              ) => Promise<ResponseByAlias<Api, Alias>>;
-        }
-      : never
-    : never
->;
+export type ZodiosAliases<Api extends unknown[]> = {
+  [Alias in Aliases<Api>]: AliasEndpointApiDescription<
+    Api,
+    Alias
+  >[number]["method"] extends MutationMethod
+    ? (
+        data?: ReadonlyDeep<BodyByAlias<Api, Alias>>,
+        configOptions?: ReadonlyDeep<ZodiosConfigByAlias<Api, Alias>>
+      ) => Promise<ResponseByAlias<Api, Alias>>
+    : (
+        configOptions?: ReadonlyDeep<ZodiosConfigByAlias<Api, Alias>>
+      ) => Promise<ResponseByAlias<Api, Alias>>;
+};
 
 export type AnyZodiosMethodOptions = Merge<
   {
