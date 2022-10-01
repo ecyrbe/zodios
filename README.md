@@ -162,6 +162,7 @@ Check out the [full documentation](https://www.zodios.org) or following shortcut
 - [API definition](https://www.zodios.org/docs/category/zodios-api-definition)
 - [Http client](https://www.zodios.org/docs/category/zodios-client)
 - [React hooks](https://www.zodios.org/docs/client/react)
+- [Solid hooks](https://www.zodios.org/docs/client/solid)
 - [API server](http://www.zodios.org/docs/category/zodios-server)
 - [Nextjs integration](http://www.zodios.org/docs/server/next)
 
@@ -171,6 +172,7 @@ Check out the [full documentation](https://www.zodios.org) or following shortcut
 - [@zodios/express](https://github.com/ecyrbe/zodios-express): full end to end type safety like tRPC, but for REST APIs
 - [@zodios/plugins](https://github.com/ecyrbe/zodios-plugins) : some plugins for zodios
 - [@zodios/react](https://github.com/ecyrbe/zodios-react) : a react-query wrapper for zodios
+- [@zodios/solid](https://github.com/ecyrbe/zodios-solid) : a solid-query wrapper for zodios
 
 # Roadmap
 
