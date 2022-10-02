@@ -56,6 +56,40 @@ describe("ZodiosPlugins", () => {
     );
   });
 
+  it("should execute response plugins consistently", async () => {
+    const plugins = new ZodiosPlugins("any", "any");
+    const plugin1: ZodiosPlugin = {
+      request: async (api, config) => config,
+      response: async (api, config, response) => {
+        response.data += "1";
+        return response;
+      },
+    };
+    plugins.use(plugin1);
+    const plugin2: ZodiosPlugin = {
+      request: async (api, config) => config,
+      response: async (api, config, response) => {
+        response.data += "2";
+        return response;
+      },
+    };
+    plugins.use(plugin2);
+    const response1 = await plugins.interceptResponse(
+      [],
+      // @ts-ignore
+      {},
+      Promise.resolve({ data: "test1:" })
+    );
+    expect(response1.data).toBe("test1:21");
+    const response2 = await plugins.interceptResponse(
+      [],
+      // @ts-ignore
+      {},
+      Promise.resolve({ data: "test2:" })
+    );
+    expect(response2.data).toBe("test2:21");
+  });
+
   it('should catch error if plugin "error" is defined', async () => {
     const plugins = new ZodiosPlugins("any", "any");
     const plugin: ZodiosPlugin = {

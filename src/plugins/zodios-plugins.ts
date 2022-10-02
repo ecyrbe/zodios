@@ -108,7 +108,8 @@ export class ZodiosPlugins {
     response: Promise<AxiosResponse>
   ) {
     let pluginResponse = response;
-    for (const plugin of this.plugins.reverse()) {
+    for (let index = this.plugins.length - 1; index >= 0; index--) {
+      const plugin = this.plugins[index];
       if (plugin) {
         pluginResponse = pluginResponse.then(
           plugin?.response
