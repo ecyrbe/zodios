@@ -34,8 +34,9 @@ It's an axios compatible API client and an optional expressJS compatible API ser
 - typescript response types
 - parameters and responses schema thanks to zod
 - response schema validation
-- bearer token injection and token renewal with simple token provider interface
+- powerfull plugins like `fetch` adapter or `auth` automatic injection
 - all axios features available
+- `@tanstack/query` wrappers for react and solid (vue, svelte, etc, soon)
 - all expressJS features available (middlewares, etc.)
 
   
@@ -183,8 +184,8 @@ The following will need investigation to check if it's doable :
 You have other ideas ? [Let me know !](https://github.com/ecyrbe/zodios/discussions)
 # Dependencies
 
-Zodios even when working in pure Javascript is better suited to be working with Typescript server to handle autocompletion.
-So you should at least use the one provided by your IDE (vscode integrates a typescript server)
+Zodios even when working in pure Javascript is better suited to be working with Typescript Language Server to handle autocompletion.
+So you should at least use the one provided by your IDE (vscode integrates a typescript language server)
 However, we will only support fixing bugs related to typings for versions of Typescript Language v4.5
 Earlier versions should work, but do not have TS tail recusion optimisation that impact the size of the API you can declare.
 
