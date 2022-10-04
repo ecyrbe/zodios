@@ -398,6 +398,11 @@ export type ZodiosEndpointDescription<R = unknown> = {
    */
   response: z.ZodType<R>;
   /**
+   * optional response status of the endpoint for sucess, default is 200
+   * customize it if your endpoint returns a different status code and if you need openapi to generate the correct status code
+   */
+  status?: number;
+  /**
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
   errors?: Array<ZodiosEndpointError>;

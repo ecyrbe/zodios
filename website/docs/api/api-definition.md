@@ -18,6 +18,7 @@ The API definition is a javascript array of endpoint descriptions. Each endpoint
 | method        | string                                        | The HTTP method of the endpoint.                               |
 | path          | string                                        | The path of the endpoint.                                      |
 | response      | ZodSchema                                     | The response Schema of the endpoint using Zod.                 |
+| status        | number                                        | The status code of the response. default: 200                  |
 | alias         | string                                        | Optional alias of the endpoint.                                |
 | immutable     | boolean                                       | Optional flag to indicate if the 'post' endpoint is immutable. |
 | description   | string                                        | Optional description of the endpoint. Used for openapi.        |
