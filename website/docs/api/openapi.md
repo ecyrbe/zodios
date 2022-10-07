@@ -1,8 +1,9 @@
 ---
-sidebar_position: 4
+sidebar_position: 3
 ---
 
-# Zodios API definition to OpenAPI
+# OpenAPI
+## Zodios API definition to OpenAPI
 
 Zodios api definition format while simple can contain sufficient information to generate an OpenAPI documentation.
 
@@ -18,7 +19,9 @@ function toOpenApi(
 ): OpenAPIV3.Document;
 ```
 
-## swagger-ui-express
+### Examples
+
+### swagger-ui-express
 
 You can expose your OpenAPI documentation with the `@zodios/express` package.
 
@@ -56,7 +59,7 @@ app.use("/docs", setup(undefined, { swaggerUrl: "/docs/swagger.json" }));
 app.listen(3000);
 ```
 
-# OpenAPI to Zodios API definition
+## OpenAPI to Zodios API definition
 
 If you want to use an existing OpenAPI documentation to generate your Zodios API definition, you can use the [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) package.
 
