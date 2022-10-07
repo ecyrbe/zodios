@@ -49,6 +49,12 @@ npm install --dev @types/react @types/react-dom
 npm install @zodios/core @zodios/express express zod axios
 ```
 
+optional packages for openapi generation:
+
+```bash npm2yarn
+npm install @zodios/openapi swagger-ui-express
+```
+
 ### With NextJS
 
 ```bash npm2yarn

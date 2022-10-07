@@ -18,7 +18,7 @@ It's composed of multiple packages :
 | `@zodios/react`   | Frontend         | React hooks for the client based on [tanstack-query](https://tanstack.com/query).                                                                                 |
 | `@zodios/solid`   | Frontend         | Solid hooks for the client based on [tanstack-query](https://tanstack.com/query).                                                                                 |
 | `@zodios/express` | Backend          | A simple adapter for [Express](https://expressjs.com/) but with full typesafety and autocompletion.                                                               |
-| `@zodios/openapi` | Backend          | 🚧 Not released yet 🚧<br/> Helper that generates OpenAPI specs from Zodios [API definitions](api/api-definition.md) and allows you to easily generate swagger ui.  |
+| `@zodios/openapi` | Backend          | Helper that generates OpenAPI specs from Zodios [API definitions](api/api-definition.md) and allows you to easily generate swagger ui.                            |
 
 :::tip It's worth noting that frontend and backend packages can be used as standalone packages.
 Meaning that you don't need to use Zodios Backend to use Zodios Frontend packages and vice-versa. Allowing you to scale the developpement of your API between frontend and backend teams.  
