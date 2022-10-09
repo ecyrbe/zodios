@@ -15,8 +15,80 @@ function toOpenApi(
   options?: {
     info?: OpenAPIV3.InfoObject
     servers?: OpenAPIV3.ServerObject[];
+    securityScheme?: OpenAPIV3.SecuritySchemeObject;
+    tagsFromPathFn?: (path: string) => string[];
   }
 ): OpenAPIV3.Document;
+```
+
+### Info option
+
+The `info` option allows you to specify the OpenAPI info object.
+
+```ts
+const doc = toOpenApi(api, {
+  info: {
+    title: "My API",
+    version: "1.0.0",
+  },
+});
+```
+
+### Servers option
+
+The `servers` option allows you to specify the OpenAPI servers object. This is useful if you want to specify the base url of your api.
+
+```ts
+const doc = toOpenApi(api, {
+  servers: [
+    {
+      url: "https://api.example.com",
+    },
+  ],
+});
+```
+
+### Security scheme option
+
+The `securityScheme` option allows you to specify the OpenAPI security scheme object. Zodios has 3 helper functions to generate the security scheme object.
+
+#### Basic auth
+
+```ts
+import { basicAuthScheme } from "@zodios/openapi";
+
+const doc = toOpenApi(api, {
+  securityScheme: basicAuthScheme(),
+});
+```
+
+#### Bearer auth
+
+```ts
+import { bearerAuthScheme } from "@zodios/openapi";
+
+const doc = toOpenApi(api, {
+  securityScheme: bearerAuthScheme(),
+});
+```
+
+#### OAuth2
+
+```ts
+
+import { oauth2Scheme } from "@zodios/openapi";
+
+const doc = toOpenApi(api, {
+  securityScheme: oauth2Scheme({
+    implicit: {
+      authorizationUrl: "https://example.com/oauth2/authorize",
+      scopes: {
+        "read:users": "read users",
+        "write:users": "write users",
+      },
+    },
+  }),
+});
 ```
 
 ### Examples
