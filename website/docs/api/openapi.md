@@ -91,9 +91,28 @@ const doc = toOpenApi(api, {
 });
 ```
 
+### custom tags
+
+The `tagsFromPathFn` option allows you to specify a function that returns an array of tags for a given path. This is useful if you want to group your endpoints by tags.
+
+:::note
+Zodios will by default deduce tags from the last named resource in the path. So for example, the path `/users/:id` will have the tag `users`, and the path `/users/:id/comments` will have the tag `comments`.
+Only pass this option if you want to override this behavior.
+:::
+
+```ts
+const doc = toOpenApi(api, {
+  // hardcoded tags with dictionary
+  tagsFromPathFn: (path) => {
+    '/users': ['users'],
+    '/users/:id': ['users'],
+    '/users/:id/comments': ['users'],
+  }[path],
+});
+```
 ### Examples
 
-### swagger-ui-express
+#### swagger-ui-express
 
 You can expose your OpenAPI documentation with the `@zodios/express` package.
 
