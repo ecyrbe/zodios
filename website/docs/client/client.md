@@ -657,18 +657,3 @@ const apiClient = new Zodios(BASE_URL, [
   },
 ]);
 ```
-
-## Passing types around
-
-Sometimes, you might need an endpoint-related type (it could be its query params, body, response, etc...) in another place than the one where you're using the API client.
-In such case, there are plenty of utility-types provided out-of-the-box.
-
-Re-using the [CRUD helper](#crud-helper) example above, here are some examples on how to retrieve any type of an endpoint.
-
-
-```ts
-import type { Body } from '@zodios/core';
-
-type UserList = Response<typeof apiClient.api, "get", "/users">
-type PatchUserBody = Body<typeof apiClient.api, "patch", "/users/:id">
-```
