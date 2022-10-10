@@ -15,7 +15,7 @@ import {
   Body,
   PathParams,
   QueryParams,
-} from "../src/index";
+} from "@zodios/code";
 import z from "zod";
 
 const user = z.object({
