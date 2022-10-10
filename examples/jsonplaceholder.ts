@@ -1,6 +1,10 @@
-import { ApiOf, ResponseByAlias, Zodios } from "../src/index";
+import {
+  ApiOf,
+  ResponseByAlias,
+  HeaderParamsByAlias,
+  Zodios,
+} from "../src/index";
 import { z } from "zod";
-import { HeaderParamsByAlias } from "../src/zodios.types";
 
 async function bootstrap() {
   const apiClient = new Zodios("https://jsonplaceholder.typicode.com", [
