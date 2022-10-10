@@ -9,7 +9,6 @@ import type {
   SetPropsOptionalIfChildrenAreOptional,
   ReadonlyDeep,
   Merge,
-  MergeUnion,
   FilterArrayByKey,
   IfEquals,
 } from "./utils.types";
@@ -27,44 +26,46 @@ export type RequestFormat =
   | "text"; // for text data
 
 type MethodApiDescription<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method
 > = FilterArrayByValue<Api, { method: M }>;
 
 export type EndpointApiDescription<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path
+  Path extends Paths<Api, M>
 > = FilterArrayByValue<Api, { method: M; path: Path }>;
 
 export type AliasEndpointApiDescription<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = FilterArrayByValue<Api, { alias: Alias }>;
 
 export type Paths<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method
 > = MethodApiDescription<Api, M>[number]["path"];
 
-export type Aliases<Api extends unknown[]> = FilterArrayByKey<
+export type Aliases<Api extends ZodiosEndpointDescription[]> = FilterArrayByKey<
   Api,
   "alias"
 >[number]["alias"];
 
-export type Response<Api extends unknown[], M extends Method, Path> = z.infer<
-  EndpointApiDescription<Api, M, Path>[number]["response"]
->;
+export type Response<
+  Api extends ZodiosEndpointDescription[],
+  M extends Method,
+  Path extends Paths<Api, M>
+> = z.infer<EndpointApiDescription<Api, M, Path>[number]["response"]>;
 
 export type ResponseByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = z.infer<AliasEndpointApiDescription<Api, Alias>[number]["response"]>;
 
 type DefaultError<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path
+  Path extends Paths<Api, M>
 > = FilterArrayByValue<
   EndpointApiDescription<Api, M, Path>[number]["errors"],
   {
@@ -73,7 +74,7 @@ type DefaultError<
 >[number]["schema"];
 
 type DefaultErrorByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = FilterArrayByValue<
   AliasEndpointApiDescription<Api, Alias>[number]["errors"],
@@ -85,9 +86,9 @@ type DefaultErrorByAlias<
 type IfNever<E, A> = IfEquals<E, never, A, E>;
 
 export type EndpointError<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path,
+  Path extends Paths<Api, M>,
   Status extends number
 > = z.input<
   IfNever<
@@ -102,7 +103,7 @@ export type EndpointError<
 >;
 
 export type EndpointErrorByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string,
   Status extends number
 > = z.input<
@@ -118,34 +119,37 @@ export type EndpointErrorByAlias<
 >;
 
 export type BodySchema<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path
+  Path extends Paths<Api, M>
 > = FilterArrayByValue<
   EndpointApiDescription<Api, M, Path>[number]["parameters"],
   { type: "Body" }
 >[number]["schema"];
 
-export type Body<Api extends unknown[], M extends Method, Path> = z.input<
-  BodySchema<Api, M, Path>
->;
+export type Body<
+  Api extends ZodiosEndpointDescription[],
+  M extends Method,
+  Path extends Paths<Api, M>
+> = z.input<BodySchema<Api, M, Path>>;
 
 export type BodySchemaByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = FilterArrayByValue<
   AliasEndpointApiDescription<Api, Alias>[number]["parameters"],
   { type: "Body" }
 >[number]["schema"];
 
-export type BodyByAlias<Api extends unknown[], Alias extends string> = z.input<
-  BodySchemaByAlias<Api, Alias>
->;
+export type BodyByAlias<
+  Api extends ZodiosEndpointDescription[],
+  Alias extends string
+> = z.input<BodySchemaByAlias<Api, Alias>>;
 
 export type QueryParams<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path
+  Path extends Paths<Api, M>
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
@@ -158,7 +162,7 @@ export type QueryParams<
 >;
 
 export type QueryParamsByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = NeverIfEmpty<
   UndefinedToOptional<
@@ -176,7 +180,7 @@ export type PathParams<Path extends string> = NeverIfEmpty<
 >;
 
 export type PathParamByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = NeverIfEmpty<
   Record<
@@ -186,9 +190,9 @@ export type PathParamByAlias<
 >;
 
 export type HeaderParams<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path
+  Path extends Paths<Api, M>
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
@@ -201,7 +205,7 @@ export type HeaderParams<
 >;
 
 export type HeaderParamsByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = NeverIfEmpty<
   UndefinedToOptional<
@@ -215,7 +219,7 @@ export type HeaderParamsByAlias<
 >;
 
 export type ZodiosConfigByAlias<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   Alias extends string
 > = Merge<
   SetPropsOptionalIfChildrenAreOptional<
@@ -228,7 +232,7 @@ export type ZodiosConfigByAlias<
   Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
 >;
 
-export type ZodiosAliases<Api extends unknown[]> = {
+export type ZodiosAliases<Api extends ZodiosEndpointDescription[]> = {
   [Alias in Aliases<Api>]: AliasEndpointApiDescription<
     Api,
     Alias
@@ -257,9 +261,9 @@ export type AnyZodiosRequestOptions = Merge<
 >;
 
 export type ZodiosMethodOptions<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path extends string
+  Path extends Paths<Api, M>
 > = Merge<
   SetPropsOptionalIfChildrenAreOptional<
     PickDefined<{
@@ -272,9 +276,9 @@ export type ZodiosMethodOptions<
 >;
 
 export type ZodiosRequestOptions<
-  Api extends unknown[],
+  Api extends ZodiosEndpointDescription[],
   M extends Method,
-  Path extends string
+  Path extends Paths<Api, M>
 > = Merge<
   {
     method: M;
