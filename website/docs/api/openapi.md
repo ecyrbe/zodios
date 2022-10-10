@@ -150,6 +150,9 @@ app.use("/docs", setup(undefined, { swaggerUrl: "/docs/swagger.json" }));
 app.listen(3000);
 ```
 
+Result:  
+![openapi](/img/openapi.png)
+
 ## OpenAPI to Zodios API definition
 
 If you want to use an existing OpenAPI documentation to generate your Zodios API definition, you can use the [openapi-zod-client](https://github.com/astahmer/openapi-zod-client) package.
