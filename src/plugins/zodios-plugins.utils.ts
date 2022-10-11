@@ -1,7 +1,7 @@
-import { ZodiosEnpointDescriptions } from "../zodios.types";
+import { ZodiosEndpointDefinitions } from "../zodios.types";
 
 export function findEndpoint(
-  api: ZodiosEnpointDescriptions,
+  api: ZodiosEndpointDefinitions,
   method: string,
   path: string
 ) {

@@ -3,7 +3,7 @@ import { ReadonlyDeep } from "../utils.types";
 import {
   AnyZodiosRequestOptions,
   Method,
-  ZodiosEnpointDescriptions,
+  ZodiosEndpointDefinitions,
   ZodiosPlugin,
 } from "../zodios.types";
 
@@ -83,7 +83,7 @@ export class ZodiosPlugins {
    * @returns the modified config
    */
   async interceptRequest(
-    api: ZodiosEnpointDescriptions,
+    api: ZodiosEndpointDefinitions,
     config: ReadonlyDeep<AnyZodiosRequestOptions>
   ) {
     let pluginConfig = config;
@@ -103,7 +103,7 @@ export class ZodiosPlugins {
    * @returns the modified response
    */
   async interceptResponse(
-    api: ZodiosEnpointDescriptions,
+    api: ZodiosEndpointDefinitions,
     config: ReadonlyDeep<AnyZodiosRequestOptions>,
     response: Promise<AxiosResponse>
   ) {
