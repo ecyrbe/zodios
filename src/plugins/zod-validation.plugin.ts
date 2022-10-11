@@ -21,16 +21,21 @@ const plugin: ZodiosPlugin = {
       headers: {
         ...config.headers,
       },
+      params: {
+        ...config.params,
+      },
     };
     const paramsOf = {
       Query: (name: string) => conf.queries?.[name],
       Body: (_: string) => conf.data,
       Header: (name: string) => conf.headers?.[name],
+      Path: (name: string) => conf.params?.[name],
     };
     const setParamsOf = {
       Query: (name: string, value: any) => (conf.queries![name] = value),
       Body: (_: string, value: any) => (conf.data = value),
       Header: (name: string, value: any) => (conf.headers![name] = value),
+      Path: (name: string, value: any) => (conf.params![name] = value),
     };
     for (const parameter of parameters) {
       const { name, schema, type } = parameter;

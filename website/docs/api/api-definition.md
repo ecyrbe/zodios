@@ -30,15 +30,16 @@ The API definition is a javascript array of endpoint descriptions. Each endpoint
 
 The parameters of an endpoint are an array of parameter descriptions. Each parameter description is an object with the following properties:
 
-| Property    | Type                        | Description                                             |
-| ----------- | --------------------------- | ------------------------------------------------------- |
-| name        | string                      | The name of the parameter.                              |
-| type        | `Query`, `Body` or `Header` | The type of the parameter.                              |
-| description | string                      | Optional description of the endpoint. Used for openapi. |
-| schema      | ZodSchema                   | The schema of the parameter using Zod.                  |
+| Property    | Type                                | Description                                             |
+| ----------- | ----------------------------------- | ------------------------------------------------------- |
+| name        | string                              | The name of the parameter.                              |
+| type        | `Path`, `Query`, `Body` or `Header` | The type of the parameter.                              |
+| description | string                              | Optional description of the endpoint. Used for openapi. |
+| schema      | ZodSchema                           | The schema of the parameter using Zod.                  |
 
 :::note Path parameters do not need to be defined in the API definition `parameters` array.
 Indeed, they are automatically deduced from the path and added to the request parameters implicitly.
+Only declare path parameters in the `parameters` array if you want to add a description or a schema to validate them
 :::
 
 

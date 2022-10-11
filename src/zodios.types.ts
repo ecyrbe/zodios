@@ -325,9 +325,9 @@ export type ZodiosEndpointParameter<T = unknown> = {
    */
   description?: string;
   /**
-   * type of the parameter: Query, Body, Header
+   * type of the parameter: Query, Body, Header, Path
    */
-  type: "Query" | "Body" | "Header";
+  type: "Query" | "Body" | "Header" | "Path";
   /**
    * zod schema of the parameter
    * you can use zod `transform` to transform the value of the parameter before sending it to the server

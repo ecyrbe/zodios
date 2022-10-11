@@ -37,6 +37,9 @@ describe("Zodios", () => {
     app.get("/:id", (req, res) => {
       res.status(200).json({ id: Number(req.params.id), name: "test" });
     });
+    app.get("/path/:uuid", (req, res) => {
+      res.status(200).json({ uuid: req.params.uuid });
+    });
     app.get("/:id/address/:address", (req, res) => {
       res
         .status(200)
@@ -690,6 +693,63 @@ describe("Zodios", () => {
       params: { id: 6 },
     });
     expect(response).toEqual({ id: 6 });
+  });
+
+  it("should validate uuid in path params", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/path/:uuid",
+        parameters: [
+          {
+            name: "uuid",
+            type: "Path",
+            schema: z.string().uuid(),
+          },
+        ],
+        response: z.object({
+          uuid: z.string(),
+        }),
+      },
+    ]);
+    const response = await zodios.get("/path/:uuid", {
+      params: { uuid: "e9e09a1d-3967-4518-bc89-75a901aee128" },
+    });
+    expect(response).toEqual({
+      uuid: "e9e09a1d-3967-4518-bc89-75a901aee128",
+    });
+  });
+
+  it("should not validate bad path params", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/path/:uuid",
+        parameters: [
+          {
+            name: "uuid",
+            type: "Path",
+            schema: z.string().uuid(),
+          },
+        ],
+        response: z.object({
+          uuid: z.string(),
+        }),
+      },
+    ]);
+    let error;
+    try {
+      await zodios.get("/path/:uuid", {
+        params: { uuid: "e9e09a1-3967-4518-bc89-75a901aee128" },
+      });
+    } catch (e) {
+      error = e;
+    }
+    expect(error).toBeInstanceOf(ZodiosError);
+    expect((error as ZodiosError).cause).toBeInstanceOf(ZodError);
+    expect((error as ZodiosError).message).toBe(
+      "Zodios: Invalid Path parameter 'uuid'"
+    );
   });
 
   it("should not validate bad formatted responses", async () => {
