@@ -2,12 +2,12 @@ import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   AnyZodiosRequestOptions,
   ZodiosRequestOptions,
-  Body,
+  ZodiosBodyByPath,
   Method,
-  Paths,
-  Response,
+  ZodiosPathsByMethod,
+  ZodiosResponseByPath,
   ZodiosOptions,
-  ZodiosEnpointDescriptions,
+  ZodiosEndpointDefinitions,
   ZodiosMethodOptions,
   ZodiosAliases,
   ZodiosPlugin,
@@ -27,7 +27,7 @@ import { checkApi } from "./api";
 /**
  * zodios api client based on axios
  */
-export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
+export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   private axiosInstance: AxiosInstance;
   public readonly options: ZodiosOptions;
   public readonly api: Api;
@@ -165,7 +165,7 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
     alias: Alias,
     plugin: ZodiosPlugin
   ): PluginId;
-  use<M extends Method, Path extends Paths<Api, M>>(
+  use<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
     method: M,
     path: Path,
     plugin: ZodiosPlugin
@@ -241,9 +241,9 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    */
   async request<
     M extends Method,
-    Path extends Paths<Api, M>,
+    Path extends ZodiosPathsByMethod<Api, M>,
     TConfig = ReadonlyDeep<ZodiosRequestOptions<Api, M, Path>>
-  >(config: TConfig): Promise<Response<Api, M, Path>> {
+  >(config: TConfig): Promise<ZodiosResponseByPath<Api, M, Path>> {
     let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
     const anyPlugin = this.getAnyEndpointPlugins()!;
     const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
@@ -271,12 +271,12 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @returns response validated with zod schema provided in the api description
    */
   async get<
-    Path extends Paths<Api, "get">,
+    Path extends ZodiosPathsByMethod<Api, "get">,
     TConfig extends ZodiosMethodOptions<Api, "get", Path>
   >(
     path: Path,
     config?: ReadonlyDeep<TConfig>
-  ): Promise<Response<Api, "get", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "get", Path>> {
     return this.request({
       ...config,
       method: "get",
@@ -292,14 +292,14 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @returns response validated with zod schema provided in the api description
    */
   async post<
-    Path extends Paths<Api, "post">,
-    TBody extends ReadonlyDeep<Body<Api, "post", Path>>,
+    Path extends ZodiosPathsByMethod<Api, "post">,
+    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "post", Path>>,
     TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "post", Path>>
   >(
     path: Path,
     data?: TBody,
     config?: TConfig
-  ): Promise<Response<Api, "post", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "post", Path>> {
     return this.request({
       ...config,
       method: "post",
@@ -316,14 +316,14 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @returns response validated with zod schema provided in the api description
    */
   async put<
-    Path extends Paths<Api, "put">,
-    TBody extends ReadonlyDeep<Body<Api, "put", Path>>,
+    Path extends ZodiosPathsByMethod<Api, "put">,
+    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "put", Path>>,
     TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "put", Path>>
   >(
     path: Path,
     data?: TBody,
     config?: TConfig
-  ): Promise<Response<Api, "put", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "put", Path>> {
     return this.request({
       ...config,
       method: "put",
@@ -340,14 +340,14 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @returns response validated with zod schema provided in the api description
    */
   async patch<
-    Path extends Paths<Api, "patch">,
-    TBody extends ReadonlyDeep<Body<Api, "patch", Path>>,
+    Path extends ZodiosPathsByMethod<Api, "patch">,
+    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "patch", Path>>,
     TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "patch", Path>>
   >(
     path: Path,
     data?: TBody,
     config?: TConfig
-  ): Promise<Response<Api, "patch", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "patch", Path>> {
     return this.request({
       ...config,
       method: "patch",
@@ -363,14 +363,14 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
    * @returns response validated with zod schema provided in the api description
    */
   async delete<
-    Path extends Paths<Api, "delete">,
-    TBody extends ReadonlyDeep<Body<Api, "delete", Path>>,
+    Path extends ZodiosPathsByMethod<Api, "delete">,
+    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "delete", Path>>,
     TConfig extends ReadonlyDeep<ZodiosMethodOptions<Api, "delete", Path>>
   >(
     path: Path,
     data?: TBody,
     config?: TConfig
-  ): Promise<Response<Api, "delete", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "delete", Path>> {
     return this.request({
       ...config,
       method: "delete",
@@ -380,15 +380,15 @@ export class ZodiosClass<Api extends ZodiosEnpointDescriptions> {
   }
 }
 
-export type ZodiosInstance<Api extends ZodiosEnpointDescriptions> =
+export type ZodiosInstance<Api extends ZodiosEndpointDefinitions> =
   ZodiosClass<Api> & ZodiosAliases<Api>;
 
 export type ZodiosConstructor = {
-  new <Api extends ZodiosEnpointDescriptions>(
+  new <Api extends ZodiosEndpointDefinitions>(
     api: Narrow<Api>,
     options?: ZodiosOptions
   ): ZodiosInstance<Api>;
-  new <Api extends ZodiosEnpointDescriptions>(
+  new <Api extends ZodiosEndpointDefinitions>(
     baseUrl: string,
     api: Narrow<Api>,
     options?: ZodiosOptions

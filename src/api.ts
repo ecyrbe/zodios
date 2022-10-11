@@ -2,9 +2,9 @@
 // indeed typescript seems to have a bug, where it tries to infer the type of an undecidable generic type
 // but when using the functions, types are inferred correctly
 import {
-  ZodiosEndpointDescription,
+  ZodiosEndpointDefinition,
   ZodiosEndpointParameter,
-  ZodiosEnpointDescriptions,
+  ZodiosEndpointDefinitions,
   ZodiosEndpointError,
 } from "./zodios.types";
 import z from "zod";
@@ -17,7 +17,7 @@ import { Narrow } from "./utils.types";
  * @return - nothing
  * @throws - error if api has non unique paths
  */
-export function checkApi<T extends ZodiosEnpointDescriptions>(api: T) {
+export function checkApi<T extends ZodiosEndpointDefinitions>(api: T) {
   const paths = new Set<string>();
   for (let endpoint of api) {
     const fullpath = `${endpoint.method} ${endpoint.path}`;
@@ -35,7 +35,7 @@ export function checkApi<T extends ZodiosEnpointDescriptions>(api: T) {
  * @param api - api definitions
  * @returns the api definitions
  */
-export function makeApi<Api extends ZodiosEnpointDescriptions>(
+export function makeApi<Api extends ZodiosEndpointDefinitions>(
   api: Narrow<Api>
 ): Api {
   checkApi(api);
@@ -98,14 +98,14 @@ export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
  */
 export const asErrors = makeErrors;
 
-export function makeEndpoint<T extends ZodiosEndpointDescription<any>>(
+export function makeEndpoint<T extends ZodiosEndpointDefinition<any>>(
   endpoint: Narrow<T>
 ): T {
   return endpoint as T;
 }
-export class Builder<T extends ZodiosEnpointDescriptions> {
+export class Builder<T extends ZodiosEndpointDefinitions> {
   constructor(private api: T) {}
-  addEndpoint<E extends ZodiosEndpointDescription>(endpoint: Narrow<E>) {
+  addEndpoint<E extends ZodiosEndpointDefinition>(endpoint: Narrow<E>) {
     return new Builder<[...T, E]>([...this.api, endpoint] as [...T, E]);
   }
   build(): T {
@@ -120,7 +120,7 @@ export class Builder<T extends ZodiosEnpointDescriptions> {
  * @param endpoint
  * @returns - a builder to build your api definitions
  */
-export function apiBuilder<T extends ZodiosEndpointDescription<any>>(
+export function apiBuilder<T extends ZodiosEndpointDefinition<any>>(
   endpoint: Narrow<T>
 ): Builder<[T]> {
   return new Builder([endpoint] as [T]);
