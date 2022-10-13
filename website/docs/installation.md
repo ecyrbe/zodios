@@ -19,11 +19,8 @@ npm install @zodios/core axios zod
 if you want to use the react hooks, you need to install the following packages:
 
 ```bash npm2yarn
-npm install react-query @zodios/core @zodios/react axios react react-dom zod
+npm install @tanstack/react-query @zodios/core @zodios/react axios react react-dom zod
 ```
-:::note
-@zodios/react is using react-query v3, in future next major version we will upgrade to react-query v4
-:::
 
 ### With Solid
 
