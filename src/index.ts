@@ -10,6 +10,7 @@ export type {
   ZodiosHeaderParamsByAlias,
   Method,
   ZodiosPathParams,
+  ZodiosPathParamsByPath,
   ZodiosPathParamByAlias,
   ZodiosPathsByMethod,
   ZodiosResponseByPath,
@@ -29,6 +30,7 @@ export type {
   ZodiosOptions,
   ZodiosRequestOptions,
   ZodiosMethodOptions,
+  ZodiosRequestOptionsByPath,
   ZodiosRequestOptionsByAlias,
   ZodiosPlugin,
 } from "./zodios.types";
@@ -40,15 +42,11 @@ export {
   headerPlugin,
 } from "./plugins";
 export {
-  asApi,
   makeApi,
-  asCrudApi,
   makeCrudApi,
   apiBuilder,
-  asParameters,
   makeParameters,
   makeEndpoint,
-  asErrors,
   makeErrors,
   checkApi,
 } from "./api";

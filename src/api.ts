@@ -43,16 +43,6 @@ export function makeApi<Api extends ZodiosEndpointDefinitions>(
 }
 
 /**
- * Simple helper to split your api definitions into multiple files
- * Mandatory to be used when declaring your endpoint definitions outside zodios constructor
- * to enable type inferrence and autocompletion
- * @param api - api definitions
- * @returns the api definitions
- * @deprecated - use makeApi instead
- */
-export const asApi = makeApi;
-
-/**
  * Simple helper to split your parameter definitions into multiple files
  * Mandatory to be used when declaring parameters appart from your endpoint definitions
  * to enable type inferrence and autocompletion
@@ -64,16 +54,6 @@ export function makeParameters<
 >(params: Narrow<ParameterDescriptions>): ParameterDescriptions {
   return params as ParameterDescriptions;
 }
-
-/**
- * Simple helper to split your parameter definitions into multiple files
- * Mandatory to be used when declaring parameters appart from your endpoint definitions
- * to enable type inferrence and autocompletion
- * @param params - api parameter definitions
- * @returns the api parameter definitions
- * @deprecated - use makeParameters instead
- */
-export const asParameters = makeParameters;
 
 /**
  * Simple helper to split your error definitions into multiple files
@@ -92,12 +72,9 @@ export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
  * Simple helper to split your error definitions into multiple files
  * Mandatory to be used when declaring errors appart from your endpoint definitions
  * to enable type inferrence and autocompletion
- * @param errors - api error definitions
- * @returns the error definitions
- * @deprecated - use makeErrors instead
+ * @param endpoint - api endpoint definition
+ * @returns the endpoint definition
  */
-export const asErrors = makeErrors;
-
 export function makeEndpoint<T extends ZodiosEndpointDefinition<any>>(
   endpoint: Narrow<T>
 ): T {
@@ -225,12 +202,3 @@ export function makeCrudApi<T extends string, S extends z.ZodObject<any>>(
     },
   ]);
 }
-
-/**
- * Helper to generate a basic CRUD api for a given resource
- * @param resource - the resource to generate the api for
- * @param schema - the schema of the resource
- * @returns - the api definitions
- * @deprecated use makeCrudApi instead
- */
-export const asCrudApi = makeCrudApi;

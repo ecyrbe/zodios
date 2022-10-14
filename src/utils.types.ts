@@ -7,7 +7,7 @@ import { z, ZodType } from "zod";
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type FilterArrayByValue<
-  T extends unknown[],
+  T extends unknown[] | undefined,
   C,
   Acc extends unknown[] = []
 > = T extends [infer Head, ...infer Tail]

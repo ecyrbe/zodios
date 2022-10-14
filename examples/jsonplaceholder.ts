@@ -1,7 +1,7 @@
 import {
   ApiOf,
-  ResponseByAlias,
-  HeaderParamsByAlias,
+  ZodiosResponseByAlias,
+  ZodiosHeaderParamsByAlias,
   Zodios,
 } from "../src/index";
 import { z } from "zod";
@@ -65,9 +65,12 @@ async function bootstrap() {
     },
   ]);
 
-  type UserResponseAlias = ResponseByAlias<ApiOf<typeof apiClient>, "getUsers">;
+  type UserResponseAlias = ZodiosResponseByAlias<
+    ApiOf<typeof apiClient>,
+    "getUsers"
+  >;
 
-  type Test = HeaderParamsByAlias<ApiOf<typeof apiClient>, "createUser">;
+  type Test = ZodiosHeaderParamsByAlias<ApiOf<typeof apiClient>, "createUser">;
 
   const users: UserResponseAlias = await apiClient.getUsers({
     queries: { q: "Nicholas" },

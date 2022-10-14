@@ -175,19 +175,51 @@ export type ZodiosQueryParamsByAlias<
   >
 >;
 
+/**
+ * @deprecated - use ZodiosQueryParamsByPath instead
+ */
 export type ZodiosPathParams<Path extends string> = NeverIfEmpty<
   Record<PathParamNames<Path>, string | number>
 >;
 
+/**
+ * Get path params for a given endpoint by path
+ */
+export type ZodiosPathParamsByPath<
+  Api extends ZodiosEndpointDefinition[],
+  M extends Method,
+  Path extends ZodiosPathsByMethod<Api, M>,
+  PathParameters = MapSchemaParameters<
+    FilterArrayByValue<
+      ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
+      { type: "Path" }
+    >
+  >
+> = NeverIfEmpty<{
+  [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
+    ? PathParameters[K]
+    : string | number;
+}>;
+
+/**
+ * Get path params for a given endpoint by alias
+ */
 export type ZodiosPathParamByAlias<
   Api extends ZodiosEndpointDefinition[],
-  Alias extends string
-> = NeverIfEmpty<
-  Record<
-    PathParamNames<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["path"]>,
-    string | number
+  Alias extends string,
+  EndpointDefinition extends ZodiosEndpointDefinition = ZodiosEndpointDefinitionByAlias<
+    Api,
+    Alias
+  >[number],
+  Path = EndpointDefinition["path"],
+  PathParameters = MapSchemaParameters<
+    FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>
   >
->;
+> = NeverIfEmpty<{
+  [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
+    ? PathParameters[K]
+    : string | number;
+}>;
 
 export type ZodiosHeaderParamsByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -260,6 +292,9 @@ export type AnyZodiosRequestOptions = Merge<
   AnyZodiosMethodOptions
 >;
 
+/**
+ * @deprecated - use ZodiosRequestOptionsByPath instead
+ */
 export type ZodiosMethodOptions<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
@@ -267,7 +302,25 @@ export type ZodiosMethodOptions<
 > = Merge<
   SetPropsOptionalIfChildrenAreOptional<
     PickDefined<{
-      params: ZodiosPathParams<Path>;
+      params: ZodiosPathParamsByPath<Api, M, Path>;
+      queries: ZodiosQueryParamsByPath<Api, M, Path>;
+      headers: ZodiosHeaderParamsByPath<Api, M, Path>;
+    }>
+  >,
+  Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
+>;
+
+/**
+ * Get the request options for a given endpoint
+ */
+export type ZodiosRequestOptionsByPath<
+  Api extends ZodiosEndpointDefinition[],
+  M extends Method,
+  Path extends ZodiosPathsByMethod<Api, M>
+> = Merge<
+  SetPropsOptionalIfChildrenAreOptional<
+    PickDefined<{
+      params: ZodiosPathParamsByPath<Api, M, Path>;
       queries: ZodiosQueryParamsByPath<Api, M, Path>;
       headers: ZodiosHeaderParamsByPath<Api, M, Path>;
     }>
@@ -285,7 +338,7 @@ export type ZodiosRequestOptions<
     url: Path;
     data?: ZodiosBodyByPath<Api, M, Path>;
   },
-  ZodiosMethodOptions<Api, M, Path>
+  ZodiosRequestOptionsByPath<Api, M, Path>
 >;
 
 /**
