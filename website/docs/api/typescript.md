@@ -8,14 +8,18 @@ Even though zodios is written in typescript, you can use it with javascript. How
 
 ## `ApiOf`
 
+`ApiOf` is a type helper that extracts the api definition type from your zodios client instance.
+
 ```ts
 import { ApiOf, Zodios } from 'zodios';
 
 const client = new Zodios(myApiDefinition);
 
-type MyApi = ApiOf<typeof myApiDefinition>;
+type MyApi = ApiOf<typeof client>;
 ```
 ## `ZodiosBodyByPath`
+
+`ZodiosBodyByPath` is a type helper that extracts the body type of a request from your api definition.
 
 ```ts
 import { ZodiosBodyByPath, Zodios } from 'zodios'
@@ -26,6 +30,8 @@ type User = ZodiosBodyByPath<MyApi,'post','/users'>;
 
 ## `ZodiosBodyByAlias`
 
+`ZodiosBodyByAlias` is a type helper that extracts the body type of a request from your api definition.
+
 ```ts
 import { ZodiosBodyByAlias, Zodios } from 'zodios'
 import { MyApi } from './my-api';
@@ -34,6 +40,8 @@ type User = ZodiosBodyByAlias<MyApi,'createUsers'>;
 ```
 ## `ZodiosHeaderParamsByPath`
 
+`ZodiosHeaderParamsByPath` is a type helper that extracts the header params type of a request from your api definition.
+
 ```ts
 import { ZodiosHeaderParamsByPath, Zodios } from 'zodios'
 import { MyApi } from './my-api';
@@ -41,6 +49,8 @@ import { MyApi } from './my-api';
 type CreateUsersHeaderParams = ZodiosHeaderParamsByPath<MyApi,'post','/users'>;
 ```
 ## `ZodiosHeaderParamsByAlias`
+
+`ZodiosHeaderParamsByAlias` is a type helper that extracts the header params type of a request from your api definition.
 
 ```ts
 import { ZodiosHeaderParamsByAlias, Zodios } from 'zodios'
@@ -51,6 +61,8 @@ type CreateUsersHeaderParams = ZodiosHeaderParamsByAlias<MyApi,'createUsers'>;
 
 ## `ZodiosPathParams`
 
+`ZodiosPathParams` is a type helper that extracts the path params type of a request from your api definition.
+
 ```ts
 import { ZodiosPathParams, Zodios } from 'zodios'
 import { MyApi } from './my-api';
@@ -58,14 +70,18 @@ import { MyApi } from './my-api';
 type GetUserPathParams = ZodiosPathParams<'/users/:id'>;
 ```
 ## `ZodiosPathParamByAlias`
+
+`ZodiosPathParamByAlias` is a type helper that extracts the path params type of a request from your api definition.
   
-  ```ts
+```ts
 import { ZodiosPathParamByAlias, Zodios } from 'zodios'
 import { MyApi } from './my-api';
 
 type GetUserPathParams = ZodiosPathParamByAlias<MyApi,'getUser'>;
 ```
 ## `ZodiosResponseByPath`
+
+`ZodiosResponseByPath` is a type helper that extracts the response type of a request from your api definition.
 
 ```ts
 import { ZodiosResponseByPath, Zodios } from 'zodios'
@@ -76,6 +92,8 @@ type Users = ZodiosResponseByPath<MyApi,'get','/users'>;
 
 ## `ZodiosResponseByAlias`
 
+`ZodiosResponseByAlias` is a type helper that extracts the response type of a request from your api definition.
+
 ```ts
 import { ZodiosResponseByAlias, Zodios } from 'zodios'
 import { MyApi } from './my-api';
@@ -83,7 +101,9 @@ import { MyApi } from './my-api';
 type Users = ZodiosResponseByAlias<MyApi,'getUsers'>;
 ```
 ## `ZodiosQueryParamsByPath`
-  
+
+`ZodiosQueryParamsByPath` is a type helper that extracts the query params type of a request from your api definition.
+
 ```ts
 import { ZodiosQueryParamsByPath, Zodios } from 'zodios'
 import { MyApi } from './my-api';
@@ -91,6 +111,8 @@ import { MyApi } from './my-api';
 type GetUsersQueryParams = ZodiosQueryParamsByPath<MyApi,'get','/users'>;
 ```
 ## `ZodiosQueryParamsByAlias`
+
+`ZodiosQueryParamsByAlias` is a type helper that extracts the query params type of a request from your api definition.
 
 ```ts
 import { ZodiosQueryParamsByAlias, Zodios } from 'zodios'
@@ -100,6 +122,8 @@ type GetUsersQueryParams = ZodiosQueryParamsByAlias<MyApi,'getUsers'>;
 ```
 ## `ZodiosErrorByPath`
 
+`ZodiosErrorByPath` is a type helper that extracts the error type of a request from your api definition given a status code.
+
 ```ts
 import { ZodiosErrorByPath, Zodios } from 'zodios'
 import { MyApi } from './my-api';
@@ -107,6 +131,8 @@ import { MyApi } from './my-api';
 type NotFoundUsersError = ZodiosErrorByPath<MyApi,'get','/users',404>;
 ```
 ## `ZodiosErrorByAlias`
+
+`ZodiosErrorByAlias` is a type helper that extracts the error type of a request from your api definition given a status code.
 
 ```ts
 import { ZodiosErrorByAlias, Zodios } from 'zodios'
