@@ -346,11 +346,6 @@ export type ZodiosRequestOptions<
  */
 export type ZodiosOptions = {
   /**
-   * Should zodios validate the response? Default: true
-   * @deprecated use `validate` instead
-   */
-  validateResponse?: boolean;
-  /**
    * Should zodios validate parameters and response? Default: true
    */
   validate?: boolean;

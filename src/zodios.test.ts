@@ -815,7 +815,7 @@ received:
           }),
         },
       ],
-      { validateResponse: false }
+      { validate: false }
     );
     const response = await zodios.get("/:id", { params: { id: 1 } });
     expect(response).toEqual({

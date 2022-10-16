@@ -62,28 +62,35 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   constructor(api: Narrow<Api>, options?: ZodiosOptions);
   constructor(baseUrl: string, api: Narrow<Api>, options?: ZodiosOptions);
-  constructor(...args: unknown[]) {
-    if (!args[0]) {
-      if (Array.isArray(args[1])) {
+  constructor(
+    arg1?: Api | string,
+    arg2?: Api | ZodiosOptions,
+    arg3?: ZodiosOptions
+  ) {
+    let options: ZodiosOptions;
+    if (!arg1) {
+      if (Array.isArray(arg2)) {
         throw new Error("Zodios: missing base url");
       }
       throw new Error("Zodios: missing api description");
     }
     let baseURL: string | undefined;
-    if (typeof args[0] === "string") {
-      [baseURL, ...args] = args;
-    }
-    this.api = args[0] as Api;
-
-    if (!Array.isArray(this.api)) {
+    if (typeof arg1 === "string" && Array.isArray(arg2)) {
+      baseURL = arg1;
+      this.api = arg2;
+      options = arg3 || {};
+    } else if (Array.isArray(arg1) && !Array.isArray(arg2)) {
+      this.api = arg1;
+      options = arg2 || {};
+    } else {
       throw new Error("Zodios: api must be an array");
     }
+
     checkApi(this.api);
 
     this.options = {
       validate: true,
-      validateResponse: true,
-      ...(args[1] as ZodiosOptions),
+      ...options,
     };
 
     if (this.options.axiosInstance) {
@@ -97,7 +104,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
     this.injectAliasEndpoints();
     this.initPlugins();
-    if (this.options.validate && this.options.validateResponse) {
+    if (this.options.validate) {
       this.use(zodValidationPlugin());
     }
   }
