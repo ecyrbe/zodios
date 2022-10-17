@@ -348,7 +348,7 @@ export type ZodiosOptions = {
   /**
    * Should zodios validate parameters and response? Default: true
    */
-  validate?: boolean;
+  validate?: boolean | "request" | "response" | "all" | "none";
   /**
    * Override the default axios instance. Default: zodios will create it's own axios instance
    */

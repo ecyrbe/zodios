@@ -104,8 +104,11 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
     this.injectAliasEndpoints();
     this.initPlugins();
-    if (this.options.validate) {
-      this.use(zodValidationPlugin());
+    if (
+      this.options.validate &&
+      [true, "all", "request", "response"].includes(this.options.validate)
+    ) {
+      this.use(zodValidationPlugin(this.options.validate));
     }
   }
 

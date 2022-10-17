@@ -5,7 +5,7 @@ import { AnyZodiosRequestOptions } from "../zodios.types";
 import { zodValidationPlugin } from "./zod-validation.plugin";
 
 describe("zodValidationPlugin", () => {
-  const plugin = zodValidationPlugin();
+  const plugin = zodValidationPlugin(true);
   describe("request", () => {
     it("should be defined", () => {
       expect(plugin.request).toBeDefined();

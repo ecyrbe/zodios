@@ -103,11 +103,11 @@ Indeed, they are automatically deduced from the path and added to the request pa
 
 Zodios API client constructor options `ZodiosOptions` are straightforward.
 
-| Option        | Type               | Default        | Description                                   |
-| ------------- | ------------------ | -------------- | --------------------------------------------- |
-| validate      | boolean            | true           | Validate parameters and responses at runtime. |
-| axiosInstance | AxiosInstance      | axios.create() | add your own axios instance                   |
-| axiosConfig   | AxiosRequestConfig | {}             | add your own default axios config             |
+| Option        | Type                                          | Default        | Description                                   |
+| ------------- | --------------------------------------------- | -------------- | --------------------------------------------- |
+| validate      | boolean \| all \| none \| request \| response | true           | Validate parameters and responses at runtime. |
+| axiosInstance | AxiosInstance                                 | axios.create() | add your own axios instance                   |
+| axiosConfig   | AxiosRequestConfig                            | {}             | add your own default axios config             |
 
 ## Zodios attributes
 
