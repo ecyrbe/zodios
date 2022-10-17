@@ -284,7 +284,7 @@ export type AnyZodiosMethodOptions = Merge<
     queries?: Record<string, unknown>;
     headers?: Record<string, string>;
   },
-  Omit<AxiosRequestConfig, "params" | "headers" | "baseURL" | "url" | "method">
+  Omit<AxiosRequestConfig, "params" | "headers" | "url" | "method">
 >;
 
 export type AnyZodiosRequestOptions = Merge<
