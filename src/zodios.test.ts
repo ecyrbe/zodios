@@ -410,6 +410,7 @@ describe("Zodios", () => {
       },
     ]);
     try {
+      // @ts-ignore
       await zodios.get("/:id");
     } catch (e) {
       expect(e).toBeInstanceOf(ZodiosError);

@@ -21,7 +21,12 @@ import {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-import { Narrow, ReadonlyDeep } from "./utils.types";
+import {
+  Narrow,
+  ReadonlyDeep,
+  RequiredKeys,
+  UndefinedIfNever,
+} from "./utils.types";
 import { checkApi } from "./api";
 
 /**
@@ -285,7 +290,9 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
     TConfig extends ZodiosRequestOptionsByPath<Api, "get", Path>
   >(
     path: Path,
-    config?: ReadonlyDeep<TConfig>
+    ...[config]: RequiredKeys<TConfig> extends never
+      ? [config?: ReadonlyDeep<TConfig>]
+      : [config: ReadonlyDeep<TConfig>]
   ): Promise<ZodiosResponseByPath<Api, "get", Path>> {
     return this.request({
       ...config,
@@ -303,12 +310,16 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async post<
     Path extends ZodiosPathsByMethod<Api, "post">,
-    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "post", Path>>,
-    TConfig extends ReadonlyDeep<ZodiosRequestOptionsByPath<Api, "post", Path>>
+    TBody extends ReadonlyDeep<
+      UndefinedIfNever<ZodiosBodyByPath<Api, "post", Path>>
+    >,
+    TConfig extends ZodiosRequestOptionsByPath<Api, "post", Path>
   >(
     path: Path,
-    data?: TBody,
-    config?: TConfig
+    data: TBody,
+    ...[config]: RequiredKeys<TConfig> extends never
+      ? [config?: ReadonlyDeep<TConfig>]
+      : [config: ReadonlyDeep<TConfig>]
   ): Promise<ZodiosResponseByPath<Api, "post", Path>> {
     return this.request({
       ...config,
@@ -327,12 +338,16 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async put<
     Path extends ZodiosPathsByMethod<Api, "put">,
-    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "put", Path>>,
-    TConfig extends ReadonlyDeep<ZodiosRequestOptionsByPath<Api, "put", Path>>
+    TBody extends ReadonlyDeep<
+      UndefinedIfNever<ZodiosBodyByPath<Api, "put", Path>>
+    >,
+    TConfig extends ZodiosRequestOptionsByPath<Api, "put", Path>
   >(
     path: Path,
-    data?: TBody,
-    config?: TConfig
+    data: TBody,
+    ...[config]: RequiredKeys<TConfig> extends never
+      ? [config?: ReadonlyDeep<TConfig>]
+      : [config: ReadonlyDeep<TConfig>]
   ): Promise<ZodiosResponseByPath<Api, "put", Path>> {
     return this.request({
       ...config,
@@ -351,12 +366,16 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async patch<
     Path extends ZodiosPathsByMethod<Api, "patch">,
-    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "patch", Path>>,
-    TConfig extends ReadonlyDeep<ZodiosRequestOptionsByPath<Api, "patch", Path>>
+    TBody extends ReadonlyDeep<
+      UndefinedIfNever<ZodiosBodyByPath<Api, "patch", Path>>
+    >,
+    TConfig extends ZodiosRequestOptionsByPath<Api, "patch", Path>
   >(
     path: Path,
-    data?: TBody,
-    config?: TConfig
+    data: TBody,
+    ...[config]: RequiredKeys<TConfig> extends never
+      ? [config?: ReadonlyDeep<TConfig>]
+      : [config: ReadonlyDeep<TConfig>]
   ): Promise<ZodiosResponseByPath<Api, "patch", Path>> {
     return this.request({
       ...config,
@@ -374,14 +393,16 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async delete<
     Path extends ZodiosPathsByMethod<Api, "delete">,
-    TBody extends ReadonlyDeep<ZodiosBodyByPath<Api, "delete", Path>>,
-    TConfig extends ReadonlyDeep<
-      ZodiosRequestOptionsByPath<Api, "delete", Path>
-    >
+    TBody extends ReadonlyDeep<
+      UndefinedIfNever<ZodiosBodyByPath<Api, "delete", Path>>
+    >,
+    TConfig extends ZodiosRequestOptionsByPath<Api, "delete", Path>
   >(
     path: Path,
-    data?: TBody,
-    config?: TConfig
+    data: TBody,
+    ...[config]: RequiredKeys<TConfig> extends never
+      ? [config?: ReadonlyDeep<TConfig>]
+      : [config: ReadonlyDeep<TConfig>]
   ): Promise<ZodiosResponseByPath<Api, "delete", Path>> {
     return this.request({
       ...config,

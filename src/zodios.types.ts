@@ -11,6 +11,8 @@ import type {
   Merge,
   FilterArrayByKey,
   IfEquals,
+  RequiredKeys,
+  UndefinedIfNever,
 } from "./utils.types";
 import z from "zod";
 
@@ -264,18 +266,36 @@ export type ZodiosRequestOptionsByAlias<
   Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
 >;
 
+export type ZodiosMutationAliasRequest<Body, Config, Response> =
+  RequiredKeys<Config> extends never
+    ? (
+        body: ReadonlyDeep<UndefinedIfNever<Body>>,
+        configOptions?: ReadonlyDeep<Config>
+      ) => Promise<Response>
+    : (
+        body: ReadonlyDeep<UndefinedIfNever<Body>>,
+        configOptions: ReadonlyDeep<Config>
+      ) => Promise<Response>;
+
+export type ZodiosAliasRequest<Config, Response> =
+  RequiredKeys<Config> extends never
+    ? (configOptions?: ReadonlyDeep<Config>) => Promise<Response>
+    : (configOptions: ReadonlyDeep<Config>) => Promise<Response>;
+
 export type ZodiosAliases<Api extends ZodiosEndpointDefinition[]> = {
   [Alias in Aliases<Api>]: ZodiosEndpointDefinitionByAlias<
     Api,
     Alias
   >[number]["method"] extends MutationMethod
-    ? (
-        data?: ReadonlyDeep<ZodiosBodyByAlias<Api, Alias>>,
-        configOptions?: ReadonlyDeep<ZodiosRequestOptionsByAlias<Api, Alias>>
-      ) => Promise<ZodiosResponseByAlias<Api, Alias>>
-    : (
-        configOptions?: ReadonlyDeep<ZodiosRequestOptionsByAlias<Api, Alias>>
-      ) => Promise<ZodiosResponseByAlias<Api, Alias>>;
+    ? ZodiosMutationAliasRequest<
+        ZodiosBodyByAlias<Api, Alias>,
+        ZodiosRequestOptionsByAlias<Api, Alias>,
+        ZodiosResponseByAlias<Api, Alias>
+      >
+    : ZodiosAliasRequest<
+        ZodiosRequestOptionsByAlias<Api, Alias>,
+        ZodiosResponseByAlias<Api, Alias>
+      >;
 };
 
 export type AnyZodiosMethodOptions = Merge<

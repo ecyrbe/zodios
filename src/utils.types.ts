@@ -99,6 +99,15 @@ export type OptionalProps<T> = Pick<
 >;
 
 /**
+ * get all properties from an object type that are not undefined or optional
+ * @param T - object type
+ * @returns - union type of all properties that are not undefined or optional
+ */
+export type RequiredKeys<T> = {
+  [P in keyof T]-?: undefined extends T[P] ? never : P;
+}[keyof T];
+
+/**
  * Simplify a type by merging intersections if possible
  * @param T - type to simplify
  */
@@ -157,6 +166,8 @@ export type NeverIfEmpty<T> = IfEquals<T, {}, never, T>;
  * type B = NotEmpty<A>; // B = never
  */
 export type UndefinedIfEmpty<T> = IfEquals<T, {}, undefined, T>;
+
+export type UndefinedIfNever<T> = IfEquals<T, never, undefined, T>;
 
 type RequiredChildProps<T> = {
   [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, never, K>;
