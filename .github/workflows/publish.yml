@@ -26,7 +26,15 @@ jobs:
       - name: run test
         run: yarn test
       - name: publish to npm
+        # only run when tag has no 'rc' in it
+        if: ${{ !contains(github.ref, 'rc') }}
         run: yarn publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: publish beta to npm
+        # only run when tag has 'rc' in it
+        if: ${{ contains(github.ref, 'rc') }}
+        run: yarn publish --access public --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: generate changelog
