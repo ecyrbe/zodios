@@ -3468,7 +3468,7 @@ ts-node@10.9.1:
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
 
-tsup@^6.3.0:
+tsup@6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/tsup/-/tsup-6.3.0.tgz#aa270a788e54248d4a5541f722c8763bca778e3c"
   integrity sha512-IaNQO/o1rFgadLhNonVKNCT2cks+vvnWX3DnL8sB87lBDqRvJXHENr5lSPJlqwplUlDxSwZK8dSg87rgBu6Emw==
