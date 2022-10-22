@@ -444,7 +444,12 @@ It should output
 
 ### Send multipart/form-data requests
 
-Zodios supports multipart/form-data requests with integrated `requestFormat`. Zodios is using `formdata-node` internally on NodeJs as it's the most up to date library for node.
+Zodios supports multipart/form-data requests with integrated `requestFormat`.
+
+:::caution node
+If you are using Zodios on your backend node, you need to install `form-data` package to use multipart/form-data requests.
+And polyfill FormData with `globalThis.FormData = require("form-data");` before importing Zodios.
+:::
 
 ```typescript
 const apiClient = new Zodios(

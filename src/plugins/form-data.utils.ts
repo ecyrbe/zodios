@@ -5,7 +5,10 @@
  * @param data - the data to be encoded as form data stream
  * @returns a readable stream of the form data and optionnaly headers
  */
-export function getFormDataStream(data: Record<string, string | Blob>) {
+export function getFormDataStream(data: Record<string, string | Blob>): {
+  data: FormData;
+  headers?: Record<string, string>;
+} {
   const formData = new FormData();
   for (const key in data) {
     formData.append(key, data[key]);

@@ -195,7 +195,3 @@ Also note that Zodios do not embed any dependency. It's your Job to install the 
 Internally Zodios uses these libraries on all platforms :
 - zod
 - axios
-  
-In addition, it also uses on NodeJS :
-- formdata-node
-- form-data-encoder

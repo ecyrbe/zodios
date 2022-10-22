@@ -1,4 +1,4 @@
-import { getFormDataStream } from "../utils.node";
+import { getFormDataStream } from "./form-data.utils";
 import { ZodiosError } from "../zodios-error";
 import type { ZodiosPlugin } from "../zodios.types";
 
@@ -11,7 +11,7 @@ const plugin: ZodiosPlugin = {
         config
       );
     }
-    const result = await getFormDataStream(config.data);
+    const result = getFormDataStream(config.data);
     return {
       ...config,
       data: result.data,

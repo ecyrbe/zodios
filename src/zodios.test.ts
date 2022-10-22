@@ -2,11 +2,13 @@ import { AxiosError } from "axios";
 import express from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
+globalThis.FormData = require("form-data");
 import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
 import { ZodiosPlugin } from "./zodios.types";
 import { apiBuilder } from "./api";
+
 const multipart = multer({ storage: multer.memoryStorage() });
 
 describe("Zodios", () => {
