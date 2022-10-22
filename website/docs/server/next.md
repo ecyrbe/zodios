@@ -33,8 +33,32 @@ To integrate zodios to NextJS, you need to create a `slug` file named `[...zodio
 │   │   ├── context.ts # export your main app context here
 └── [..]
 ```
-:::tip It's recommended to use the example below to bootstrap your NextJS application.
+:::tip It's recommended to use the example below to bootstrap your NextJS application. 
+  It has correct setup for webpack configuration with `@zodios/react`
   [Example project](https://github.com/ecyrbe/zodios-express/tree/main/examples/next)
+:::
+
+:::caution
+If you are using `@zodios/react` on the client side, you need to customize your next config to tell it to share the same instance with `@tanstack/react-query` :
+```js title="next.config.js"
+const path = require("path");
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  webpack: (config, options) => {
+    if (options.isServer) {
+      config.externals = ["@tanstack/react-query", ...config.externals];
+    }
+    const reactQuery = path.resolve(require.resolve("@tanstack/react-query"));
+    config.resolve.alias["@tanstack/react-query"] = reactQuery;
+    return config;
+  },
+};
+
+module.exports = nextConfig;
+``` 
 :::
 
 ## example
