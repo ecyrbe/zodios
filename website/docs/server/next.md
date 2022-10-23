@@ -38,28 +38,13 @@ To integrate zodios to NextJS, you need to create a `slug` file named `[...zodio
   [Example project](https://github.com/ecyrbe/zodios-express/tree/main/examples/next)
 :::
 
-:::caution
-If you are using `@zodios/react` on the client side, you need to customize your next config to tell it to share the same instance with `@tanstack/react-query` :
-```js title="next.config.js"
-const path = require("path");
+## Bundling
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-  swcMinify: true,
-  webpack: (config, options) => {
-    if (options.isServer) {
-      config.externals = ["@tanstack/react-query", ...config.externals];
-    }
-    const reactQuery = path.resolve(require.resolve("@tanstack/react-query"));
-    config.resolve.alias["@tanstack/react-query"] = reactQuery;
-    return config;
-  },
-};
+If you are bundling your NextJS App with a custom library that embeds `@zodios/react` or `@tanstack/react-query`, you need to bundle you library with both `esm` and `cjs` support.
+We recommend using [tsup](https://esbuild.github.io/) to bundle your library and declare your `package.json` like [this](https://github.com/ecyrbe/zodios/blob/main/package.json)
+Else, you'll get the following error:
 
-module.exports = nextConfig;
-``` 
-:::
+![error](https://user-images.githubusercontent.com/38932402/196659212-5bdb675f-d019-4d8b-8681-5f00ed24db4d.png)
 
 ## example
 

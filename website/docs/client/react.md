@@ -305,6 +305,14 @@ To get a key to invalidate an alias endpoint for all possible parameters:
 const key = zodios.getKeyByAlias('getUser');
 queryClient.invalidateQueries(key);
 ```
+
+## Bundling
+
+If you are bundling your App with Webpack and with a custom library that embeds `@zodios/react` or `@tanstack/react-query`, you need to bundle you library with both `esm` and `cjs` support.
+We recommend using [tsup](https://tsup.egoist.dev/) to bundle your library and declare your `package.json` like [this](https://github.com/ecyrbe/zodios/blob/main/package.json)
+Else, you'll get the following error:
+
+![error](https://user-images.githubusercontent.com/38932402/196659212-5bdb675f-d019-4d8b-8681-5f00ed24db4d.png)
 ## Example
 
 ```tsx title="users.tsx"
