@@ -145,7 +145,7 @@ type ZodiosEndpointDescriptions = Array<{
   parameters?: Array<{
     name: string;
     description?: string;
-    type: 'Query'|'Body'|'Header';
+    type: 'Path'|'Query'|'Body'|'Header';
     schema: ZodSchema; // you can use zod `transform` to transform the value of the parameter before sending it to the server
   }>;
   response: ZodSchema; // you can use zod `transform` to transform the value of the response before returning it
