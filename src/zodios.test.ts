@@ -865,7 +865,24 @@ received:
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
+        //     ^?
         const test: Assert<typeof data, { error: { message: string } }> = true;
+      } else if (error.response.status === 401) {
+        const data = error.response.data;
+        //     ^?
+        const test: Assert<
+          typeof data,
+          { error: { message: string; _401: true } }
+        > = true;
+      } else {
+        const testStatus = error.response.status;
+        //        ^?
+        const data = error.response.data;
+        //     ^?
+        const test: Assert<
+          typeof data,
+          { error: { message: string; _default: true } }
+        > = true;
       }
       expect(error.response?.data).toEqual({
         error: { message: "bad gateway" },

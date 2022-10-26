@@ -127,7 +127,11 @@ export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
               {
                 response: Merge<
                   AxiosError<z.output<Schema>>["response"],
-                  { status: Status }
+                  {
+                    status: Status extends "default"
+                      ? 0 & { error: Status }
+                      : Status;
+                  }
                 >;
               }
             >
