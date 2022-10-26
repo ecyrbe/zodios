@@ -1,4 +1,9 @@
-import { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
+import {
+  AxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from "axios";
 import type {
   FilterArrayByValue,
   MapSchemaParameters,
@@ -103,6 +108,38 @@ export type ZodiosErrorByPath<
     ZodiosDefaultErrorByPath<Api, M, Path>
   >
 >;
+
+export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
+  infer Head,
+  ...infer Tail
+]
+  ? Head extends {
+      status: infer Status;
+      schema: infer Schema;
+    }
+    ? Schema extends z.ZodTypeAny
+      ? ErrorsToAxios<
+          Tail,
+          [...Acc, { status: Status; error: AxiosError<z.output<Schema>> }]
+        >
+      : Acc
+    : Acc
+  : Acc;
+
+export type ZodiosMatchingErrorsByPath<
+  Api extends ZodiosEndpointDefinition[],
+  M extends Method,
+  Path extends ZodiosPathsByMethod<Api, M>
+> = ErrorsToAxios<
+  ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"]
+>[number];
+
+export type ZodiosMatchingErrorsByAlias<
+  Api extends ZodiosEndpointDefinition[],
+  Alias extends string
+> = ErrorsToAxios<
+  ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"]
+>[number];
 
 export type ZodiosErrorByAlias<
   Api extends ZodiosEndpointDefinition[],

@@ -804,6 +804,84 @@ received:
     }
   });
 
+  it("should match Expected error", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        alias: "getError502",
+        path: "/error502",
+        response: z.void(),
+        errors: [
+          {
+            status: 502,
+            schema: z.object({
+              error: z.object({
+                message: z.string(),
+              }),
+            }),
+          },
+        ],
+      },
+    ]);
+    let error;
+    try {
+      await zodios.get("/error502");
+    } catch (e) {
+      error = e;
+    }
+    const match = zodios.matchErrorByPath("get", "/error502", error);
+    expect(error).toBeInstanceOf(AxiosError);
+    expect((error as AxiosError).response?.status).toBe(502);
+    expect(match.type).toBe("ZodiosExpectedError");
+    if (match.type === "ZodiosExpectedError") {
+      expect(match.status).toBe(502);
+      expect(match.error.response?.data).toEqual({
+        error: { message: "bad gateway" },
+      });
+    }
+    const matchAlias = zodios.matchErrorByAlias("getError502", error);
+    expect(matchAlias.type).toBe("ZodiosExpectedError");
+    if (matchAlias.type === "ZodiosExpectedError") {
+      expect(matchAlias.status).toBe(502);
+      expect(matchAlias.error.response?.data).toEqual({
+        error: { message: "bad gateway" },
+      });
+    }
+  });
+
+  it("should match Unexpected error", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        alias: "getError502",
+        path: "/error502",
+        response: z.void(),
+      },
+    ]);
+    let error;
+    try {
+      await zodios.get("/error502");
+    } catch (e) {
+      error = e;
+    }
+    const match = zodios.matchErrorByPath("get", "/error502", error);
+    expect(error).toBeInstanceOf(AxiosError);
+    expect((error as AxiosError).response?.status).toBe(502);
+    expect(match.type).toBe("ZodiosUnexpectedError");
+    if (match.type === "ZodiosUnexpectedError") {
+      expect(match.error.response?.data).toEqual({
+        error: { message: "bad gateway" },
+      });
+    }
+    const matchAlias = zodios.matchErrorByAlias("getError502", error);
+    expect(matchAlias.type).toBe("ZodiosUnexpectedError");
+    if (matchAlias.type === "ZodiosUnexpectedError") {
+      expect(matchAlias.error.response?.data).toEqual({
+        error: { message: "bad gateway" },
+      });
+    }
+  });
+
   it("should return response when disabling validation", async () => {
     const zodios = new Zodios(
       `http://localhost:${port}`,

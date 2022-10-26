@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosRequestConfig } from "axios";
 import {
   AnyZodiosRequestOptions,
   ZodiosRequestOptions,
@@ -11,8 +11,16 @@ import {
   ZodiosRequestOptionsByPath,
   ZodiosAliases,
   ZodiosPlugin,
+  ZodiosMatchingErrorsByPath,
+  ZodiosMatchingErrorsByAlias,
+  ZodiosEndpointError,
 } from "./zodios.types";
-import { omit, replacePathParams } from "./utils";
+import {
+  findEndpointErrorByAlias,
+  findEndpointErrorByPath,
+  omit,
+  replacePathParams,
+} from "./utils";
 import {
   PluginId,
   ZodiosPlugins,
@@ -22,12 +30,14 @@ import {
   headerPlugin,
 } from "./plugins";
 import {
+  Merge,
   Narrow,
   ReadonlyDeep,
   RequiredKeys,
   UndefinedIfNever,
 } from "./utils.types";
 import { checkApi } from "./api";
+import { ZodiosError, ZodiosMatchingErrorType } from "./zodios-error";
 
 /**
  * zodios api client based on axios
@@ -247,6 +257,89 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
         }
       }
     });
+  }
+
+  private matchError(
+    error: unknown,
+    findEnpoint: (error: AxiosError) => ZodiosEndpointError | undefined
+  ) {
+    if (error instanceof ZodiosError) {
+      return { type: ZodiosMatchingErrorType.ValidationError, error };
+    }
+    if (
+      error instanceof AxiosError ||
+      (error && typeof error === "object" && "isAxiosError" in error)
+    ) {
+      const err = error as AxiosError;
+      if (err.response) {
+        const endpointError = findEnpoint(err);
+        if (endpointError) {
+          const result = endpointError.schema.safeParse(err.response!.data);
+          if (result.success) {
+            return {
+              type: ZodiosMatchingErrorType.ExpectedError,
+              error: err,
+              status: err.response.status,
+            } as any;
+          }
+        }
+      }
+      return { type: ZodiosMatchingErrorType.UnexpectedError, error: err };
+    }
+    if (error instanceof Error) {
+      return { type: ZodiosMatchingErrorType.Error, error };
+    }
+    return { type: ZodiosMatchingErrorType.UnknownError, error };
+  }
+
+  matchErrorByPath<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
+    method: M,
+    path: Path,
+    error: unknown
+  ):
+    | {
+        type: typeof ZodiosMatchingErrorType.ValidationError;
+        error: ZodiosError;
+      }
+    | {
+        type: typeof ZodiosMatchingErrorType.UnexpectedError;
+        error: AxiosError;
+      }
+    | Merge<
+        { type: typeof ZodiosMatchingErrorType.ExpectedError },
+        ZodiosMatchingErrorsByPath<Api, M, Path>
+      >
+    | { type: typeof ZodiosMatchingErrorType.Error; error: Error }
+    | { type: typeof ZodiosMatchingErrorType.UnknownError; error: unknown } {
+    if (error instanceof ZodiosError) {
+      return { type: ZodiosMatchingErrorType.ValidationError, error };
+    }
+    return this.matchError(error, (error) =>
+      findEndpointErrorByPath(this.api, method, path, error)
+    );
+  }
+
+  matchErrorByAlias<Alias extends keyof ZodiosAliases<Api>>(
+    alias: Alias,
+    error: unknown
+  ):
+    | {
+        type: typeof ZodiosMatchingErrorType.ValidationError;
+        error: ZodiosError;
+      }
+    | {
+        type: typeof ZodiosMatchingErrorType.UnexpectedError;
+        error: AxiosError;
+      }
+    | Merge<
+        { type: typeof ZodiosMatchingErrorType.ExpectedError },
+        ZodiosMatchingErrorsByAlias<Api, Alias>
+      >
+    | { type: typeof ZodiosMatchingErrorType.Error; error: Error }
+    | { type: typeof ZodiosMatchingErrorType.UnknownError; error: unknown } {
+    return this.matchError(error, (error) =>
+      findEndpointErrorByAlias(this.api, alias, error)
+    );
   }
 
   /**

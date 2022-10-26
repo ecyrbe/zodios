@@ -6,6 +6,7 @@ import {
   ZodiosQueryParamsByPath,
   makeApi,
   ZodiosPathParamByAlias,
+  makeErrors,
 } from "../src/index";
 import z from "zod";
 
@@ -15,6 +16,28 @@ const user = z.object({
   email: z.string().email(),
   phone: z.string(),
 });
+
+const errors = makeErrors([
+  {
+    status: 404,
+    schema: z.object({
+      message: z.string(),
+    }),
+  },
+  {
+    status: 401,
+    schema: z.object({
+      message: z.string(),
+    }),
+  },
+  {
+    status: 500,
+    schema: z.object({
+      message: z.string(),
+      cause: z.record(z.string()),
+    }),
+  },
+]);
 
 const api = makeApi([
   {
@@ -34,6 +57,7 @@ const api = makeApi([
       },
     ],
     response: user,
+    errors,
   },
   {
     path: "/users",
