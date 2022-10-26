@@ -864,7 +864,7 @@ received:
     if (isErrorFromAlias(zodios.api, "getError502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
-        const data = error.response!.data;
+        const data = error.response.data;
         const test: Assert<typeof data, { error: { message: string } }> = true;
       }
       expect(error.response?.data).toEqual({
