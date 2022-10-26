@@ -1,5 +1,4 @@
 import {
-  makeCrudApi,
   ZodiosResponseByPath,
   ZodiosBodyByPath,
   ZodiosPathParamsByPath,

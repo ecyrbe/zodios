@@ -1,6 +1,8 @@
-export { Zodios, ApiOf } from "./zodios";
-export { ZodiosError, ZodiosMatchingErrorType } from "./zodios-error";
+export { Zodios } from "./zodios";
+export type { ApiOf } from "./zodios";
 export type { ZodiosInstance, ZodiosClass, ZodiosConstructor } from "./zodios";
+export { ZodiosError, ZodiosMatchingErrorType } from "./zodios-error";
+export { matchErrorByAlias, matchErrorByPath } from "./zodios-error.utils";
 export type {
   AnyZodiosMethodOptions,
   AnyZodiosRequestOptions,
