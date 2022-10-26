@@ -9,6 +9,7 @@ import multer from "multer";
 import { ZodiosPlugin } from "./zodios.types";
 import { apiBuilder } from "./api";
 import { matchErrorByAlias, matchErrorByPath } from "./zodios-error.utils";
+import { Assert } from "./utils.types";
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -818,6 +819,24 @@ received:
             schema: z.object({
               error: z.object({
                 message: z.string(),
+                _502: z.literal(true),
+              }),
+            }),
+          },
+          {
+            status: 401,
+            schema: z.object({
+              error: z.object({
+                message: z.string(),
+                _401: z.literal(true),
+              }),
+            }),
+          },
+          {
+            status: "default",
+            schema: z.object({
+              error: z.object({
+                message: z.string(),
               }),
             }),
           },
@@ -836,6 +855,13 @@ received:
     expect(match.type).toBe("ZodiosExpectedError");
     if (match.type === "ZodiosExpectedError") {
       expect(match.status).toBe(502);
+      if (match.status === 502) {
+        const data = match.error.response!.data;
+        const test: Assert<
+          typeof data,
+          { error: { message: string; _502: true } }
+        > = true;
+      }
       expect(match.error.response?.data).toEqual({
         error: { message: "bad gateway" },
       });
