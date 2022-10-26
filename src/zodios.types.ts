@@ -120,7 +120,18 @@ export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
     ? Schema extends z.ZodTypeAny
       ? ErrorsToAxios<
           Tail,
-          [...Acc, { status: Status; error: AxiosError<z.output<Schema>> }]
+          [
+            ...Acc,
+            Merge<
+              Omit<AxiosError, "status" | "response">,
+              {
+                response: Merge<
+                  AxiosError<z.output<Schema>>["response"],
+                  { status: Status }
+                >;
+              }
+            >
+          ]
         >
       : Acc
     : Acc
