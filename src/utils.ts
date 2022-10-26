@@ -1,5 +1,10 @@
+import { AxiosError } from "axios";
 import { ReadonlyDeep } from "./utils.types";
-import { AnyZodiosRequestOptions } from "./zodios.types";
+import {
+  AnyZodiosRequestOptions,
+  ZodiosEndpointDefinition,
+  ZodiosEndpointDefinitions,
+} from "./zodios.types";
 
 /**
  * omit properties from an object
@@ -59,4 +64,48 @@ export function replacePathParams(
     );
   }
   return result;
+}
+
+export function findEndpoint(
+  api: ZodiosEndpointDefinitions,
+  method: string,
+  path: string
+) {
+  return api.find((e) => e.method === method && e.path === path);
+}
+
+export function findEndpointByAlias(
+  api: ZodiosEndpointDefinitions,
+  alias: string
+) {
+  return api.find((e) => e.alias === alias);
+}
+
+export function findEndpointError(
+  endpoint: ZodiosEndpointDefinition,
+  err: AxiosError
+) {
+  return (
+    endpoint.errors?.find((error) => error.status === err.response!.status) ??
+    endpoint.errors?.find((error) => error.status === "default")
+  );
+}
+
+export function findEndpointErrorByPath(
+  api: ZodiosEndpointDefinitions,
+  method: string,
+  path: string,
+  err: AxiosError
+) {
+  const endpoint = findEndpoint(api, method, path);
+  return endpoint ? findEndpointError(endpoint, err) : undefined;
+}
+
+export function findEndpointErrorByAlias(
+  api: ZodiosEndpointDefinitions,
+  alias: string,
+  err: AxiosError
+) {
+  const endpoint = findEndpointByAlias(api, alias);
+  return endpoint ? findEndpointError(endpoint, err) : undefined;
 }

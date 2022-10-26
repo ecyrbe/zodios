@@ -1,6 +1,6 @@
 import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
-import { findEndpoint } from "./zodios-plugins.utils";
+import { findEndpoint } from "../utils";
 
 /**
  * Zod validation plugin used internally by Zodios.
