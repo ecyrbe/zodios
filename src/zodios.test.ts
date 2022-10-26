@@ -819,7 +819,6 @@ received:
             schema: z.object({
               error: z.object({
                 message: z.string(),
-                _502: z.literal(true),
               }),
             }),
           },
@@ -837,6 +836,7 @@ received:
             schema: z.object({
               error: z.object({
                 message: z.string(),
+                _default: z.literal(true),
               }),
             }),
           },
@@ -857,10 +857,7 @@ received:
       expect(match.status).toBe(502);
       if (match.status === 502) {
         const data = match.error.response!.data;
-        const test: Assert<
-          typeof data,
-          { error: { message: string; _502: true } }
-        > = true;
+        const test: Assert<typeof data, { error: { message: string } }> = true;
       }
       expect(match.error.response?.data).toEqual({
         error: { message: "bad gateway" },
