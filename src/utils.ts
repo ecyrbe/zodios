@@ -98,7 +98,12 @@ export function findEndpointErrorByPath(
   err: AxiosError
 ) {
   const endpoint = findEndpoint(api, method, path);
-  return endpoint ? findEndpointError(endpoint, err) : undefined;
+  return endpoint &&
+    err.config &&
+    endpoint.method === err.config.method &&
+    endpoint.path === err.config.url
+    ? findEndpointError(endpoint, err)
+    : undefined;
 }
 
 export function findEndpointErrorByAlias(
@@ -107,5 +112,10 @@ export function findEndpointErrorByAlias(
   err: AxiosError
 ) {
   const endpoint = findEndpointByAlias(api, alias);
-  return endpoint ? findEndpointError(endpoint, err) : undefined;
+  return endpoint &&
+    err.config &&
+    endpoint.method === err.config.method &&
+    endpoint.path === err.config.url
+    ? findEndpointError(endpoint, err)
+    : undefined;
 }
