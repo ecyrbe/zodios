@@ -8,6 +8,7 @@ import { ZodiosError } from "./zodios-error";
 import multer from "multer";
 import { ZodiosPlugin } from "./zodios.types";
 import { apiBuilder } from "./api";
+import { matchErrorByAlias, matchErrorByPath } from "./zodios-error.utils";
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -829,7 +830,7 @@ received:
     } catch (e) {
       error = e;
     }
-    const match = zodios.matchErrorByPath("get", "/error502", error);
+    const match = matchErrorByPath(zodios.api, "get", "/error502", error);
     expect(error).toBeInstanceOf(AxiosError);
     expect((error as AxiosError).response?.status).toBe(502);
     expect(match.type).toBe("ZodiosExpectedError");
@@ -839,7 +840,7 @@ received:
         error: { message: "bad gateway" },
       });
     }
-    const matchAlias = zodios.matchErrorByAlias("getError502", error);
+    const matchAlias = matchErrorByAlias(zodios.api, "getError502", error);
     expect(matchAlias.type).toBe("ZodiosExpectedError");
     if (matchAlias.type === "ZodiosExpectedError") {
       expect(matchAlias.status).toBe(502);
@@ -864,7 +865,7 @@ received:
     } catch (e) {
       error = e;
     }
-    const match = zodios.matchErrorByPath("get", "/error502", error);
+    const match = matchErrorByPath(zodios.api, "get", "/error502", error);
     expect(error).toBeInstanceOf(AxiosError);
     expect((error as AxiosError).response?.status).toBe(502);
     expect(match.type).toBe("ZodiosUnexpectedError");
@@ -873,7 +874,7 @@ received:
         error: { message: "bad gateway" },
       });
     }
-    const matchAlias = zodios.matchErrorByAlias("getError502", error);
+    const matchAlias = matchErrorByAlias(zodios.api, "getError502", error);
     expect(matchAlias.type).toBe("ZodiosUnexpectedError");
     if (matchAlias.type === "ZodiosUnexpectedError") {
       expect(matchAlias.error.response?.data).toEqual({
