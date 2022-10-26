@@ -261,7 +261,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
   private matchError(
     error: unknown,
-    findEnpoint: (error: AxiosError) => ZodiosEndpointError | undefined
+    findEndpoint: (error: AxiosError) => ZodiosEndpointError | undefined
   ) {
     if (error instanceof ZodiosError) {
       return { type: ZodiosMatchingErrorType.ValidationError, error };
@@ -272,7 +272,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
     ) {
       const err = error as AxiosError;
       if (err.response) {
-        const endpointError = findEnpoint(err);
+        const endpointError = findEndpoint(err);
         if (endpointError) {
           const result = endpointError.schema.safeParse(err.response!.data);
           if (result.success) {
