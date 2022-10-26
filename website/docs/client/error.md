@@ -26,7 +26,7 @@ function isErrorFromAlias(api: ZodiosEndpointDefinitions, alias: string, error: 
 ## Example
 
 ```typescript
-import { isExpectedErrorByPath, makeApi, Zodios } from "@zodios/core";
+import { isErrorFromPath, makeApi, Zodios } from "@zodios/core";
 
 const api = makeApi([
   {
