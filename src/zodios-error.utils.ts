@@ -31,6 +31,14 @@ function isDefinedError(
   return false;
 }
 
+/**
+ * check if the error is matching the endpoint errors definitions
+ * @param api - the api definition
+ * @param method - http method of the endpoint
+ * @param path - path of the endpoint
+ * @param error - the error to check
+ * @returns - if true, the error type is narrowed to the matching endpoint errors
+ */
 export function isErrorFromPath<
   Api extends ZodiosEndpointDefinitions,
   M extends Method,
@@ -46,6 +54,13 @@ export function isErrorFromPath<
   );
 }
 
+/**
+ * check if the error is matching the endpoint errors definitions
+ * @param api - the api definition
+ * @param alias - alias of the endpoint
+ * @param error - the error to check
+ * @returns - if true, the error type is narrowed to the matching endpoint errors
+ */
 export function isErrorFromAlias<
   Api extends ZodiosEndpointDefinitions,
   Alias extends keyof ZodiosAliases<Api>
