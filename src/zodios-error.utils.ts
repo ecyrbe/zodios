@@ -1,7 +1,5 @@
 import { AxiosError } from "axios";
 import { findEndpointErrorByAlias, findEndpointErrorByPath } from "./utils";
-import { Merge } from "./utils.types";
-import { ZodiosError, ZodiosMatchingErrorType } from "./zodios-error";
 import {
   Method,
   ZodiosAliases,

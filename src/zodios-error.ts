@@ -18,11 +18,3 @@ export class ZodiosError extends Error {
     super(message);
   }
 }
-
-export const ZodiosMatchingErrorType = {
-  ValidationError: "ZodiosValidationError",
-  UnexpectedError: "ZodiosUnexpectedError",
-  ExpectedError: "ZodiosExpectedError",
-  UnknownError: "UnknownError",
-  Error: "Error",
-} as const;
