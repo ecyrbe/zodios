@@ -81,17 +81,18 @@ export function findEndpointByAlias(
   return api.find((e) => e.alias === alias);
 }
 
-export function findEndpointError(
+export function findEndpointErrors(
   endpoint: ZodiosEndpointDefinition,
   err: AxiosError
 ) {
-  return (
-    endpoint.errors?.find((error) => error.status === err.response!.status) ??
-    endpoint.errors?.find((error) => error.status === "default")
+  const matchingErrors = endpoint.errors?.filter(
+    (error) => error.status === err.response!.status
   );
+  if (matchingErrors && matchingErrors.length > 0) return matchingErrors;
+  return endpoint.errors?.filter((error) => error.status === "default");
 }
 
-export function findEndpointErrorByPath(
+export function findEndpointErrorsByPath(
   api: ZodiosEndpointDefinitions,
   method: string,
   path: string,
@@ -102,11 +103,11 @@ export function findEndpointErrorByPath(
     err.config &&
     endpoint.method === err.config.method &&
     endpoint.path === err.config.url
-    ? findEndpointError(endpoint, err)
+    ? findEndpointErrors(endpoint, err)
     : undefined;
 }
 
-export function findEndpointErrorByAlias(
+export function findEndpointErrorsByAlias(
   api: ZodiosEndpointDefinitions,
   alias: string,
   err: AxiosError
@@ -116,6 +117,6 @@ export function findEndpointErrorByAlias(
     err.config &&
     endpoint.method === err.config.method &&
     endpoint.path === err.config.url
-    ? findEndpointError(endpoint, err)
+    ? findEndpointErrors(endpoint, err)
     : undefined;
 }
