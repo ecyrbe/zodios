@@ -17,14 +17,14 @@ function openApiBuilder(info: OpenAPIV3.InfoObject): OpenApiBuilder
 
 ### Methods of the builder
 
-| Method                                                                                                  | Description                                |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| addSecurityScheme(name: string, securityScheme: OpenAPIV3.SecuritySchemeObject)                         | add a security scheme to proctect the apis |
-| addPublicApi(definitions: ZodiosEndpointDefinitions)                                                    | add an api with public endpoints           |
-| addProtectedApi(scheme: string, definitions: ZodiosEndpointDefinitions, securityRequirement?: string[]) | add an api protected by a security scheme  |
-| addServer(server: OpenAPIV3.ServerObject)                                                               | add a server to the openapi document       |
-| setCustomTagsFn(tagsFromPathFn: (path: string) => string[])                                             | override the default tagsFromPathFn        |
-| build() => OpenAPIV3.Document                                                                           | build the openapi document                 |
+| Method                                                                                                    | Description                                |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
+| `addSecurityScheme(name: string, securityScheme: OpenAPIV3.SecuritySchemeObject)`                         | add a security scheme to proctect the apis |
+| `addPublicApi(definitions: ZodiosEndpointDefinitions)`                                                    | add an api with public endpoints           |
+| `addProtectedApi(scheme: string, definitions: ZodiosEndpointDefinitions, securityRequirement?: string[])` | add an api protected by a security scheme  |
+| `addServer(server: OpenAPIV3.ServerObject)`                                                               | add a server to the openapi document       |
+| `setCustomTagsFn(tagsFromPathFn: (path: string) => string[])`                                             | override the default tagsFromPathFn        |
+| `build() => OpenAPIV3.Document`                                                                           | build the openapi document                 |
 
 
 ### Security scheme
