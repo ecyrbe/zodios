@@ -11,6 +11,7 @@ import {
   ZodiosRequestOptionsByPath,
   ZodiosAliases,
   ZodiosPlugin,
+  Aliases,
 } from "./zodios.types";
 import { omit, replacePathParams } from "./utils";
 import {
@@ -176,10 +177,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    * @returns an id to allow you to unregister the plugin
    */
   use(plugin: ZodiosPlugin): PluginId;
-  use<Alias extends keyof ZodiosAliases<Api>>(
-    alias: Alias,
-    plugin: ZodiosPlugin
-  ): PluginId;
+  use<Alias extends Aliases<Api>>(alias: Alias, plugin: ZodiosPlugin): PluginId;
   use<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
     method: M,
     path: Path,

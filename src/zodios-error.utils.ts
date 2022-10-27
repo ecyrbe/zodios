@@ -1,8 +1,8 @@
 import { AxiosError } from "axios";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 import {
+  Aliases,
   Method,
-  ZodiosAliases,
   ZodiosEndpointDefinitions,
   ZodiosEndpointError,
   ZodiosMatchingErrorsByAlias,
@@ -63,7 +63,7 @@ export function isErrorFromPath<
  */
 export function isErrorFromAlias<
   Api extends ZodiosEndpointDefinitions,
-  Alias extends keyof ZodiosAliases<Api>
+  Alias extends Aliases<Api>
 >(
   api: Api,
   alias: Alias,
