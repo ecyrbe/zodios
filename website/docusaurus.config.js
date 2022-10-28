@@ -56,6 +56,7 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: "/img/zodios-social.png",
       navbar: {
         title: "Zodios",
         logo: {
