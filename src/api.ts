@@ -113,7 +113,7 @@ export function makeCrudApi<T extends string, S extends z.ZodObject<any>>(
   resource: T,
   schema: S
 ) {
-  type Schema = z.infer<S>;
+  type Schema = z.input<S>;
   const capitalizedResource = capitalize(resource);
   return makeApi([
     {

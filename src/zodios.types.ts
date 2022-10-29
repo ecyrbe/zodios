@@ -61,13 +61,19 @@ export type Aliases<Api extends ZodiosEndpointDefinition[]> = FilterArrayByKey<
 export type ZodiosResponseByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
-> = z.infer<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>;
+  Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.output<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>
+  : z.input<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>;
 
 export type ZodiosResponseByAlias<
   Api extends ZodiosEndpointDefinition[],
-  Alias extends string
-> = z.infer<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>;
+  Alias extends string,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.output<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>
+  : z.input<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>;
 
 type ZodiosDefaultErrorByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -96,18 +102,31 @@ export type ZodiosErrorByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
-  Status extends number
-> = z.input<
-  IfNever<
-    FilterArrayByValue<
-      ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
-      {
-        status: Status;
-      }
-    >[number]["schema"],
-    ZodiosDefaultErrorByPath<Api, M, Path>
-  >
->;
+  Status extends number,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.output<
+      IfNever<
+        FilterArrayByValue<
+          ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+          {
+            status: Status;
+          }
+        >[number]["schema"],
+        ZodiosDefaultErrorByPath<Api, M, Path>
+      >
+    >
+  : z.input<
+      IfNever<
+        FilterArrayByValue<
+          ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+          {
+            status: Status;
+          }
+        >[number]["schema"],
+        ZodiosDefaultErrorByPath<Api, M, Path>
+      >
+    >;
 
 export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
   infer Head,
@@ -159,18 +178,31 @@ export type ZodiosMatchingErrorsByAlias<
 export type ZodiosErrorByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
-  Status extends number
-> = z.input<
-  IfNever<
-    FilterArrayByValue<
-      ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
-      {
-        status: Status;
-      }
-    >[number]["schema"],
-    ZodiosDefaultErrorByAlias<Api, Alias>
-  >
->;
+  Status extends number,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.output<
+      IfNever<
+        FilterArrayByValue<
+          ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+          {
+            status: Status;
+          }
+        >[number]["schema"],
+        ZodiosDefaultErrorByAlias<Api, Alias>
+      >
+    >
+  : z.input<
+      IfNever<
+        FilterArrayByValue<
+          ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+          {
+            status: Status;
+          }
+        >[number]["schema"],
+        ZodiosDefaultErrorByAlias<Api, Alias>
+      >
+    >;
 
 export type BodySchema<
   Api extends ZodiosEndpointDefinition[],
@@ -184,8 +216,11 @@ export type BodySchema<
 export type ZodiosBodyByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
-> = z.input<BodySchema<Api, M, Path>>;
+  Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.input<BodySchema<Api, M, Path>>
+  : z.output<BodySchema<Api, M, Path>>;
 
 export type BodySchemaByAlias<
   Api extends ZodiosEndpointDefinition[],
@@ -197,34 +232,41 @@ export type BodySchemaByAlias<
 
 export type ZodiosBodyByAlias<
   Api extends ZodiosEndpointDefinition[],
-  Alias extends string
-> = z.input<BodySchemaByAlias<Api, Alias>>;
+  Alias extends string,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.input<BodySchemaByAlias<Api, Alias>>
+  : z.output<BodySchemaByAlias<Api, Alias>>;
 
 export type ZodiosQueryParamsByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
+  Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
         ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
         { type: "Query" }
-      >
+      >,
+      Frontend
     >
   >
 >;
 
 export type ZodiosQueryParamsByAlias<
   Api extends ZodiosEndpointDefinition[],
-  Alias extends string
+  Alias extends string,
+  Frontend extends boolean = true
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
         ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["parameters"],
         { type: "Query" }
-      >
+      >,
+      Frontend
     >
   >
 >;
@@ -243,11 +285,13 @@ export type ZodiosPathParamsByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true,
   PathParameters = MapSchemaParameters<
     FilterArrayByValue<
       ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
       { type: "Path" }
-    >
+    >,
+    Frontend
   >
 > = NeverIfEmpty<{
   [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
@@ -261,13 +305,15 @@ export type ZodiosPathParamsByPath<
 export type ZodiosPathParamByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
+  Frontend extends boolean = true,
   EndpointDefinition extends ZodiosEndpointDefinition = ZodiosEndpointDefinitionByAlias<
     Api,
     Alias
   >[number],
   Path = EndpointDefinition["path"],
   PathParameters = MapSchemaParameters<
-    FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>
+    FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
+    Frontend
   >
 > = NeverIfEmpty<{
   [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
@@ -278,28 +324,32 @@ export type ZodiosPathParamByAlias<
 export type ZodiosHeaderParamsByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
+  Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
         ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
         { type: "Header" }
-      >
+      >,
+      Frontend
     >
   >
 >;
 
 export type ZodiosHeaderParamsByAlias<
   Api extends ZodiosEndpointDefinition[],
-  Alias extends string
+  Alias extends string,
+  Frontend extends boolean = true
 > = NeverIfEmpty<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
         ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["parameters"],
         { type: "Header" }
-      >
+      >,
+      Frontend
     >
   >
 >;

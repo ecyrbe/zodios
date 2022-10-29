@@ -219,10 +219,11 @@ export type MaybeReadonly<T> = T | ReadonlyDeep<T>;
  * @param T - array of api description parameters
  * @details -  this is using tail recursion type optimization from typescript 4.5
  */
-export type MapSchemaParameters<T, Acc = {}> = T extends [
-  infer Head,
-  ...infer Tail
-]
+export type MapSchemaParameters<
+  T,
+  Frontend extends boolean = true,
+  Acc = {}
+> = T extends [infer Head, ...infer Tail]
   ? Head extends {
       name: infer Name;
       schema: infer Schema;
@@ -230,10 +231,13 @@ export type MapSchemaParameters<T, Acc = {}> = T extends [
     ? Name extends string
       ? MapSchemaParameters<
           Tail,
+          Frontend,
           Merge<
             {
               [Key in Name]: Schema extends z.ZodType<any, any, any>
-                ? z.input<Schema>
+                ? Frontend extends true
+                  ? z.input<Schema>
+                  : z.output<Schema>
                 : never;
             },
             Acc
