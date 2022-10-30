@@ -58,6 +58,13 @@ export type Aliases<Api extends ZodiosEndpointDefinition[]> = FilterArrayByKey<
   "alias"
 >[number]["alias"];
 
+export type ZodiosResponseForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.output<Endpoint["response"]>
+  : z.input<Endpoint["response"]>;
+
 export type ZodiosResponseByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
@@ -74,6 +81,15 @@ export type ZodiosResponseByAlias<
 > = Frontend extends true
   ? z.output<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>
   : z.input<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>;
+
+export type ZodiosDefaultErrorForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition
+> = FilterArrayByValue<
+  Endpoint["errors"],
+  {
+    status: "default";
+  }
+>[number]["schema"];
 
 type ZodiosDefaultErrorByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -97,6 +113,34 @@ type ZodiosDefaultErrorByAlias<
 >[number]["schema"];
 
 type IfNever<E, A> = IfEquals<E, never, A, E>;
+
+export type ZodiosErrorForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition,
+  Status extends number,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.output<
+      IfNever<
+        FilterArrayByValue<
+          Endpoint["errors"],
+          {
+            status: Status;
+          }
+        >[number]["schema"],
+        ZodiosDefaultErrorForEndpoint<Endpoint>
+      >
+    >
+  : z.input<
+      IfNever<
+        FilterArrayByValue<
+          Endpoint["errors"],
+          {
+            status: Status;
+          }
+        >[number]["schema"],
+        ZodiosDefaultErrorForEndpoint<Endpoint>
+      >
+    >;
 
 export type ZodiosErrorByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -204,6 +248,12 @@ export type ZodiosErrorByAlias<
       >
     >;
 
+export type BodySchemaForEndpoint<Endpoint extends ZodiosEndpointDefinition> =
+  FilterArrayByValue<
+    Endpoint["parameters"],
+    { type: "Body" }
+  >[number]["schema"];
+
 export type BodySchema<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
@@ -212,6 +262,13 @@ export type BodySchema<
   ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
   { type: "Body" }
 >[number]["schema"];
+
+export type ZodiosBodyForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition,
+  Frontend extends boolean = true
+> = Frontend extends true
+  ? z.input<BodySchemaForEndpoint<Endpoint>>
+  : z.output<BodySchemaForEndpoint<Endpoint>>;
 
 export type ZodiosBodyByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -237,6 +294,18 @@ export type ZodiosBodyByAlias<
 > = Frontend extends true
   ? z.input<BodySchemaByAlias<Api, Alias>>
   : z.output<BodySchemaByAlias<Api, Alias>>;
+
+export type ZodiosQueryParamsForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition,
+  Frontend extends boolean = true
+> = NeverIfEmpty<
+  UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<Endpoint["parameters"], { type: "Query" }>,
+      Frontend
+    >
+  >
+>;
 
 export type ZodiosQueryParamsByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -277,6 +346,21 @@ export type ZodiosQueryParamsByAlias<
 export type ZodiosPathParams<Path extends string> = NeverIfEmpty<
   Record<PathParamNames<Path>, string | number>
 >;
+
+export type ZodiosPathParamsForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition,
+  Frontend extends boolean = true,
+  PathParameters = MapSchemaParameters<
+    FilterArrayByValue<Endpoint["parameters"], { type: "Path" }>,
+    Frontend
+  >
+> = NeverIfEmpty<{
+  [K in PathParamNames<Endpoint["path"]>]: PathParameters extends {
+    [Key in K]: any;
+  }
+    ? PathParameters[K]
+    : string | number;
+}>;
 
 /**
  * Get path params for a given endpoint by path
@@ -320,6 +404,18 @@ export type ZodiosPathParamByAlias<
     ? PathParameters[K]
     : string | number;
 }>;
+
+export type ZodiosHeaderParamsForEndpoint<
+  Endpoint extends ZodiosEndpointDefinition,
+  Frontend extends boolean = true
+> = NeverIfEmpty<
+  UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<Endpoint["parameters"], { type: "Header" }>,
+      Frontend
+    >
+  >
+>;
 
 export type ZodiosHeaderParamsByPath<
   Api extends ZodiosEndpointDefinition[],
