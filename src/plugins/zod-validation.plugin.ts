@@ -2,14 +2,17 @@ import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
 
+type Options = Pick<ZodiosOptions, "validate" | "rawValues">;
+
 /**
  * Zod validation plugin used internally by Zodios.
  * By default zodios always validates the response.
  * @returns zod-validation plugin
  */
-export function zodValidationPlugin(
-  validate?: ZodiosOptions["validate"]
-): ZodiosPlugin {
+export function zodValidationPlugin({
+  validate,
+  rawValues,
+}: Options): ZodiosPlugin {
   return {
     name: "zod-validation",
     request:
@@ -64,7 +67,15 @@ export function zodValidationPlugin(
                     parsed.error
                   );
                 }
-                setParamsOf[type](name, parsed.data);
+                if (
+                  rawValues === true ||
+                  rawValues === "all" ||
+                  rawValues === "request"
+                ) {
+                  setParamsOf[type](name, value);
+                } else {
+                  setParamsOf[type](name, parsed.data);
+                }
               }
             }
             return conf;
@@ -100,7 +111,13 @@ export function zodValidationPlugin(
                   parsed.error
                 );
               }
-              response.data = parsed.data;
+              if (
+                rawValues !== true &&
+                rawValues !== "all" &&
+                rawValues !== "response"
+              ) {
+                response.data = parsed.data;
+              }
             }
             return response;
           }
