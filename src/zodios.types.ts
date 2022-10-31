@@ -568,6 +568,10 @@ export type ZodiosOptions = {
    */
   validate?: boolean | "request" | "response" | "all" | "none";
   /**
+   * Use raw values from request/response rather than parsed values. Default: true
+   */
+  rawValues?: boolean | "request" | "response" | "all" | "none";
+  /**
    * Override the default axios instance. Default: zodios will create it's own axios instance
    */
   axiosInstance?: AxiosInstance;

@@ -13,7 +13,7 @@ import {
   ZodiosPlugin,
   Aliases,
 } from "./zodios.types";
-import { omit, replacePathParams } from "./utils";
+import { omit, pick, replacePathParams } from "./utils";
 import {
   PluginId,
   ZodiosPlugins,
@@ -96,6 +96,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
     this.options = {
       validate: true,
+      rawValues: true,
       ...options,
     };
 
@@ -114,7 +115,9 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       this.options.validate &&
       [true, "all", "request", "response"].includes(this.options.validate)
     ) {
-      this.use(zodValidationPlugin(this.options.validate));
+      this.use(
+        zodValidationPlugin(pick(this.options, ["validate", "rawValues"]))
+      );
     }
   }
 
