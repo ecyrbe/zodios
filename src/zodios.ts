@@ -96,7 +96,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
     this.options = {
       validate: true,
-      rawValues: true,
+      transform: true,
       ...options,
     };
 
@@ -116,7 +116,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       [true, "all", "request", "response"].includes(this.options.validate)
     ) {
       this.use(
-        zodValidationPlugin(pick(this.options, ["validate", "rawValues"]))
+        zodValidationPlugin(pick(this.options, ["validate", "transform"]))
       );
     }
   }
