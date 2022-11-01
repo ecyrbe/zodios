@@ -570,7 +570,7 @@ export type ZodiosOptions = {
   /**
    * Should zodios transform the request and response ? Default: true
    */
-  transform?: boolean | "request" | "response" | "all" | "none";
+  transform?: boolean | "request" | "response";
   /**
    * Override the default axios instance. Default: zodios will create it's own axios instance
    */

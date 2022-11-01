@@ -67,11 +67,7 @@ export function zodValidationPlugin({
                     parsed.error
                   );
                 }
-                if (
-                  transform === true ||
-                  transform === "all" ||
-                  transform === "request"
-                ) {
+                if (transform === true || transform === "request") {
                   setParamsOf[type](name, parsed.data);
                 } else {
                   setParamsOf[type](name, value);
@@ -111,11 +107,7 @@ export function zodValidationPlugin({
                   parsed.error
                 );
               }
-              if (
-                transform === true ||
-                transform === "all" ||
-                transform === "response"
-              ) {
+              if (transform === true || transform === "response") {
                 response.data = parsed.data;
               }
             }
