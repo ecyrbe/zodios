@@ -150,6 +150,7 @@ type ZodiosEndpointDescriptions = Array<{
   }>;
   response: ZodSchema; // you can use zod `transform` to transform the value of the response before returning it
   status?: number; // default to 200, you can use this to override the sucess status code of the response (only usefull for openapi and express)
+  responseDescription?: string; // optional response description of the endpoint
   errors?: Array<{
     status: number | 'default';
     description?: string;
