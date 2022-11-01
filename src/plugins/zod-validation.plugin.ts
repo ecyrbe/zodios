@@ -2,7 +2,7 @@ import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
 
-type Options = Pick<ZodiosOptions, "validate" | "rawValues">;
+type Options = Pick<ZodiosOptions, "validate" | "transform">;
 
 /**
  * Zod validation plugin used internally by Zodios.
@@ -11,7 +11,7 @@ type Options = Pick<ZodiosOptions, "validate" | "rawValues">;
  */
 export function zodValidationPlugin({
   validate,
-  rawValues,
+  transform,
 }: Options): ZodiosPlugin {
   return {
     name: "zod-validation",
@@ -68,13 +68,13 @@ export function zodValidationPlugin({
                   );
                 }
                 if (
-                  rawValues === true ||
-                  rawValues === "all" ||
-                  rawValues === "request"
+                  transform === true ||
+                  transform === "all" ||
+                  transform === "request"
                 ) {
-                  setParamsOf[type](name, value);
-                } else {
                   setParamsOf[type](name, parsed.data);
+                } else {
+                  setParamsOf[type](name, value);
                 }
               }
             }
@@ -112,9 +112,9 @@ export function zodValidationPlugin({
                 );
               }
               if (
-                rawValues !== true &&
-                rawValues !== "all" &&
-                rawValues !== "response"
+                transform === true ||
+                transform === "all" ||
+                transform === "response"
               ) {
                 response.data = parsed.data;
               }
