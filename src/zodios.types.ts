@@ -669,6 +669,10 @@ export type ZodiosEndpointDefinition<R = unknown> = {
    */
   status?: number;
   /**
+   * optional response description of the endpoint
+   */
+  responseDescription?: string;
+  /**
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
   errors?: Array<ZodiosEndpointError>;
