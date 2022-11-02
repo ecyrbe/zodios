@@ -6,6 +6,11 @@ import { zodValidationPlugin } from "./zod-validation.plugin";
 
 describe("zodValidationPlugin", () => {
   const plugin = zodValidationPlugin({ validate: true, transform: true });
+  const pluginWithoutTransform = zodValidationPlugin({
+    validate: true,
+    transform: false,
+  });
+
   describe("request", () => {
     it("should be defined", () => {
       expect(plugin.request).toBeDefined();
@@ -47,6 +52,21 @@ describe("zodValidationPlugin", () => {
       });
     });
 
+    it("should not transform parameters", async () => {
+      const notTransformed = await pluginWithoutTransform.request!(
+        api,
+        createSampleConfig("/transform")
+      );
+
+      expect(notTransformed.data).toBe("123");
+      expect(notTransformed.queries).toStrictEqual({
+        sampleQueryParam: "456",
+      });
+      expect(notTransformed.headers).toStrictEqual({
+        sampleHeader: "789",
+      });
+    });
+
     it("should transform parameters (async)", async () => {
       const transformed = await plugin.request!(
         api,
@@ -59,6 +79,21 @@ describe("zodValidationPlugin", () => {
       });
       expect(transformed.headers).toStrictEqual({
         sampleHeader: "789_transformed",
+      });
+    });
+
+    it("should not transform parameters (async)", async () => {
+      const notTransformed = await pluginWithoutTransform.request!(
+        api,
+        createSampleConfig("/transformAsync")
+      );
+
+      expect(notTransformed.data).toBe("123");
+      expect(notTransformed.queries).toStrictEqual({
+        sampleQueryParam: "456",
+      });
+      expect(notTransformed.headers).toStrictEqual({
+        sampleHeader: "789",
       });
     });
 
@@ -111,6 +146,19 @@ describe("zodValidationPlugin", () => {
       });
     });
 
+    it("should not transform body", async () => {
+      const notTransformed = await pluginWithoutTransform.response!(
+        api,
+        createSampleConfig("/transform"),
+        createSampleResponse()
+      );
+
+      expect(notTransformed.data).toStrictEqual({
+        first: "123",
+        second: 111,
+      });
+    });
+
     it("should transform body (async)", async () => {
       const transformed = await plugin.response!(
         api,
@@ -121,6 +169,19 @@ describe("zodValidationPlugin", () => {
       expect(transformed.data).toStrictEqual({
         first: "123_transformed",
         second: 234,
+      });
+    });
+
+    it("should not transform body (async)", async () => {
+      const notTransformed = await pluginWithoutTransform.response!(
+        api,
+        createSampleConfig("/transformAsync"),
+        createSampleResponse()
+      );
+
+      expect(notTransformed.data).toStrictEqual({
+        first: "123",
+        second: 111,
       });
     });
 
