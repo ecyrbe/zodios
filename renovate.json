@@ -1,5 +1,5 @@
 {
   "extends": ["config:base"],
   "ignorePaths": ["website/package.json"],
-  "ignoreDeps": ["form-data-encoder", "formdata-node"]
+  "ignoreDeps": ["tsup"]
 }
