@@ -273,3 +273,5 @@ export type Assert<T, U> = IfEquals<
   true,
   { error: "Types are not equal"; type1: T; type2: U }
 >;
+
+export type PickRequired<T, K extends keyof T> = Merge<T, { [P in K]-?: T[P] }>;

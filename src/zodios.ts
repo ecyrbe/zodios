@@ -13,7 +13,7 @@ import {
   ZodiosPlugin,
   Aliases,
 } from "./zodios.types";
-import { omit, pick, replacePathParams } from "./utils";
+import { omit, replacePathParams } from "./utils";
 import {
   PluginId,
   ZodiosPlugins,
@@ -24,6 +24,7 @@ import {
 } from "./plugins";
 import {
   Narrow,
+  PickRequired,
   ReadonlyDeep,
   RequiredKeys,
   UndefinedIfNever,
@@ -35,7 +36,10 @@ import { checkApi } from "./api";
  */
 export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   private axiosInstance: AxiosInstance;
-  public readonly options: ZodiosOptions;
+  public readonly options: PickRequired<
+    ZodiosOptions,
+    "validate" | "transform"
+  >;
   public readonly api: Api;
   private endpointPlugins: Map<string, ZodiosPlugins> = new Map();
 
@@ -111,13 +115,8 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
     this.injectAliasEndpoints();
     this.initPlugins();
-    if (
-      this.options.validate &&
-      [true, "all", "request", "response"].includes(this.options.validate)
-    ) {
-      this.use(
-        zodValidationPlugin(pick(this.options, ["validate", "transform"]))
-      );
+    if ([true, "all", "request", "response"].includes(this.options.validate)) {
+      this.use(zodValidationPlugin(this.options));
     }
   }
 

@@ -2,7 +2,7 @@ import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
 
-type Options = Pick<ZodiosOptions, "validate" | "transform">;
+type Options = Required<Pick<ZodiosOptions, "validate" | "transform">>;
 
 /**
  * Zod validation plugin used internally by Zodios.
@@ -13,23 +13,10 @@ export function zodValidationPlugin({
   validate,
   transform,
 }: Options): ZodiosPlugin {
-  const validateRequest =
-    validate === true || validate === "all" || validate === "request";
-  const validateResponse =
-    validate === true || validate === "all" || validate === "response";
-  const transformRequest = transform === true || transform === "request";
-  const transformResponse = transform === true || transform === "response";
-
-  if (
-    (transformRequest && !validateRequest) ||
-    (transformResponse && !validateResponse)
-  ) {
-    console.warn(
-      "Zodios: validation is enabled.",
-      "ZodiosOptions.transform implies ZodiosOptions.validate",
-      "To suppress this warning, align the value of validate to transform when initializing Zodios"
-    );
-  }
+  const validateRequest = [true, "request", "all"].includes(validate);
+  const validateResponse = [true, "response", "all"].includes(validate);
+  const transformRequest = [true, "request"].includes(transform);
+  const transformResponse = [true, "response"].includes(transform);
 
   return {
     name: "zod-validation",
@@ -84,8 +71,6 @@ export function zodValidationPlugin({
               }
               if (transformRequest) {
                 setParamsOf[type](name, parsed.data);
-              } else {
-                setParamsOf[type](name, value);
               }
             }
           }
