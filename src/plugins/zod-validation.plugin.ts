@@ -4,6 +4,14 @@ import { findEndpoint } from "../utils";
 
 type Options = Required<Pick<ZodiosOptions, "validate" | "transform">>;
 
+function shouldResponse(option: string | boolean) {
+  return [true, "response", "all"].includes(option);
+}
+
+function shouldRequest(option: string | boolean) {
+  return [true, "request", "all"].includes(option);
+}
+
 /**
  * Zod validation plugin used internally by Zodios.
  * By default zodios always validates the response.
@@ -13,14 +21,9 @@ export function zodValidationPlugin({
   validate,
   transform,
 }: Options): ZodiosPlugin {
-  const validateRequest = [true, "request", "all"].includes(validate);
-  const validateResponse = [true, "response", "all"].includes(validate);
-  const transformRequest = [true, "request"].includes(transform);
-  const transformResponse = [true, "response"].includes(transform);
-
   return {
     name: "zod-validation",
-    request: validateRequest
+    request: shouldRequest(validate)
       ? async (api, config) => {
           const endpoint = findEndpoint(api, config.method, config.url);
           if (!endpoint) {
@@ -56,6 +59,7 @@ export function zodValidationPlugin({
             Header: (name: string, value: any) => (conf.headers![name] = value),
             Path: (name: string, value: any) => (conf.params![name] = value),
           };
+          const transformRequest = shouldRequest(transform);
           for (const parameter of parameters) {
             const { name, schema, type } = parameter;
             const value = paramsOf[type](name);
@@ -77,7 +81,7 @@ export function zodValidationPlugin({
           return conf;
         }
       : undefined,
-    response: validateResponse
+    response: shouldResponse(validate)
       ? async (api, config, response) => {
           const endpoint = findEndpoint(api, config.method, config.url);
           /* istanbul ignore next */
@@ -108,7 +112,7 @@ export function zodValidationPlugin({
                 parsed.error
               );
             }
-            if (transformResponse) {
+            if (shouldResponse(transform)) {
               response.data = parsed.data;
             }
           }
