@@ -52,6 +52,21 @@ describe("zodValidationPlugin", () => {
       });
     });
 
+    it("should transform empty string parameters", async () => {
+      const transformed = await plugin.request!(
+        api,
+        createEmptySampleConfig("/transform")
+      );
+
+      expect(transformed.data).toBe("_transformed");
+      expect(transformed.queries).toStrictEqual({
+        sampleQueryParam: "_transformed",
+      });
+      expect(transformed.headers).toStrictEqual({
+        sampleHeader: "_transformed",
+      });
+    });
+
     it("should not transform parameters", async () => {
       const notTransformed = await pluginWithoutTransform.request!(
         api,
@@ -229,6 +244,18 @@ received:
     },
     headers: {
       sampleHeader: "789",
+    },
+  });
+
+  const createEmptySampleConfig = (url: string): AnyZodiosRequestOptions => ({
+    method: "post",
+    url,
+    data: "",
+    queries: {
+      sampleQueryParam: "",
+    },
+    headers: {
+      sampleHeader: "",
     },
   });
 

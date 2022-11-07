@@ -63,7 +63,7 @@ export function zodValidationPlugin({
           for (const parameter of parameters) {
             const { name, schema, type } = parameter;
             const value = paramsOf[type](name);
-            if (value) {
+            if (value !== undefined) {
               const parsed = await schema.safeParseAsync(value);
               if (!parsed.success) {
                 throw new ZodiosError(
