@@ -39,7 +39,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   private axiosInstance: AxiosInstance;
   public readonly options: PickRequired<
     ZodiosOptions,
-    "validate" | "transform"
+    "validate" | "transform" | "sendDefaults"
   >;
   public readonly api: Api;
   private endpointPlugins: Map<string, ZodiosPlugins> = new Map();
@@ -102,6 +102,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
     this.options = {
       validate: true,
       transform: true,
+      sendDefaults: false,
       ...options,
     };
 

@@ -5,10 +5,20 @@ import { AnyZodiosRequestOptions } from "../zodios.types";
 import { zodValidationPlugin } from "./zod-validation.plugin";
 
 describe("zodValidationPlugin", () => {
-  const plugin = zodValidationPlugin({ validate: true, transform: true });
+  const plugin = zodValidationPlugin({
+    validate: true,
+    transform: true,
+    sendDefaults: false,
+  });
+  const pluginWithDefaults = zodValidationPlugin({
+    validate: true,
+    transform: true,
+    sendDefaults: true,
+  });
   const pluginWithoutTransform = zodValidationPlugin({
     validate: true,
     transform: false,
+    sendDefaults: false,
   });
 
   describe("request", () => {
@@ -67,7 +77,21 @@ describe("zodValidationPlugin", () => {
       });
     });
 
-    it("should not transform parameters", async () => {
+    it("should generate default parameter when generateDefaults is activated", async () => {
+      const defaulted = await pluginWithDefaults.request!(
+        api,
+        createUndefinedSampleConfig("/defaults")
+      );
+
+      expect(defaulted.queries).toStrictEqual({
+        sampleQueryParam: "defaultQueryParam",
+      });
+      expect(defaulted.headers).toStrictEqual({
+        sampleHeader: "defaultHeader",
+      });
+    });
+
+    it("should not transform parameters when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.request!(
         api,
         createSampleConfig("/transform")
@@ -97,7 +121,7 @@ describe("zodValidationPlugin", () => {
       });
     });
 
-    it("should not transform parameters (async)", async () => {
+    it("should not transform parameters (async) when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.request!(
         api,
         createSampleConfig("/transformAsync")
@@ -161,7 +185,7 @@ describe("zodValidationPlugin", () => {
       });
     });
 
-    it("should not transform body", async () => {
+    it("should not transform body when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.response!(
         api,
         createSampleConfig("/transform"),
@@ -187,7 +211,7 @@ describe("zodValidationPlugin", () => {
       });
     });
 
-    it("should not transform body (async)", async () => {
+    it("should not transform body (async) when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.response!(
         api,
         createSampleConfig("/transformAsync"),
@@ -259,6 +283,13 @@ received:
     },
   });
 
+  const createUndefinedSampleConfig = (
+    url: string
+  ): AnyZodiosRequestOptions => ({
+    method: "get",
+    url,
+  });
+
   const createSampleResponse = () => ({
     data: {
       first: "123",
@@ -297,6 +328,26 @@ received:
       },
     ],
   })
+    .addEndpoint({
+      path: "/defaults",
+      method: "get",
+      response: z.object({
+        first: z.string(),
+        second: z.number(),
+      }),
+      parameters: [
+        {
+          type: "Query",
+          schema: z.string().default("defaultQueryParam"),
+          name: "sampleQueryParam",
+        },
+        {
+          type: "Header",
+          schema: z.string().default("defaultHeader"),
+          name: "sampleHeader",
+        },
+      ],
+    })
     .addEndpoint({
       path: "/transform",
       method: "post",

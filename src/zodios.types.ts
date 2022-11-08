@@ -572,6 +572,11 @@ export type ZodiosOptions = {
    */
   transform?: boolean | "request" | "response";
   /**
+   * Should zod schema default values be used on parameters? Default: false
+   * you usually want your backend to handle default values
+   */
+  sendDefaults?: boolean;
+  /**
    * Override the default axios instance. Default: zodios will create it's own axios instance
    */
   axiosInstance?: AxiosInstance;

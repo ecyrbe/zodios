@@ -2,7 +2,9 @@ import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
 
-type Options = Required<Pick<ZodiosOptions, "validate" | "transform">>;
+type Options = Required<
+  Pick<ZodiosOptions, "validate" | "transform" | "sendDefaults">
+>;
 
 function shouldResponse(option: string | boolean) {
   return [true, "response", "all"].includes(option);
@@ -20,6 +22,7 @@ function shouldRequest(option: string | boolean) {
 export function zodValidationPlugin({
   validate,
   transform,
+  sendDefaults,
 }: Options): ZodiosPlugin {
   return {
     name: "zod-validation",
@@ -63,7 +66,7 @@ export function zodValidationPlugin({
           for (const parameter of parameters) {
             const { name, schema, type } = parameter;
             const value = paramsOf[type](name);
-            if (value !== undefined) {
+            if (sendDefaults || value !== undefined) {
               const parsed = await schema.safeParseAsync(value);
               if (!parsed.success) {
                 throw new ZodiosError(
