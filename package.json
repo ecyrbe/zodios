@@ -1,7 +1,7 @@
 {
   "name": "@zodios/core",
   "description": "Typescript API client with autocompletion and zod validations",
-  "version": "10.6.2",
+  "version": "10.7.0",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
