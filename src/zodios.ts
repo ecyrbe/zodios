@@ -13,6 +13,8 @@ import {
   ZodiosAliases,
   ZodiosPlugin,
   Aliases,
+  AnyZodiosTypeProvider,
+  ZodTypeProvider,
 } from "./zodios.types";
 import { omit, replacePathParams } from "./utils";
 import {
@@ -35,10 +37,13 @@ import { checkApi } from "./api";
 /**
  * zodios api client based on axios
  */
-export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
+export class ZodiosClass<
+  Api extends ZodiosEndpointDefinitions,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+> {
   private axiosInstance: AxiosInstance;
   public readonly options: PickRequired<
-    ZodiosOptions,
+    ZodiosOptions<TypeProvider>,
     "validate" | "transform" | "sendDefaults"
   >;
   public readonly api: Api;
@@ -71,14 +76,18 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    *     }
    *   ]);
    */
-  constructor(api: Narrow<Api>, options?: ZodiosOptions);
-  constructor(baseUrl: string, api: Narrow<Api>, options?: ZodiosOptions);
+  constructor(api: Narrow<Api>, options?: ZodiosOptions<TypeProvider>);
+  constructor(
+    baseUrl: string,
+    api: Narrow<Api>,
+    options?: ZodiosOptions<TypeProvider>
+  );
   constructor(
     arg1?: Api | string,
-    arg2?: Api | ZodiosOptions,
-    arg3?: ZodiosOptions
+    arg2?: Api | ZodiosOptions<TypeProvider>,
+    arg3?: ZodiosOptions<TypeProvider>
   ) {
-    let options: ZodiosOptions;
+    let options: ZodiosOptions<TypeProvider>;
     if (!arg1) {
       if (Array.isArray(arg2)) {
         throw new Error("Zodios: missing base url");
@@ -259,8 +268,12 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   async request<
     M extends Method,
     Path extends ZodiosPathsByMethod<Api, M>,
-    TConfig = ReadonlyDeep<ZodiosRequestOptions<Api, M, Path>>
-  >(config: TConfig): Promise<ZodiosResponseByPath<Api, M, Path>> {
+    TConfig = ReadonlyDeep<
+      ZodiosRequestOptions<Api, M, Path, true, TypeProvider>
+    >
+  >(
+    config: TConfig
+  ): Promise<ZodiosResponseByPath<Api, M, Path, true, TypeProvider>> {
     let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
     const anyPlugin = this.getAnyEndpointPlugins()!;
     const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
@@ -289,18 +302,24 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async get<
     Path extends ZodiosPathsByMethod<Api, "get">,
-    TConfig extends ZodiosRequestOptionsByPath<Api, "get", Path>
+    TConfig extends ZodiosRequestOptionsByPath<
+      Api,
+      "get",
+      Path,
+      true,
+      TypeProvider
+    >
   >(
     path: Path,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "get", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "get", Path, true, TypeProvider>> {
     return this.request({
       ...config,
       method: "get",
       url: path,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "get", Path>>);
+    });
   }
 
   /**
@@ -313,22 +332,28 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   async post<
     Path extends ZodiosPathsByMethod<Api, "post">,
     TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "post", Path>>
+      UndefinedIfNever<ZodiosBodyByPath<Api, "post", Path, true, TypeProvider>>
     >,
-    TConfig extends ZodiosRequestOptionsByPath<Api, "post", Path>
+    TConfig extends ZodiosRequestOptionsByPath<
+      Api,
+      "post",
+      Path,
+      true,
+      TypeProvider
+    >
   >(
     path: Path,
     data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "post", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "post", Path, true, TypeProvider>> {
     return this.request({
       ...config,
       method: "post",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "post", Path>>);
+    });
   }
 
   /**
@@ -341,22 +366,28 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   async put<
     Path extends ZodiosPathsByMethod<Api, "put">,
     TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "put", Path>>
+      UndefinedIfNever<ZodiosBodyByPath<Api, "put", Path, true, TypeProvider>>
     >,
-    TConfig extends ZodiosRequestOptionsByPath<Api, "put", Path>
+    TConfig extends ZodiosRequestOptionsByPath<
+      Api,
+      "put",
+      Path,
+      true,
+      TypeProvider
+    >
   >(
     path: Path,
     data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "put", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "put", Path, true, TypeProvider>> {
     return this.request({
       ...config,
       method: "put",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "put", Path>>);
+    });
   }
 
   /**
@@ -369,22 +400,28 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   async patch<
     Path extends ZodiosPathsByMethod<Api, "patch">,
     TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "patch", Path>>
+      UndefinedIfNever<ZodiosBodyByPath<Api, "patch", Path, true, TypeProvider>>
     >,
-    TConfig extends ZodiosRequestOptionsByPath<Api, "patch", Path>
+    TConfig extends ZodiosRequestOptionsByPath<
+      Api,
+      "patch",
+      Path,
+      true,
+      TypeProvider
+    >
   >(
     path: Path,
     data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "patch", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "patch", Path, true, TypeProvider>> {
     return this.request({
       ...config,
       method: "patch",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "patch", Path>>);
+    });
   }
 
   /**
@@ -396,38 +433,54 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   async delete<
     Path extends ZodiosPathsByMethod<Api, "delete">,
     TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "delete", Path>>
+      UndefinedIfNever<
+        ZodiosBodyByPath<Api, "delete", Path, true, TypeProvider>
+      >
     >,
-    TConfig extends ZodiosRequestOptionsByPath<Api, "delete", Path>
+    TConfig extends ZodiosRequestOptionsByPath<
+      Api,
+      "delete",
+      Path,
+      true,
+      TypeProvider
+    >
   >(
     path: Path,
     data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "delete", Path>> {
+  ): Promise<ZodiosResponseByPath<Api, "delete", Path, true, TypeProvider>> {
     return this.request({
       ...config,
       method: "delete",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "delete", Path>>);
+    });
   }
 }
 
-export type ZodiosInstance<Api extends ZodiosEndpointDefinitions> =
-  ZodiosClass<Api> & ZodiosAliases<Api>;
+export type ZodiosInstance<
+  Api extends ZodiosEndpointDefinitions,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+> = ZodiosClass<Api, TypeProvider> & ZodiosAliases<Api, true, TypeProvider>;
 
 export type ZodiosConstructor = {
-  new <Api extends ZodiosEndpointDefinitions>(
+  new <
+    Api extends ZodiosEndpointDefinitions,
+    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  >(
     api: Narrow<Api>,
-    options?: ZodiosOptions
-  ): ZodiosInstance<Api>;
-  new <Api extends ZodiosEndpointDefinitions>(
+    options?: ZodiosOptions<TypeProvider>
+  ): ZodiosInstance<Api, TypeProvider>;
+  new <
+    Api extends ZodiosEndpointDefinitions,
+    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  >(
     baseUrl: string,
     api: Narrow<Api>,
-    options?: ZodiosOptions
-  ): ZodiosInstance<Api>;
+    options?: ZodiosOptions<TypeProvider>
+  ): ZodiosInstance<Api, TypeProvider>;
 };
 
 export const Zodios = ZodiosClass as ZodiosConstructor;
@@ -436,4 +489,10 @@ export const Zodios = ZodiosClass as ZodiosConstructor;
  * Get the Api description type from zodios
  * @param Z - zodios type
  */
-export type ApiOf<Z> = Z extends ZodiosInstance<infer Api> ? Api : never;
+export type ApiOf<Z> = Z extends ZodiosInstance<infer Api, any> ? Api : never;
+export type TypeProviderOf<Z> = Z extends ZodiosInstance<
+  infer Api,
+  infer TypeProvider
+>
+  ? TypeProvider
+  : never;
