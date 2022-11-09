@@ -215,39 +215,6 @@ export type ReadonlyDeep<T> = T extends (infer R)[]
 export type MaybeReadonly<T> = T | ReadonlyDeep<T>;
 
 /**
- * Map a type an api description parameter to a zod infer type
- * @param T - array of api description parameters
- * @details -  this is using tail recursion type optimization from typescript 4.5
- */
-export type MapSchemaParameters<
-  T,
-  Frontend extends boolean = true,
-  Acc = {}
-> = T extends [infer Head, ...infer Tail]
-  ? Head extends {
-      name: infer Name;
-      schema: infer Schema;
-    }
-    ? Name extends string
-      ? MapSchemaParameters<
-          Tail,
-          Frontend,
-          Merge<
-            {
-              [Key in Name]: Schema extends z.ZodType<any, any, any>
-                ? Frontend extends true
-                  ? z.input<Schema>
-                  : z.output<Schema>
-                : never;
-            },
-            Acc
-          >
-        >
-      : Acc
-    : Acc
-  : Acc;
-
-/**
  * get all parameters from an API path
  * @param Path - API path
  * @details - this is using tail recursion type optimization from typescript 4.5
