@@ -1,9 +1,13 @@
 import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
+import type { AnyZodiosTypeProvider } from "../type-provider.types";
 
-type Options = Required<
-  Pick<ZodiosOptions, "validate" | "transform" | "sendDefaults">
+type Options<TypeProvider extends AnyZodiosTypeProvider> = Required<
+  Pick<
+    ZodiosOptions<TypeProvider>,
+    "validate" | "transform" | "sendDefaults" | "typeProvider"
+  >
 >;
 
 function shouldResponse(option: string | boolean) {
@@ -19,11 +23,14 @@ function shouldRequest(option: string | boolean) {
  * By default zodios always validates the response.
  * @returns zod-validation plugin
  */
-export function zodValidationPlugin({
+export function zodValidationPlugin<
+  TypeProvider extends AnyZodiosTypeProvider
+>({
   validate,
   transform,
   sendDefaults,
-}: Options): ZodiosPlugin {
+  typeProvider,
+}: Options<TypeProvider>): ZodiosPlugin {
   return {
     name: "zod-validation",
     request: shouldRequest(validate)
@@ -67,7 +74,7 @@ export function zodValidationPlugin({
             const { name, schema, type } = parameter;
             const value = paramsOf[type](name);
             if (sendDefaults || value !== undefined) {
-              const parsed = await schema.safeParseAsync(value);
+              const parsed = await typeProvider.validateAsync(schema, value);
               if (!parsed.success) {
                 throw new ZodiosError(
                   `Zodios: Invalid ${type} parameter '${name}'`,
@@ -96,7 +103,8 @@ export function zodValidationPlugin({
           if (
             response.headers?.["content-type"]?.includes("application/json")
           ) {
-            const parsed = await endpoint.response.safeParseAsync(
+            const parsed = await typeProvider.validateAsync(
+              endpoint.response,
               response.data
             );
             if (!parsed.success) {
@@ -105,11 +113,9 @@ export function zodValidationPlugin({
                   endpoint.path
                 }'\nstatus: ${response.status} ${
                   response.statusText
-                }\ncause:\n${parsed.error.message}\nreceived:\n${JSON.stringify(
-                  response.data,
-                  null,
-                  2
-                )}`,
+                }\ncause:\n${
+                  parsed.error.message ?? JSON.stringify(parsed.error)
+                }\nreceived:\n${JSON.stringify(response.data, null, 2)}`,
                 config,
                 response.data,
                 parsed.error
