@@ -20,8 +20,7 @@ type TsSchema<Schema> = {
  * A basic typescript schema provider
  * @returns
  */
-export const tsSchema = <Schema extends any>(): TsSchema<Schema> =>
-  genericTsSchema as any;
+export const tsSchema = <Schema>(): TsSchema<Schema> => genericTsSchema as any;
 
 export interface TsTypeProvider extends AnyZodiosTypeProvider {
   input: this["schema"] extends { _schema: unknown }
