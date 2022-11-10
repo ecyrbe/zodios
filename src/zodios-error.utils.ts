@@ -19,7 +19,7 @@ function isDefinedError<
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   error: unknown,
-  typeProvider: ZodiosRuntimeTypeProvider<TypeProvider> = zodTypeProvider as any,
+  typeProvider: ZodiosRuntimeTypeProvider<TypeProvider>,
   findEndpointErrors: (error: AxiosError) => ZodiosEndpointError[] | undefined
 ): boolean {
   if (
