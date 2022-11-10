@@ -4,22 +4,24 @@ import {
   ZodiosValidateResult,
 } from "./type-provider.types";
 
-const parse = (data: unknown): ZodiosValidateResult => ({
-  success: true,
-  data,
-});
-
 const genericTsSchema = {
-  parse,
+  parse: (data: unknown): ZodiosValidateResult => ({
+    success: true,
+    data,
+  }),
 };
+
+type TsSchema<Schema> = {
+  readonly _schema: Schema;
+  parse: (input: unknown) => ZodiosValidateResult;
+};
+
 /**
  * A basic typescript schema provider
  * @returns
  */
-export const tsSchema = <Schema extends any>(): {
-  readonly _schema: Schema;
-  parse: (input: unknown) => ZodiosValidateResult;
-} => genericTsSchema as any;
+export const tsSchema = <Schema extends any>(): TsSchema<Schema> =>
+  genericTsSchema as any;
 
 export interface TsTypeProvider extends AnyZodiosTypeProvider {
   input: this["schema"] extends { _schema: unknown }
