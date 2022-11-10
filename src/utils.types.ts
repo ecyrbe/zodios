@@ -1,5 +1,3 @@
-import { z, ZodType } from "zod";
-
 /**
  * filter an array type by a predicate value
  * @param T - array type
@@ -53,10 +51,14 @@ type NarrowRaw<T> =
   | (T extends string | number | bigint | boolean ? T : never)
   | (T extends [] ? [] : never)
   | {
-      [K in keyof T]: K extends "description" ? T[K] : NarrowNotZod<T[K]>;
+      [K in keyof T]: K extends "description" ? T[K] : NarrowNotSchema<T[K]>;
     };
 
-type NarrowNotZod<T> = Try<T, ZodType, NarrowRaw<T>>;
+type NarrowNotSchema<T> = Try<
+  T,
+  { parse: (...args: any[]) => any } | { validate: (...args: any[]) => any },
+  NarrowRaw<T>
+>;
 
 /**
  * Utility to infer the embedded primitive type of any type
@@ -64,7 +66,7 @@ type NarrowNotZod<T> = Try<T, ZodType, NarrowRaw<T>>;
  * @param T - type to infer the embedded type of
  * @see - thank you tannerlinsley for this idea
  */
-export type Narrow<T> = Try<T, [], NarrowNotZod<T>>;
+export type Narrow<T> = Try<T, [], NarrowNotSchema<T>>;
 
 /**
  * merge all union types into a single type
