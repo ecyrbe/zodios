@@ -57,6 +57,7 @@ async function bootstrap() {
   console.log(users);
   const user = await apiClient.get("/users/:id", { params: { id: 7 } });
   //    ^?
+  console.log(user);
 }
 
 bootstrap();
