@@ -3,22 +3,26 @@ import { apiBuilder } from "../api";
 import { ReadonlyDeep } from "../utils.types";
 import { AnyZodiosRequestOptions } from "../zodios.types";
 import { zodValidationPlugin } from "./zod-validation.plugin";
+import { zodTypeProvider } from "../type-provider.zod";
 
 describe("zodValidationPlugin", () => {
   const plugin = zodValidationPlugin({
     validate: true,
     transform: true,
     sendDefaults: false,
+    typeProvider: zodTypeProvider,
   });
   const pluginWithDefaults = zodValidationPlugin({
     validate: true,
     transform: true,
     sendDefaults: true,
+    typeProvider: zodTypeProvider,
   });
   const pluginWithoutTransform = zodValidationPlugin({
     validate: true,
     transform: false,
     sendDefaults: false,
+    typeProvider: zodTypeProvider,
   });
 
   describe("request", () => {
