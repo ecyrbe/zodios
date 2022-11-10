@@ -1,5 +1,12 @@
-import { Zodios, makeApi } from "../src/index";
-import { ApiOf, TypeProviderOf, tsSchema, tsTypeProvider } from "../src/index";
+import {
+  Zodios,
+  makeApi,
+  tsFnSchema,
+  ApiOf,
+  TypeProviderOf,
+  tsSchema,
+  tsTypeProvider,
+} from "../src/index";
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
@@ -23,7 +30,12 @@ const jsonplaceholderApi = makeApi([
         name: "q",
         description: "full text search",
         type: "Query",
-        schema: tsSchema<string>(),
+        schema: tsFnSchema((data) => {
+          if (typeof data !== "string") {
+            throw new Error("not a string");
+          }
+          return data;
+        }),
       },
       {
         name: "page",
