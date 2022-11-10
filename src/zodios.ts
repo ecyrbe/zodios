@@ -13,8 +13,6 @@ import {
   ZodiosAliases,
   ZodiosPlugin,
   Aliases,
-  AnyZodiosTypeProvider,
-  ZodTypeProvider,
 } from "./zodios.types";
 import { omit, replacePathParams } from "./utils";
 import {
@@ -33,7 +31,9 @@ import {
   UndefinedIfNever,
 } from "./utils.types";
 import { checkApi } from "./api";
-
+import type { AnyZodiosTypeProvider } from "./type-provider.types";
+import type { ZodTypeProvider } from "./type-provider.zod";
+import { zodTypeProvider } from "./type-provider.zod";
 /**
  * zodios api client based on axios
  */
@@ -44,7 +44,7 @@ export class ZodiosClass<
   private axiosInstance: AxiosInstance;
   public readonly options: PickRequired<
     ZodiosOptions<TypeProvider>,
-    "validate" | "transform" | "sendDefaults"
+    "validate" | "transform" | "sendDefaults" | "typeProvider"
   >;
   public readonly api: Api;
   private endpointPlugins: Map<string, ZodiosPlugins> = new Map();
@@ -112,6 +112,7 @@ export class ZodiosClass<
       validate: true,
       transform: true,
       sendDefaults: false,
+      typeProvider: zodTypeProvider as any,
       ...options,
     };
 
@@ -489,7 +490,9 @@ export const Zodios = ZodiosClass as ZodiosConstructor;
  * Get the Api description type from zodios
  * @param Z - zodios type
  */
-export type ApiOf<Z> = Z extends ZodiosInstance<infer Api, any> ? Api : never;
+export type ApiOf<Z> = Z extends ZodiosInstance<infer Api, infer TypeProvider>
+  ? Api
+  : never;
 export type TypeProviderOf<Z> = Z extends ZodiosInstance<
   infer Api,
   infer TypeProvider

@@ -4,6 +4,8 @@ import {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
+import z from "zod";
+
 import type {
   FilterArrayByValue,
   PickDefined,
@@ -18,7 +20,13 @@ import type {
   RequiredKeys,
   UndefinedIfNever,
 } from "./utils.types";
-import z from "zod";
+import type {
+  AnyZodiosTypeProvider,
+  InferInputTypeFromSchema,
+  InferOutputTypeFromSchema,
+  ZodiosDynamicTypeProvider,
+} from "./type-provider.types";
+import type { ZodTypeProvider } from "./type-provider.zod";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
@@ -192,51 +200,57 @@ export type ZodiosErrorByPath<
       >
     >;
 
-export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
-  infer Head,
-  ...infer Tail
-]
+export type ErrorsToAxios<
+  T,
+  TypeProvider extends AnyZodiosTypeProvider,
+  Acc extends unknown[] = []
+> = T extends [infer Head, ...infer Tail]
   ? Head extends {
       status: infer Status;
       schema: infer Schema;
     }
-    ? Schema extends z.ZodTypeAny
-      ? ErrorsToAxios<
-          Tail,
-          [
-            ...Acc,
-            Merge<
-              Omit<AxiosError, "status" | "response">,
-              {
-                response: Merge<
-                  AxiosError<z.output<Schema>>["response"],
-                  {
-                    status: Status extends "default"
-                      ? 0 & { error: Status }
-                      : Status;
-                  }
-                >;
-              }
-            >
-          ]
-        >
-      : Acc
+    ? ErrorsToAxios<
+        Tail,
+        TypeProvider,
+        [
+          ...Acc,
+          Merge<
+            Omit<AxiosError, "status" | "response">,
+            {
+              response: Merge<
+                AxiosError<
+                  InferOutputTypeFromSchema<TypeProvider, Schema>
+                >["response"],
+                {
+                  status: Status extends "default"
+                    ? 0 & { error: Status }
+                    : Status;
+                }
+              >;
+            }
+          >
+        ]
+      >
     : Acc
   : Acc;
 
 export type ZodiosMatchingErrorsByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
+  Path extends ZodiosPathsByMethod<Api, M>,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = ErrorsToAxios<
-  ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"]
+  ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+  TypeProvider
 >[number];
 
 export type ZodiosMatchingErrorsByAlias<
   Api extends ZodiosEndpointDefinition[],
-  Alias extends string
+  Alias extends string,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = ErrorsToAxios<
-  ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"]
+  ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+  TypeProvider
 >[number];
 
 export type ZodiosErrorByAlias<
@@ -677,9 +691,9 @@ export type ZodiosOptions<
   axiosConfig?: AxiosRequestConfig;
 
   /**
-   * set a custom validation plugin via a custom factory
+   * set a custom type provider. Default: ZodTypeProvider
    */
-  validationPluginFactory?: ZodiosTypeProviderFactory<TypeProvider>;
+  typeProvider?: ZodiosDynamicTypeProvider<TypeProvider>;
 };
 
 export type ZodiosEndpointParameter<T = unknown> = {
@@ -699,7 +713,7 @@ export type ZodiosEndpointParameter<T = unknown> = {
    * zod schema of the parameter
    * you can use zod `transform` to transform the value of the parameter before sending it to the server
    */
-  schema: z.ZodType<T>;
+  schema: unknown;
 };
 
 export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
@@ -717,7 +731,7 @@ export type ZodiosEndpointError<T = unknown> = {
   /**
    * schema of the error
    */
-  schema: z.ZodType<T>;
+  schema: unknown;
 };
 
 export type ZodiosEndpointErrors = ZodiosEndpointError[];
@@ -767,7 +781,7 @@ export type ZodiosEndpointDefinition<R = unknown> = {
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
    */
-  response: z.ZodType<R>;
+  response: unknown;
   /**
    * optional response status of the endpoint for sucess, default is 200
    * customize it if your endpoint returns a different status code and if you need openapi to generate the correct status code
@@ -784,39 +798,6 @@ export type ZodiosEndpointDefinition<R = unknown> = {
 };
 
 export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
-
-export interface AnyZodiosTypeProvider {
-  schema: unknown;
-  input: unknown;
-  output: unknown;
-}
-
-export type InferInputTypeFromSchema<
-  F extends AnyZodiosTypeProvider,
-  Schema
-> = (F & { schema: Schema })["input"];
-export type InferOutputTypeFromSchema<
-  F extends AnyZodiosTypeProvider,
-  Schema
-> = (F & { schema: Schema })["output"];
-
-export interface ZodTypeProvider extends AnyZodiosTypeProvider {
-  input: this["schema"] extends z.ZodTypeAny ? z.input<this["schema"]> : never;
-  output: this["schema"] extends z.ZodTypeAny
-    ? z.output<this["schema"]>
-    : never;
-}
-
-export type ZodiosTypeProviderFactory<
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = {
-  _provider: TypeProvider;
-  factory: (options: {
-    validate: boolean | "request" | "response" | "all" | "none";
-    transform: boolean | "request" | "response";
-    sendDefaults: boolean;
-  }) => ZodiosPlugin;
-};
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses
