@@ -54,7 +54,11 @@ export { zodTypeProvider } from "./type-provider.zod";
 export type { IoTsTypeProvider } from "./type-provider.io-ts";
 export { ioTsTypeProvider } from "./type-provider.io-ts";
 export type { TsTypeProvider } from "./type-provider.typescript";
-export { tsTypeProvider, tsSchema } from "./type-provider.typescript";
+export {
+  tsTypeProvider,
+  tsSchema,
+  tsFnSchema,
+} from "./type-provider.typescript";
 export {
   PluginId,
   zodValidationPlugin,
