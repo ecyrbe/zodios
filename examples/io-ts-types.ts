@@ -1,7 +1,11 @@
-import { Zodios, makeApi } from "../src/index";
+import {
+  Zodios,
+  makeApi,
+  ApiOf,
+  TypeProviderOf,
+  ioTsTypeProvider,
+} from "../src/index";
 import * as t from "io-ts";
-import { ApiOf, TypeProviderOf } from "../src/zodios";
-import { ioTsTypeProvider } from "../src/type-provider.io-ts";
 
 // you can define schema before declaring the API to get back the type
 
