@@ -1,4 +1,9 @@
 import { AxiosError } from "axios";
+import {
+  AnyZodiosTypeProvider,
+  ZodiosDynamicTypeProvider,
+} from "./type-provider.types";
+import { ZodTypeProvider, zodTypeProvider } from "./type-provider.zod";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 import {
   Aliases,
@@ -10,8 +15,11 @@ import {
   ZodiosPathsByMethod,
 } from "./zodios.types";
 
-function isDefinedError(
+function isDefinedError<
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+>(
   error: unknown,
+  typeProvider: ZodiosDynamicTypeProvider<TypeProvider> = zodTypeProvider as any,
   findEndpointErrors: (error: AxiosError) => ZodiosEndpointError[] | undefined
 ): boolean {
   if (
@@ -23,7 +31,8 @@ function isDefinedError(
       const endpointErrors = findEndpointErrors(err);
       if (endpointErrors) {
         return endpointErrors.some(
-          (desc) => desc.schema.safeParse(err.response!.data).success
+          (desc) =>
+            typeProvider.validate(desc.schema, err.response!.data).success
         );
       }
     }
@@ -42,14 +51,16 @@ function isDefinedError(
 export function isErrorFromPath<
   Api extends ZodiosEndpointDefinitions,
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
+  Path extends ZodiosPathsByMethod<Api, M>,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   api: Api,
   method: M,
   path: Path,
-  error: unknown
-): error is ZodiosMatchingErrorsByPath<Api, M, Path> {
-  return isDefinedError(error, (err) =>
+  error: unknown,
+  typeProvider: ZodiosDynamicTypeProvider<TypeProvider> = zodTypeProvider as any
+): error is ZodiosMatchingErrorsByPath<Api, M, Path, TypeProvider> {
+  return isDefinedError(error, typeProvider, (err) =>
     findEndpointErrorsByPath(api, method, path, err)
   );
 }
@@ -63,13 +74,15 @@ export function isErrorFromPath<
  */
 export function isErrorFromAlias<
   Api extends ZodiosEndpointDefinitions,
-  Alias extends Aliases<Api>
+  Alias extends Aliases<Api>,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   api: Api,
   alias: Alias,
-  error: unknown
-): error is ZodiosMatchingErrorsByAlias<Api, Alias> {
-  return isDefinedError(error, (err) =>
+  error: unknown,
+  typeProvider: ZodiosDynamicTypeProvider<TypeProvider> = zodTypeProvider as any
+): error is ZodiosMatchingErrorsByAlias<Api, Alias, TypeProvider> {
+  return isDefinedError(error, typeProvider, (err) =>
     findEndpointErrorsByAlias(api, alias, err)
   );
 }
