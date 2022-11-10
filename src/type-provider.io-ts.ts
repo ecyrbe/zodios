@@ -1,27 +1,23 @@
-import * as t from "io-ts";
-import * as Either from "fp-ts/Either";
 import {
   AnyZodiosTypeProvider,
-  ZodiosDynamicTypeProvider,
+  ZodiosRuntimeTypeProvider,
 } from "./type-provider.types";
 
 export interface IoTsTypeProvider extends AnyZodiosTypeProvider {
-  input: this["schema"] extends t.Type<any> ? t.InputOf<this["schema"]> : never;
-  output: this["schema"] extends t.Type<any>
-    ? t.OutputOf<this["schema"]>
-    : never;
+  input: this["schema"] extends { _I: unknown } ? this["schema"]["_I"] : never;
+  output: this["schema"] extends { _O: unknown } ? this["schema"]["_O"] : never;
 }
 
-export const ioTsTypeProvider: ZodiosDynamicTypeProvider<IoTsTypeProvider> = {
-  validate: (schema: t.Type<any>, input: unknown) => {
+export const ioTsTypeProvider: ZodiosRuntimeTypeProvider<IoTsTypeProvider> = {
+  validate: (schema, input) => {
     const result = schema.decode(input);
-    return Either.isRight(result)
+    return result._tag === "Right"
       ? { success: true, data: result.right }
       : { success: false, error: result.left };
   },
-  validateAsync: async (schema: t.Type<any>, input: unknown) => {
+  validateAsync: async (schema, input) => {
     const result = schema.decode(input);
-    return Either.isRight(result)
+    return result._tag === "Right"
       ? { success: true, data: result.right }
       : { success: false, error: result.left };
   },

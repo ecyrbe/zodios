@@ -5,22 +5,23 @@ export interface AnyZodiosTypeProvider {
 }
 
 export type InferInputTypeFromSchema<
-  F extends AnyZodiosTypeProvider,
+  TypeProvider extends AnyZodiosTypeProvider,
   Schema
-> = (F & { schema: Schema })["input"];
+> = (TypeProvider & { schema: Schema })["input"];
+
 export type InferOutputTypeFromSchema<
-  F extends AnyZodiosTypeProvider,
+  TypeProvider extends AnyZodiosTypeProvider,
   Schema
-> = (F & { schema: Schema })["output"];
+> = (TypeProvider & { schema: Schema })["output"];
 
 export type ZodiosValidateResult =
   | { success: true; data: any }
   | { success: false; error: any };
 
-export type ZodiosDynamicTypeProvider<
+export type ZodiosRuntimeTypeProvider<
   TypeProvider extends AnyZodiosTypeProvider
 > = {
-  _provider?: TypeProvider;
+  readonly _provider?: TypeProvider;
   validate: (schema: any, input: unknown) => ZodiosValidateResult;
   validateAsync: (schema: any, input: unknown) => Promise<ZodiosValidateResult>;
 };
