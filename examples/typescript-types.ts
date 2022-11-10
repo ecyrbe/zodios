@@ -1,6 +1,5 @@
 import { Zodios, makeApi } from "../src/index";
-import { ApiOf, TypeProviderOf } from "../src/zodios";
-import { tsSchema, tsTypeProvider } from "../src/type-provider.typescript";
+import { ApiOf, TypeProviderOf, tsSchema, tsTypeProvider } from "../src/index";
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
