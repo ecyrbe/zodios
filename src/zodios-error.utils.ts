@@ -1,4 +1,9 @@
 import { AxiosError } from "axios";
+import {
+  AnyZodiosTypeProvider,
+  ZodiosDynamicTypeProvider,
+} from "./type-provider.types";
+import { ZodTypeProvider, zodTypeProvider } from "./type-provider.zod";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 import {
   Aliases,
@@ -10,8 +15,11 @@ import {
   ZodiosPathsByMethod,
 } from "./zodios.types";
 
-function isDefinedError(
+function isDefinedError<
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+>(
   error: unknown,
+  typeProvider: ZodiosDynamicTypeProvider<TypeProvider> = zodTypeProvider as any,
   findEndpointErrors: (error: AxiosError) => ZodiosEndpointError[] | undefined
 ): boolean {
   if (
@@ -23,7 +31,8 @@ function isDefinedError(
       const endpointErrors = findEndpointErrors(err);
       if (endpointErrors) {
         return endpointErrors.some(
-          (desc) => desc.schema.safeParse(err.response!.data).success
+          (desc) =>
+            typeProvider.validate(desc.schema, err.response!.data).success
         );
       }
     }
