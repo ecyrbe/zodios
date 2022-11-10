@@ -24,7 +24,7 @@ import type {
   AnyZodiosTypeProvider,
   InferInputTypeFromSchema,
   InferOutputTypeFromSchema,
-  ZodiosDynamicTypeProvider,
+  ZodiosRuntimeTypeProvider,
 } from "./type-provider.types";
 import type { ZodTypeProvider } from "./type-provider.zod";
 
@@ -693,7 +693,7 @@ export type ZodiosOptions<
   /**
    * set a custom type provider. Default: ZodTypeProvider
    */
-  typeProvider?: ZodiosDynamicTypeProvider<TypeProvider>;
+  typeProvider?: ZodiosRuntimeTypeProvider<TypeProvider>;
 };
 
 export type ZodiosEndpointParameter<T = unknown> = {
