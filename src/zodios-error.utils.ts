@@ -1,7 +1,7 @@
 import { AxiosError } from "axios";
 import {
   AnyZodiosTypeProvider,
-  ZodiosDynamicTypeProvider,
+  ZodiosRuntimeTypeProvider,
 } from "./type-provider.types";
 import { ZodTypeProvider, zodTypeProvider } from "./type-provider.zod";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
@@ -19,7 +19,7 @@ function isDefinedError<
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   error: unknown,
-  typeProvider: ZodiosDynamicTypeProvider<TypeProvider> = zodTypeProvider as any,
+  typeProvider: ZodiosRuntimeTypeProvider<TypeProvider> = zodTypeProvider as any,
   findEndpointErrors: (error: AxiosError) => ZodiosEndpointError[] | undefined
 ): boolean {
   if (
