@@ -695,7 +695,7 @@ export type ZodiosOptions<
   typeProvider?: ZodiosRuntimeTypeProvider<TypeProvider>;
 };
 
-export type ZodiosEndpointParameter<T = unknown> = {
+export type ZodiosEndpointParameter = {
   /**
    * name of the parameter
    */
@@ -717,7 +717,7 @@ export type ZodiosEndpointParameter<T = unknown> = {
 
 export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
 
-export type ZodiosEndpointError<T = unknown> = {
+export type ZodiosEndpointError = {
   /**
    * status code of the error
    * use 'default' to declare a default error
@@ -738,7 +738,7 @@ export type ZodiosEndpointErrors = ZodiosEndpointError[];
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
-export type ZodiosEndpointDefinition<R = unknown> = {
+export type ZodiosEndpointDefinition = {
   /**
    * http method : get, post, put, patch, delete
    */
