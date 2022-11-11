@@ -11,8 +11,8 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
-    "noErrorTruncation": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["jest", "node"]
   },
   "exclude": ["node_modules", "lib"]
 }
