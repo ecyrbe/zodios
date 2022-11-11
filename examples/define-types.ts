@@ -1,4 +1,4 @@
-import { Zodios, makeApi } from "../src/index";
+import { Zodios, makeApi } from "../packages/core/src/index";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { makeApi } from "../../src/index";
+import { makeApi } from "../../packages/core/src/index";
 import { paramPages } from "./params";
 
 const devFollower = z.object({
