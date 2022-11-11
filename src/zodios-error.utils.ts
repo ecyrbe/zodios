@@ -1,11 +1,12 @@
 import { AxiosError } from "axios";
-import {
+import type {
   AnyZodiosTypeProvider,
   ZodiosRuntimeTypeProvider,
-} from "./type-provider.types";
-import { ZodTypeProvider, zodTypeProvider } from "./type-provider.zod";
+  ZodTypeProvider,
+} from "./type-providers";
+import { zodTypeProvider } from "./type-providers";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
-import {
+import type {
   Aliases,
   Method,
   ZodiosEndpointDefinitions,
