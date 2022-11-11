@@ -5,13 +5,12 @@
     "build": "turbo run build",
     "test": "turbo run test",
     "dev": "turbo run dev",
-    "lint": "turbo run lint"
+    "lint": "turbo run lint",
+    "publish-packages": "turbo run build test && changeset version && changeset publish"
   },
   "private": true,
   "devDependencies": {
-    "turbo": "1.6.3"
-  },
-  "dependencies": {
+    "turbo": "1.6.3",
     "@changesets/cli": "^2.25.2"
   }
 }
