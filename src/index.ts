@@ -46,19 +46,19 @@ export type {
   AnyZodiosTypeProvider,
   InferInputTypeFromSchema,
   InferOutputTypeFromSchema,
+  IoTsTypeProvider,
+  TsTypeProvider,
   ZodiosRuntimeTypeProvider,
   ZodiosValidateResult,
-} from "./type-provider.types";
-export type { ZodTypeProvider } from "./type-provider.zod";
-export { zodTypeProvider } from "./type-provider.zod";
-export type { IoTsTypeProvider } from "./type-provider.io-ts";
-export { ioTsTypeProvider } from "./type-provider.io-ts";
-export type { TsTypeProvider } from "./type-provider.typescript";
+  ZodTypeProvider,
+} from "./type-providers";
 export {
+  ioTsTypeProvider,
   tsTypeProvider,
+  zodTypeProvider,
   tsSchema,
   tsFnSchema,
-} from "./type-provider.typescript";
+} from "./type-providers";
 export {
   PluginId,
   zodValidationPlugin,

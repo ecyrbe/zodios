@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
-import { ReadonlyDeep } from "./utils.types";
-import {
+import type { ReadonlyDeep } from "./utils.types";
+import type {
   AnyZodiosRequestOptions,
   ZodiosEndpointDefinition,
   ZodiosEndpointDefinitions,
