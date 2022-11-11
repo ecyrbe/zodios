@@ -10,5 +10,8 @@
   "private": true,
   "devDependencies": {
     "turbo": "1.6.3"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.25.2"
   }
 }
