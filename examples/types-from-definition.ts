@@ -6,7 +6,7 @@ import {
   makeApi,
   ZodiosPathParamByAlias,
   makeErrors,
-} from "../src/index";
+} from "../packages/core/src/index";
 import z from "zod";
 
 const user = z.object({

@@ -4,7 +4,7 @@ import {
   ApiOf,
   TypeProviderOf,
   ioTsTypeProvider,
-} from "../src/index";
+} from "../packages/core/src/index";
 import * as t from "io-ts";
 
 // you can define schema before declaring the API to get back the type
