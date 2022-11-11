@@ -1,6 +1,3 @@
-// disable type checking for this file as we need to defer type checking when using these utility types
-// indeed typescript seems to have a bug, where it tries to infer the type of an undecidable generic type
-// but when using the functions, types are inferred correctly
 import type {
   ZodiosEndpointDefinition,
   ZodiosEndpointParameter,
@@ -198,7 +195,7 @@ export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
  * @param endpoint - api endpoint definition
  * @returns the endpoint definition
  */
-export function makeEndpoint<T extends ZodiosEndpointDefinition<any>>(
+export function makeEndpoint<T extends ZodiosEndpointDefinition>(
   endpoint: Narrow<T>
 ): T {
   return endpoint as T;
@@ -220,7 +217,7 @@ export class Builder<T extends ZodiosEndpointDefinitions> {
  * @param endpoint
  * @returns - a builder to build your api definitions
  */
-export function apiBuilder<T extends ZodiosEndpointDefinition<any>>(
+export function apiBuilder<T extends ZodiosEndpointDefinition>(
   endpoint: Narrow<T>
 ): Builder<[T]> {
   return new Builder([endpoint] as [T]);
