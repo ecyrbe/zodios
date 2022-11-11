@@ -5,7 +5,9 @@
       "dependsOn": ["^build"],
       "outputs": ["lib/**"]
     },
-    "test": {},
+    "test": {
+      "outputs": []
+    },
     "lint": {},
     "deploy": {}
   }
