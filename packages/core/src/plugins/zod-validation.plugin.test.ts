@@ -3,7 +3,7 @@ import { apiBuilder } from "../api";
 import { ReadonlyDeep } from "../utils.types";
 import { AnyZodiosRequestOptions } from "../zodios.types";
 import { zodValidationPlugin } from "./zod-validation.plugin";
-import { zodTypeProvider } from "../type-provider.zod";
+import { zodTypeProvider } from "../type-providers";
 
 describe("zodValidationPlugin", () => {
   const plugin = zodValidationPlugin({

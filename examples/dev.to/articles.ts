@@ -1,4 +1,4 @@
-import { apiBuilder, makeApi } from "../../src/index";
+import { apiBuilder, makeApi } from "../../packages/core/src/index";
 import { z } from "zod";
 import { devUser } from "./users";
 import { paramPages } from "./params";

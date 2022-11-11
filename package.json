@@ -1,83 +1,14 @@
 {
-  "name": "@zodios/core",
-  "description": "Typescript API client with autocompletion and zod validations",
+  "name": "zodios",
   "version": "11.0.0-rc.0",
-  "main": "lib/index.js",
-  "module": "lib/index.mjs",
-  "typings": "lib/index.d.ts",
-  "exports": {
-    ".": {
-      "import": "./lib/index.mjs",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
-    },
-    "./package.json": "./package.json"
-  },
-  "files": [
-    "lib"
-  ],
-  "author": {
-    "name": "ecyrbe",
-    "email": "ecyrbe@gmail.com"
-  },
-  "homepage": "https://github.com/ecyrbe/zodios",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ecyrbe/zodios.git"
-  },
-  "license": "MIT",
-  "keywords": [
-    "axios",
-    "openapi",
-    "zod",
-    "autocomplete",
-    "validation"
-  ],
   "scripts": {
-    "prebuild": "rimraf lib",
-    "example": "ts-node examples/jsonplaceholder.ts",
-    "example:dev.to": "ts-node examples/dev.to/example.ts",
-    "major-rc": "npm version premajor --preid=rc",
-    "minor-rc": "npm version preminor --preid=rc",
-    "patch-rc": "npm version prepatch --preid=rc",
-    "rc": "npm version prerelease --preid=rc",
-    "build": "tsup",
-    "test": "jest --coverage"
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint"
   },
-  "peerDependencies": {
-    "axios": "^0.x || ^1.0.0",
-    "zod": "^3.x",
-    "fp-ts": "2.x",
-    "io-ts": "2.x"
-  },
-  "peerDependenciesMeta": {
-    "zod": {
-      "optional": true
-    },
-    "fp-ts": {
-      "optional": true
-    },
-    "io-ts": {
-      "optional": true
-    }
-  },
+  "private": true,
   "devDependencies": {
-    "@types/express": "4.17.14",
-    "@types/jest": "29.2.3",
-    "@types/multer": "1.4.7",
-    "@types/node": "18.11.9",
-    "axios": "1.2.0",
-    "express": "4.18.2",
-    "fp-ts": "2.13.1",
-    "io-ts": "2.2.19",
-    "jest": "29.3.0",
-    "multer": "1.4.5-lts.1",
-    "rimraf": "3.0.2",
-    "ts-jest": "29.0.3",
-    "ts-node": "10.9.1",
-    "tsup": "6.3.0",
-    "typescript": "4.9.3",
-    "zod": "3.19.1"
-  },
-  "dependencies": {}
+    "turbo": "1.6.3"
+  }
 }
