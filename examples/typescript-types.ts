@@ -6,7 +6,7 @@ import {
   TypeProviderOf,
   tsSchema,
   tsTypeProvider,
-} from "../src/index";
+} from "../packages/core/src/index";
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
