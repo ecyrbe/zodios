@@ -1,7 +1,7 @@
-import { ZodiosError } from "../zodios-error";
-import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
-import type { AnyZodiosTypeProvider } from "../type-provider.types";
+import { ZodiosError } from "../zodios-error";
+import type { AnyZodiosTypeProvider } from "../type-providers";
+import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 
 type Options<TypeProvider extends AnyZodiosTypeProvider> = Required<
   Pick<
