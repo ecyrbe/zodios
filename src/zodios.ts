@@ -1,6 +1,6 @@
 import axios from "axios";
 import type { AxiosInstance, AxiosRequestConfig } from "axios";
-import {
+import type {
   AnyZodiosRequestOptions,
   ZodiosRequestOptions,
   ZodiosBodyByPath,
@@ -23,7 +23,7 @@ import {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-import {
+import type {
   Narrow,
   PickRequired,
   ReadonlyDeep,
@@ -31,9 +31,8 @@ import {
   UndefinedIfNever,
 } from "./utils.types";
 import { checkApi } from "./api";
-import type { AnyZodiosTypeProvider } from "./type-provider.types";
-import type { ZodTypeProvider } from "./type-provider.zod";
-import { zodTypeProvider } from "./type-provider.zod";
+import type { AnyZodiosTypeProvider, ZodTypeProvider } from "./type-providers";
+import { zodTypeProvider } from "./type-providers";
 /**
  * zodios api client based on axios
  */
