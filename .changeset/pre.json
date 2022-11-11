@@ -5,6 +5,7 @@
     "@zodios/core": "11.0.0-rc.0"
   },
   "changesets": [
+    "dry-worms-smell",
     "thin-dots-know"
   ]
 }
