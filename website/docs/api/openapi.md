@@ -162,3 +162,7 @@ If you want to use an existing OpenAPI documentation to generate your Zodios API
 ```bash
 npx openapi-zod-client "swagger.json" -o "zodios-client.ts"
 ```
+
+You can also use the [online openapi to zodios api definition](https://openapi-zod-client.vercel.app/) tool.
+
+![openapi-to-zodios](/img/openapi-to-zodios.png)
