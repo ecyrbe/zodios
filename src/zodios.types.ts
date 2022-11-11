@@ -24,8 +24,8 @@ import type {
   InferInputTypeFromSchema,
   InferOutputTypeFromSchema,
   ZodiosRuntimeTypeProvider,
-} from "./type-provider.types";
-import type { ZodTypeProvider } from "./type-provider.zod";
+  ZodTypeProvider,
+} from "./type-providers";
 
 type AxiosRequestConfig = Parameters<typeof axios.request>[0];
 

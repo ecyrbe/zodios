@@ -1,5 +1,5 @@
-import { ReadonlyDeep } from "./utils.types";
-import { AnyZodiosRequestOptions } from "./zodios.types";
+import type { ReadonlyDeep } from "./utils.types";
+import type { AnyZodiosRequestOptions } from "./zodios.types";
 
 /**
  * Custom Zodios Error with additional information
