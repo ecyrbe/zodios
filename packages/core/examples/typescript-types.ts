@@ -1,27 +1,24 @@
 import {
   Zodios,
   makeApi,
+  tsFnSchema,
   ApiOf,
   TypeProviderOf,
-  ioTsTypeProvider,
-} from "../packages/core/src/index";
-import * as t from "io-ts";
-
-// you can define schema before declaring the API to get back the type
-
-// you can then get back the types
-type User = t.TypeOf<typeof userSchema>;
-type Users = t.TypeOf<typeof usersSchema>;
+  tsSchema,
+  tsTypeProvider,
+} from "../src/index";
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
 
-const userSchema = t.type({
-  id: t.number,
-  name: t.string,
-});
+type User = {
+  id: number;
+  name: string;
+};
 
-const usersSchema = t.array(userSchema);
+const userSchema = tsSchema<User>();
+
+const usersSchema = tsSchema<User[]>();
 
 const jsonplaceholderApi = makeApi([
   {
@@ -33,13 +30,18 @@ const jsonplaceholderApi = makeApi([
         name: "q",
         description: "full text search",
         type: "Query",
-        schema: t.string,
+        schema: tsFnSchema((data) => {
+          if (typeof data !== "string") {
+            throw new Error("not a string");
+          }
+          return data;
+        }),
       },
       {
         name: "page",
         description: "page number",
         type: "Query",
-        schema: t.union([t.number, t.undefined]),
+        schema: tsSchema<number | undefined>(),
       },
     ],
     response: usersSchema,
@@ -54,7 +56,7 @@ const jsonplaceholderApi = makeApi([
 
 async function bootstrap() {
   const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi, {
-    typeProvider: ioTsTypeProvider,
+    typeProvider: tsTypeProvider,
   });
 
   type Api = ApiOf<typeof apiClient>;

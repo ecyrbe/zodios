@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { makeApi } from "../../packages/core/src/index";
+import { makeApi } from "../../src/index";
 
 export const devFollow = z.object({
   id: z.number(),

@@ -1,4 +1,4 @@
-import { makeApi, makeEndpoint } from "../../packages/core/src/index";
+import { makeApi, makeEndpoint } from "../../src/index";
 import { z } from "zod";
 import { devUser, User } from "./users";
 
