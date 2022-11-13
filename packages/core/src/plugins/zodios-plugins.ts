@@ -1,4 +1,7 @@
-import { AxiosResponse } from "axios";
+import {
+  AnyZodiosFetcherProvider,
+  TypeOfFetcherResponse,
+} from "../fetcher-providers";
 import { ReadonlyDeep } from "../utils.types";
 import {
   AnyZodiosRequestOptions,
@@ -15,9 +18,9 @@ export type PluginId = {
 /**
  * A list of plugins that can be used by the Zodios client.
  */
-export class ZodiosPlugins {
+export class ZodiosPlugins<FetcherProvider extends AnyZodiosFetcherProvider> {
   public readonly key: string;
-  private plugins: Array<ZodiosPlugin | undefined> = [];
+  private plugins: Array<ZodiosPlugin<FetcherProvider> | undefined> = [];
 
   /**
    * Constructor
@@ -43,7 +46,7 @@ export class ZodiosPlugins {
    * @param plugin - plugin to register
    * @returns unique id of the plugin
    */
-  use(plugin: ZodiosPlugin): PluginId {
+  use(plugin: ZodiosPlugin<FetcherProvider>): PluginId {
     if (plugin.name) {
       const id = this.indexOf(plugin.name);
       if (id !== -1) {
@@ -105,7 +108,7 @@ export class ZodiosPlugins {
   async interceptResponse(
     api: ZodiosEndpointDefinitions,
     config: ReadonlyDeep<AnyZodiosRequestOptions>,
-    response: Promise<AxiosResponse>
+    response: Promise<TypeOfFetcherResponse<FetcherProvider>>
   ) {
     let pluginResponse = response;
     for (let index = this.plugins.length - 1; index >= 0; index--) {
