@@ -103,10 +103,6 @@ describe("Zodios", () => {
     expect(() => new Zodios({})).toThrowError("Zodios: api must be an array");
   });
 
-  it("should return the underlying axios instance", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
-    expect(zodios.axios).toBeDefined();
-  });
   it("should create a new instance of Zodios", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     expect(zodios).toBeDefined();
@@ -147,11 +143,6 @@ describe("Zodios", () => {
           },
         ])
     ).toThrowError("Zodios: Duplicate path 'get /:id'");
-  });
-
-  it("should get base url", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
-    expect(zodios.baseURL).toBe(`http://localhost:${port}`);
   });
 
   it("should create a new instance whithout base URL", () => {
