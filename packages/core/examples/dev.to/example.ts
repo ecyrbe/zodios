@@ -1,4 +1,4 @@
-import { Zodios } from "../../packages/core/src/index";
+import { Zodios } from "../../src/index";
 import { articlesApi } from "./articles";
 import { commentsApi } from "./comments";
 import { followsApi } from "./follows";
