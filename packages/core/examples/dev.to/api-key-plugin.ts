@@ -1,5 +1,3 @@
-import { AxiosRequestConfig } from "axios";
-import { config } from "process";
 import { ZodiosPlugin } from "../../src/index";
 
 export interface ApiKeyPluginConfig {
