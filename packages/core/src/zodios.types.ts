@@ -26,7 +26,7 @@ import {
   TypeOfFetcherResponse,
   ZodiosRuntimeFetcherProvider,
   AxiosProvider,
-} from "./fetcher-providers.ts";
+} from "./fetcher-providers";
 
 type AxiosRequestConfig = Parameters<typeof axios.request>[0];
 
