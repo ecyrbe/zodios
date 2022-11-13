@@ -37,7 +37,6 @@ export type {
   ZodiosEndpointErrors,
   ZodiosOptions,
   ZodiosRequestOptions,
-  ZodiosMethodOptions,
   ZodiosRequestOptionsByPath,
   ZodiosRequestOptionsByAlias,
   ZodiosPlugin,

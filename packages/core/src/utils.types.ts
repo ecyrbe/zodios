@@ -171,22 +171,13 @@ export type UndefinedIfEmpty<T> = IfEquals<T, {}, undefined, T>;
 
 export type UndefinedIfNever<T> = IfEquals<T, never, undefined, T>;
 
-type RequiredChildProps<T> = {
-  [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, never, K>;
-}[keyof T];
-
-export type OptionalChildProps<T> = {
-  [K in keyof T]: IfEquals<T[K], OptionalProps<T[K]>, K, never>;
-}[keyof T];
-
 /**
  * set properties to optional if their child properties are optional
  * @param T - object type
  */
-export type SetPropsOptionalIfChildrenAreOptional<T> = Merge<
-  Pick<Partial<T>, OptionalChildProps<T>>,
-  Pick<T, RequiredChildProps<T>>
->;
+export type TransitiveOptional<T> = UndefinedToOptional<{
+  [k in keyof T]: RequiredKeys<T[k]> extends never ? T[k] | undefined : T[k];
+}>;
 
 /**
  * transform an array type into a readonly array type
