@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { makeParameters } from "../../packages/core/src/api";
+import { makeParameters } from "../../src/api";
 
 export const paramPages = makeParameters([
   {

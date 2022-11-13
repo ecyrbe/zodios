@@ -3,7 +3,7 @@ import {
   ZodiosResponseByAlias,
   ZodiosHeaderParamsByAlias,
   Zodios,
-} from "../packages/core/src/index";
+} from "../src/index";
 import { z } from "zod";
 
 async function bootstrap() {

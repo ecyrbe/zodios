@@ -1,6 +1,6 @@
 import { AxiosRequestConfig } from "axios";
 import { config } from "process";
-import { ZodiosPlugin } from "../../packages/core/src/index";
+import { ZodiosPlugin } from "../../src/index";
 
 export interface ApiKeyPluginConfig {
   getApiKey: () => Promise<string>;
