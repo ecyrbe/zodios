@@ -2,10 +2,14 @@ import { findEndpoint } from "../utils";
 import { ZodiosError } from "../zodios-error";
 import type { AnyZodiosTypeProvider } from "../type-providers";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
+import { AnyZodiosFetcherProvider } from "../fetcher-providers.ts";
 
-type Options<TypeProvider extends AnyZodiosTypeProvider> = Required<
+type Options<
+  FetcherProvider extends AnyZodiosFetcherProvider,
+  TypeProvider extends AnyZodiosTypeProvider
+> = Required<
   Pick<
-    ZodiosOptions<TypeProvider>,
+    ZodiosOptions<FetcherProvider, TypeProvider>,
     "validate" | "transform" | "sendDefaults" | "typeProvider"
   >
 >;
@@ -24,13 +28,14 @@ function shouldRequest(option: string | boolean) {
  * @returns zod-validation plugin
  */
 export function zodValidationPlugin<
+  FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 >({
   validate,
   transform,
   sendDefaults,
   typeProvider,
-}: Options<TypeProvider>): ZodiosPlugin {
+}: Options<FetcherProvider, TypeProvider>): ZodiosPlugin {
   return {
     name: "zod-validation",
     request: shouldRequest(validate)

@@ -1,17 +1,10 @@
-import {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
-
 import type {
   FilterArrayByValue,
   PickDefined,
   NeverIfEmpty,
   UndefinedToOptional,
   PathParamNames,
-  SetPropsOptionalIfChildrenAreOptional,
+  TransitiveOptional,
   ReadonlyDeep,
   Merge,
   FilterArrayByKey,
@@ -26,6 +19,14 @@ import type {
   ZodiosRuntimeTypeProvider,
   ZodTypeProvider,
 } from "./type-providers";
+import {
+  AnyZodiosFetcherProvider,
+  TypeOfFetcherConfig,
+  TypeOfFetcherError,
+  TypeOfFetcherResponse,
+  ZodiosRuntimeFetcherProvider,
+  AxiosProvider,
+} from "./fetcher-providers.ts";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 
@@ -199,34 +200,26 @@ export type ZodiosErrorByPath<
       >
     >;
 
-export type ErrorsToAxios<
+export type InferFetcherErrors<
   T,
   TypeProvider extends AnyZodiosTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
   Acc extends unknown[] = []
 > = T extends [infer Head, ...infer Tail]
   ? Head extends {
       status: infer Status;
       schema: infer Schema;
     }
-    ? ErrorsToAxios<
+    ? InferFetcherErrors<
         Tail,
         TypeProvider,
+        FetcherProvider,
         [
           ...Acc,
-          Merge<
-            Omit<AxiosError, "status" | "response">,
-            {
-              response: Merge<
-                AxiosError<
-                  InferOutputTypeFromSchema<TypeProvider, Schema>
-                >["response"],
-                {
-                  status: Status extends "default"
-                    ? 0 & { error: Status }
-                    : Status;
-                }
-              >;
-            }
+          TypeOfFetcherError<
+            FetcherProvider,
+            InferOutputTypeFromSchema<TypeProvider, Schema>,
+            Status
           >
         ]
       >
@@ -238,7 +231,7 @@ export type ZodiosMatchingErrorsByPath<
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = ErrorsToAxios<
+> = InferFetcherErrors<
   ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
   TypeProvider
 >[number];
@@ -247,7 +240,7 @@ export type ZodiosMatchingErrorsByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = ErrorsToAxios<
+> = InferFetcherErrors<
   ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
   TypeProvider
 >[number];
@@ -544,16 +537,17 @@ export type ZodiosRequestOptionsByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > = Merge<
-  SetPropsOptionalIfChildrenAreOptional<
+  TransitiveOptional<
     PickDefined<{
       params: ZodiosPathParamByAlias<Api, Alias, Frontend, TypeProvider>;
       queries: ZodiosQueryParamsByAlias<Api, Alias, Frontend, TypeProvider>;
       headers: ZodiosHeaderParamsByAlias<Api, Alias, Frontend, TypeProvider>;
     }>
   >,
-  Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
+  TypeOfFetcherConfig<FetcherProvider>
 >;
 
 export type ZodiosMutationAliasRequest<Body, Config, Response> =
@@ -598,32 +592,12 @@ export type AnyZodiosMethodOptions = Merge<
     queries?: Record<string, unknown>;
     headers?: Record<string, string>;
   },
-  Omit<AxiosRequestConfig, "params" | "headers" | "url" | "method">
+  TypeOfFetcherConfig<AxiosProvider>
 >;
 
 export type AnyZodiosRequestOptions = Merge<
   { method: Method; url: string },
   AnyZodiosMethodOptions
->;
-
-/**
- * @deprecated - use ZodiosRequestOptionsByPath instead
- */
-export type ZodiosMethodOptions<
-  Api extends ZodiosEndpointDefinition[],
-  M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>,
-  Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = Merge<
-  SetPropsOptionalIfChildrenAreOptional<
-    PickDefined<{
-      params: ZodiosPathParamsByPath<Api, M, Path, Frontend, TypeProvider>;
-      queries: ZodiosQueryParamsByPath<Api, M, Path, Frontend, TypeProvider>;
-      headers: ZodiosHeaderParamsByPath<Api, M, Path, Frontend, TypeProvider>;
-    }>
-  >,
-  Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
 >;
 
 /**
@@ -634,16 +608,17 @@ export type ZodiosRequestOptionsByPath<
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > = Merge<
-  SetPropsOptionalIfChildrenAreOptional<
+  TransitiveOptional<
     PickDefined<{
       params: ZodiosPathParamsByPath<Api, M, Path, Frontend, TypeProvider>;
       queries: ZodiosQueryParamsByPath<Api, M, Path, Frontend, TypeProvider>;
       headers: ZodiosHeaderParamsByPath<Api, M, Path, Frontend, TypeProvider>;
     }>
   >,
-  Omit<AxiosRequestConfig, "params" | "baseURL" | "data" | "method" | "url">
+  TypeOfFetcherConfig<FetcherProvider>
 >;
 
 export type ZodiosRequestOptions<
@@ -665,6 +640,7 @@ export type ZodiosRequestOptions<
  * Zodios options
  */
 export type ZodiosOptions<
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = {
   /**
@@ -680,14 +656,8 @@ export type ZodiosOptions<
    * you usually want your backend to handle default values
    */
   sendDefaults?: boolean;
-  /**
-   * Override the default axios instance. Default: zodios will create it's own axios instance
-   */
-  axiosInstance?: AxiosInstance;
-  /**
-   * default config for axios requests
-   */
-  axiosConfig?: AxiosRequestConfig;
+
+  fetcherProvider?: ZodiosRuntimeFetcherProvider<FetcherProvider>;
 
   /**
    * set a custom type provider. Default: ZodTypeProvider
@@ -801,7 +771,9 @@ export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses
  */
-export type ZodiosPlugin = {
+export type ZodiosPlugin<
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+> = {
   /**
    * Optional name of the plugin
    * naming a plugin allows to remove it or replace it later
@@ -827,8 +799,8 @@ export type ZodiosPlugin = {
   response?: (
     api: ZodiosEndpointDefinitions,
     config: ReadonlyDeep<AnyZodiosRequestOptions>,
-    response: AxiosResponse
-  ) => Promise<AxiosResponse>;
+    response: TypeOfFetcherResponse<FetcherProvider>
+  ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;
   /**
    * error interceptor for response errors
    * there is no error interceptor for request errors
@@ -841,5 +813,5 @@ export type ZodiosPlugin = {
     api: ZodiosEndpointDefinitions,
     config: ReadonlyDeep<AnyZodiosRequestOptions>,
     error: Error
-  ) => Promise<AxiosResponse>;
+  ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;
 };
