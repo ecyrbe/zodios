@@ -26,7 +26,7 @@ import {
   TypeOfFetcherResponse,
   ZodiosRuntimeFetcherProvider,
   AxiosProvider,
-} from "./fetcher-providers.ts";
+} from "./fetcher-providers";
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 

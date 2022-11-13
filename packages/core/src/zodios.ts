@@ -35,7 +35,7 @@ import {
   AnyZodiosFetcherProvider,
   axiosProvider,
   AxiosProvider,
-} from "./fetcher-providers.ts";
+} from "./fetcher-providers";
 
 interface ZodiosBase<
   Api extends ZodiosEndpointDefinitions,
@@ -67,7 +67,8 @@ export class ZodiosClass<
   public readonly api: Api;
   public readonly _typeProvider: TypeProvider;
   public readonly _fetcherProvider: FetcherProvider;
-  private endpointPlugins: Map<string, ZodiosPlugins> = new Map();
+  private endpointPlugins: Map<string, ZodiosPlugins<FetcherProvider>> =
+    new Map();
 
   /**
    * constructor
@@ -153,19 +154,29 @@ export class ZodiosClass<
     this.endpointPlugins.set("any-any", new ZodiosPlugins("any", "any"));
 
     this.api.forEach((endpoint) => {
-      const plugins = new ZodiosPlugins(endpoint.method, endpoint.path);
+      const plugins = new ZodiosPlugins<FetcherProvider>(
+        endpoint.method,
+        endpoint.path
+      );
       switch (endpoint.requestFormat) {
         case "binary":
-          plugins.use(headerPlugin("Content-Type", "application/octet-stream"));
+          plugins.use(
+            headerPlugin<FetcherProvider>(
+              "Content-Type",
+              "application/octet-stream"
+            )
+          );
           break;
         case "form-data":
-          plugins.use(formDataPlugin());
+          plugins.use(formDataPlugin<FetcherProvider>());
           break;
         case "form-url":
-          plugins.use(formURLPlugin());
+          plugins.use(formURLPlugin<FetcherProvider>());
           break;
         case "text":
-          plugins.use(headerPlugin("Content-Type", "text/plain"));
+          plugins.use(
+            headerPlugin<FetcherProvider>("Content-Type", "text/plain")
+          );
           break;
       }
       this.endpointPlugins.set(`${endpoint.method}-${endpoint.path}`, plugins);
@@ -203,14 +214,14 @@ export class ZodiosClass<
   use(...args: unknown[]) {
     if (typeof args[0] === "object") {
       const plugins = this.getAnyEndpointPlugins()!;
-      return plugins.use(args[0] as ZodiosPlugin);
+      return plugins.use(args[0] as ZodiosPlugin<FetcherProvider>);
     } else if (typeof args[0] === "string" && typeof args[1] === "object") {
       const plugins = this.findAliasEndpointPlugins(args[0]);
       if (!plugins)
         throw new Error(
           `Zodios: no alias '${args[0]}' found to register plugin`
         );
-      return plugins.use(args[1] as ZodiosPlugin);
+      return plugins.use(args[1] as ZodiosPlugin<FetcherProvider>);
     } else if (
       typeof args[0] === "string" &&
       typeof args[1] === "string" &&
@@ -221,7 +232,7 @@ export class ZodiosClass<
         throw new Error(
           `Zodios: no endpoint '${args[0]} ${args[1]}' found to register plugin`
         );
-      return plugins.use(args[2] as ZodiosPlugin);
+      return plugins.use(args[2] as ZodiosPlugin<FetcherProvider>);
     }
     throw new Error("Zodios: invalid plugin registration");
   }
