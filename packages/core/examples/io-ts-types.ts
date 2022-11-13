@@ -1,22 +1,28 @@
-import { Zodios, makeApi } from "../packages/core/src/index";
-import { z } from "zod";
+import {
+  Zodios,
+  makeApi,
+  ApiOf,
+  TypeProviderOf,
+  ioTsTypeProvider,
+} from "../src/index";
+import * as t from "io-ts";
 
 // you can define schema before declaring the API to get back the type
-const userSchema = z
-  .object({
-    id: z.number(),
-    name: z.string(),
-  })
-  .required();
-
-const usersSchema = z.array(userSchema);
 
 // you can then get back the types
-type User = z.infer<typeof userSchema>;
-type Users = z.infer<typeof usersSchema>;
+type User = t.TypeOf<typeof userSchema>;
+type Users = t.TypeOf<typeof usersSchema>;
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
+
+const userSchema = t.type({
+  id: t.number,
+  name: t.string,
+});
+
+const usersSchema = t.array(userSchema);
+
 const jsonplaceholderApi = makeApi([
   {
     method: "get",
@@ -27,13 +33,13 @@ const jsonplaceholderApi = makeApi([
         name: "q",
         description: "full text search",
         type: "Query",
-        schema: z.string(),
+        schema: t.string,
       },
       {
         name: "page",
         description: "page number",
         type: "Query",
-        schema: z.number().optional(),
+        schema: t.union([t.number, t.undefined]),
       },
     ],
     response: usersSchema,
@@ -46,13 +52,20 @@ const jsonplaceholderApi = makeApi([
   },
 ]);
 
-// and then use them in your API
 async function bootstrap() {
-  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi);
+  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi, {
+    typeProvider: ioTsTypeProvider,
+  });
 
+  type Api = ApiOf<typeof apiClient>;
+  //    ^?
+  type Provider = TypeProviderOf<typeof apiClient>;
+  //    ^?
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
+  //    ^?
   console.log(users);
   const user = await apiClient.get("/users/:id", { params: { id: 7 } });
+  //    ^?
   console.log(user);
 }
 
