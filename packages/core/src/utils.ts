@@ -54,7 +54,7 @@ export function capitalize<T extends string>(str: T): Capitalize<T> {
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
 export function replacePathParams(
-  config: ReadonlyDeep<AnyZodiosRequestOptions>
+  config: ReadonlyDeep<{ url: string; params?: Record<string, any> }>
 ) {
   let result: string = config.url;
   const params = config.params;
