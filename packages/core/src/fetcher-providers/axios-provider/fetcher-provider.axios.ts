@@ -7,10 +7,10 @@ import axios, {
 import {
   AnyZodiosFetcherProvider,
   ZodiosRuntimeFetcherProvider,
-} from "./fetcher-provider.types";
-import { Merge } from "../utils.types";
-import { omit, replacePathParams } from "../utils";
-import { AnyZodiosRequestOptions } from "../zodios.types";
+} from "../fetcher-provider.types";
+import { Merge } from "../../utils.types";
+import { omit, replacePathParams } from "../../utils";
+import { AnyZodiosRequestOptions } from "../../zodios.types";
 
 type AxiosErrorStatus<Response, Status> = Merge<
   Omit<AxiosError, "status" | "response">,
