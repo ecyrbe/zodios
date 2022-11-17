@@ -1,3 +1,4 @@
+import { AnyZodiosFetcherProvider } from "./fetcher-providers";
 import type { ReadonlyDeep } from "./utils.types";
 import type { AnyZodiosRequestOptions } from "./zodios.types";
 
@@ -11,7 +12,9 @@ import type { AnyZodiosRequestOptions } from "./zodios.types";
 export class ZodiosError extends Error {
   constructor(
     message: string,
-    public readonly config?: ReadonlyDeep<AnyZodiosRequestOptions>,
+    public readonly config?: ReadonlyDeep<
+      AnyZodiosRequestOptions<AnyZodiosFetcherProvider>
+    >,
     public readonly data?: unknown,
     public readonly cause?: Error
   ) {

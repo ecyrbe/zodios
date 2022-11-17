@@ -12,9 +12,10 @@ export interface AnyZodiosFetcherProvider {
   /**
    * config types to call fetcher
    */
-  config: unknown;
-  response: unknown;
-  error: unknown;
+  options: any;
+  config: any;
+  response: any;
+  error: any;
 }
 
 export type TypeOfFetcherConfig<
@@ -34,9 +35,15 @@ export type TypeOfFetcherResponse<
   FetcherProvider extends AnyZodiosFetcherProvider
 > = FetcherProvider["response"];
 
+export type TypeOfFetcherOptions<
+  FetcherProvider extends AnyZodiosFetcherProvider
+> = FetcherProvider["options"];
+
 export type ZodiosRuntimeFetcherProvider<
   FetcherProvider extends AnyZodiosFetcherProvider
 > = {
   readonly _provider?: FetcherProvider;
-  fetch: (params: any) => Promise<any>;
+  baseURL?: string;
+  create(options: any): void;
+  fetch(params: any): Promise<any>;
 };
