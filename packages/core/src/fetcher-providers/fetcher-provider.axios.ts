@@ -24,7 +24,13 @@ type AxiosErrorStatus<Response, Status> = Merge<
   }
 >;
 
+type AxiosProviderOptions = {
+  axiosInstance?: AxiosInstance;
+  axiosConfig?: AxiosRequestConfig;
+};
+
 export interface AxiosProvider extends AnyZodiosFetcherProvider {
+  options: AxiosProviderOptions;
   config: Omit<AxiosRequestConfig, "params" | "headers" | "method" | "url">;
   response: AxiosResponse;
 
@@ -32,23 +38,28 @@ export interface AxiosProvider extends AnyZodiosFetcherProvider {
   error: AxiosErrorStatus<this["arg1"], this["arg2"]>;
 }
 
-export const axiosProvider = (options: {
-  baseURL?: string;
-  axiosInstance?: AxiosInstance;
-  axiosConfig?: AxiosRequestConfig;
-}): ZodiosRuntimeFetcherProvider<AxiosProvider> => {
-  const { axiosInstance, axiosConfig, baseURL } = options;
-  const instance = axiosInstance || axios.create(axiosConfig);
-  if (baseURL) instance.defaults.baseURL = baseURL;
-
-  return {
-    fetch: async (config) => {
-      const requestConfig: AxiosRequestConfig = {
-        ...omit(config as AnyZodiosRequestOptions, ["params", "queries"]),
-        url: replacePathParams(config),
-        params: config.queries,
-      };
-      return instance.request(requestConfig);
-    },
-  };
+export const axiosProvider: ZodiosRuntimeFetcherProvider<AxiosProvider> & {
+  instance: AxiosInstance;
+} = {
+  instance: undefined as any,
+  create(
+    options: {
+      baseURL?: string;
+    } & AxiosProviderOptions
+  ) {
+    const { axiosInstance, axiosConfig, baseURL } = options;
+    this.instance = axiosInstance || axios.create(axiosConfig);
+    if (baseURL) {
+      this.instance.defaults.baseURL = baseURL;
+      this.baseURL = baseURL;
+    }
+  },
+  fetch(config: AnyZodiosRequestOptions<AxiosProvider>) {
+    const requestConfig: AxiosRequestConfig = {
+      ...omit(config, ["params", "queries"]),
+      url: replacePathParams(config),
+      params: config.queries,
+    };
+    return this.instance.request(requestConfig);
+  },
 };

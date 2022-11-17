@@ -6,6 +6,8 @@ import {
   ioTsTypeProvider,
 } from "../src/index";
 import * as t from "io-ts";
+import { fetchProvider } from "../src/fetcher-providers/fetcher-provider.fetch/fetcher-provider.fetch";
+import { FetcherProviderOf } from "../src/zodios";
 
 // you can define schema before declaring the API to get back the type
 
@@ -27,6 +29,7 @@ const jsonplaceholderApi = makeApi([
   {
     method: "get",
     path: "/users",
+    alias: "getUsers",
     description: "Get all users",
     parameters: [
       {
@@ -55,13 +58,18 @@ const jsonplaceholderApi = makeApi([
 async function bootstrap() {
   const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi, {
     typeProvider: ioTsTypeProvider,
+    fetcherProvider: fetchProvider,
   });
 
   type Api = ApiOf<typeof apiClient>;
   //    ^?
   type Provider = TypeProviderOf<typeof apiClient>;
   //    ^?
+  type FetcherProvider = FetcherProviderOf<typeof apiClient>;
+  //    ^?
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
+  //    ^?
+  const users2 = await apiClient.getUsers({ queries: { q: "Nicholas" } });
   //    ^?
   console.log(users);
   const user = await apiClient.get("/users/:id", { params: { id: 7 } });
