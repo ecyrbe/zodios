@@ -569,7 +569,8 @@ export type ZodiosAliasRequest<Config, Response> =
 export type ZodiosAliases<
   Api extends ZodiosEndpointDefinition[],
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > = {
   [Alias in Aliases<Api>]: ZodiosEndpointDefinitionByAlias<
     Api,
@@ -577,27 +578,43 @@ export type ZodiosAliases<
   >[number]["method"] extends MutationMethod
     ? ZodiosMutationAliasRequest<
         ZodiosBodyByAlias<Api, Alias, Frontend, TypeProvider>,
-        ZodiosRequestOptionsByAlias<Api, Alias, Frontend, TypeProvider>,
+        ZodiosRequestOptionsByAlias<
+          Api,
+          Alias,
+          Frontend,
+          TypeProvider,
+          FetcherProvider
+        >,
         ZodiosResponseByAlias<Api, Alias, Frontend, TypeProvider>
       >
     : ZodiosAliasRequest<
-        ZodiosRequestOptionsByAlias<Api, Alias, Frontend, TypeProvider>,
+        ZodiosRequestOptionsByAlias<
+          Api,
+          Alias,
+          Frontend,
+          TypeProvider,
+          FetcherProvider
+        >,
         ZodiosResponseByAlias<Api, Alias, Frontend, TypeProvider>
       >;
 };
 
-export type AnyZodiosMethodOptions = Merge<
+export type AnyZodiosMethodOptions<
+  FetcherProvider extends AnyZodiosFetcherProvider
+> = Merge<
   {
     params?: Record<string, unknown>;
     queries?: Record<string, unknown>;
     headers?: Record<string, string>;
   },
-  TypeOfFetcherConfig<AxiosProvider>
+  TypeOfFetcherConfig<FetcherProvider>
 >;
 
-export type AnyZodiosRequestOptions = Merge<
+export type AnyZodiosRequestOptions<
+  FetcherProvider extends AnyZodiosFetcherProvider
+> = Merge<
   { method: Method; url: string },
-  AnyZodiosMethodOptions
+  AnyZodiosMethodOptions<FetcherProvider>
 >;
 
 /**
@@ -626,14 +643,22 @@ export type ZodiosRequestOptions<
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > = Merge<
   {
     method: M;
     url: Path;
     data?: ZodiosBodyByPath<Api, M, Path, Frontend, TypeProvider>;
   },
-  ZodiosRequestOptionsByPath<Api, M, Path, Frontend, TypeProvider>
+  ZodiosRequestOptionsByPath<
+    Api,
+    M,
+    Path,
+    Frontend,
+    TypeProvider,
+    FetcherProvider
+  >
 >;
 
 /**
@@ -771,9 +796,7 @@ export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses
  */
-export type ZodiosPlugin<
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
-> = {
+export type ZodiosPlugin<FetcherProvider extends AnyZodiosFetcherProvider> = {
   /**
    * Optional name of the plugin
    * naming a plugin allows to remove it or replace it later
@@ -787,8 +810,8 @@ export type ZodiosPlugin<
    */
   request?: (
     api: ZodiosEndpointDefinitions,
-    config: ReadonlyDeep<AnyZodiosRequestOptions>
-  ) => Promise<ReadonlyDeep<AnyZodiosRequestOptions>>;
+    config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>
+  ) => Promise<ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>>;
   /**
    * response interceptor to modify or inspect the response before it is returned
    * @param api - the api description
@@ -798,7 +821,7 @@ export type ZodiosPlugin<
    */
   response?: (
     api: ZodiosEndpointDefinitions,
-    config: ReadonlyDeep<AnyZodiosRequestOptions>,
+    config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     response: TypeOfFetcherResponse<FetcherProvider>
   ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;
   /**
@@ -811,7 +834,7 @@ export type ZodiosPlugin<
    */
   error?: (
     api: ZodiosEndpointDefinitions,
-    config: ReadonlyDeep<AnyZodiosRequestOptions>,
+    config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     error: Error
   ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;
 };

@@ -87,7 +87,7 @@ export class ZodiosPlugins<FetcherProvider extends AnyZodiosFetcherProvider> {
    */
   async interceptRequest(
     api: ZodiosEndpointDefinitions,
-    config: ReadonlyDeep<AnyZodiosRequestOptions>
+    config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>
   ) {
     let pluginConfig = config;
     for (const plugin of this.plugins) {
@@ -107,7 +107,7 @@ export class ZodiosPlugins<FetcherProvider extends AnyZodiosFetcherProvider> {
    */
   async interceptResponse(
     api: ZodiosEndpointDefinitions,
-    config: ReadonlyDeep<AnyZodiosRequestOptions>,
+    config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     response: Promise<TypeOfFetcherResponse<FetcherProvider>>
   ) {
     let pluginResponse = response;

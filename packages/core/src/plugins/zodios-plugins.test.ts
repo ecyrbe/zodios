@@ -1,3 +1,4 @@
+import { AnyZodiosFetcherProvider } from "../fetcher-providers";
 import { ZodiosPlugin } from "../zodios.types";
 import { ZodiosPlugins } from "./zodios-plugins";
 
@@ -8,7 +9,7 @@ describe("ZodiosPlugins", () => {
 
   it("should register one plugin", () => {
     const plugins = new ZodiosPlugins("any", "any");
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => response,
     };
@@ -20,7 +21,7 @@ describe("ZodiosPlugins", () => {
 
   it("should unregister one plugin", () => {
     const plugins = new ZodiosPlugins("any", "any");
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => response,
     };
@@ -31,7 +32,7 @@ describe("ZodiosPlugins", () => {
 
   it("should replace named plugins", () => {
     const plugins = new ZodiosPlugins("any", "any");
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       name: "test",
       request: async (api, config) => config,
       response: async (api, config, response) => response,
@@ -58,7 +59,7 @@ describe("ZodiosPlugins", () => {
 
   it("should execute response plugins consistently", async () => {
     const plugins = new ZodiosPlugins("any", "any");
-    const plugin1: ZodiosPlugin = {
+    const plugin1: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => {
         response.data += "1";
@@ -66,7 +67,7 @@ describe("ZodiosPlugins", () => {
       },
     };
     plugins.use(plugin1);
-    const plugin2: ZodiosPlugin = {
+    const plugin2: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => {
         response.data += "2";
@@ -92,7 +93,7 @@ describe("ZodiosPlugins", () => {
 
   it('should catch error if plugin "error" is defined', async () => {
     const plugins = new ZodiosPlugins("any", "any");
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       // @ts-ignore
       error: async (api, config, error) => ({ test: true }),
@@ -109,12 +110,14 @@ describe("ZodiosPlugins", () => {
 
   it("should count plugins", () => {
     const plugins = new ZodiosPlugins("any", "any");
-    const namedPlugin: (n: number) => ZodiosPlugin = (n) => ({
+    const namedPlugin: (n: number) => ZodiosPlugin<AnyZodiosFetcherProvider> = (
+      n
+    ) => ({
       name: `test${n}`,
       request: async (api, config) => config,
       response: async (api, config, response) => response,
     });
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => response,
     };
