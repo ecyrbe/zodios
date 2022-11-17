@@ -2,7 +2,7 @@ import { findEndpoint } from "../utils";
 import { ZodiosError } from "../zodios-error";
 import type { AnyZodiosTypeProvider } from "../type-providers";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
-import { AnyZodiosFetcherProvider } from "../fetcher-providers";
+import { AnyZodiosFetcherProvider, AxiosProvider } from "../fetcher-providers";
 
 type Options<
   FetcherProvider extends AnyZodiosFetcherProvider,
@@ -35,7 +35,7 @@ export function zodValidationPlugin<
   transform,
   sendDefaults,
   typeProvider,
-}: Options<FetcherProvider, TypeProvider>): ZodiosPlugin {
+}: Options<FetcherProvider, TypeProvider>): ZodiosPlugin<AxiosProvider> {
   return {
     name: "zod-validation",
     request: shouldRequest(validate)
@@ -106,7 +106,13 @@ export function zodValidationPlugin<
             );
           }
           if (
-            response.headers?.["content-type"]?.includes("application/json")
+            typeof response.headers?.get === "function"
+              ? (response.headers.get("content-type") as string)?.includes?.(
+                  "application/json"
+                )
+              : response.headers?.["content-type"]?.includes?.(
+                  "application/json"
+                )
           ) {
             const parsed = await typeProvider.validateAsync(
               endpoint.response,

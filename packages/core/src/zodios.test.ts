@@ -10,6 +10,7 @@ import { ZodiosPlugin } from "./zodios.types";
 import { apiBuilder } from "./api";
 import { isErrorFromPath, isErrorFromAlias } from "./zodios-error.utils";
 import { Assert } from "./utils.types";
+import { AnyZodiosFetcherProvider } from "./fetcher-providers";
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -188,7 +189,7 @@ describe("Zodios", () => {
 
   it("should replace a named plugin", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       name: "test",
       request: async (_, config) => config,
     };
@@ -201,7 +202,7 @@ describe("Zodios", () => {
 
   it("should unregister a named plugin", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
-    const plugin: ZodiosPlugin = {
+    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       name: "test",
       request: async (_, config) => config,
     };
