@@ -35,12 +35,13 @@ import {
   AnyZodiosFetcherProvider,
   axiosProvider,
   AxiosProvider,
+  TypeOfFetcherOptions,
 } from "./fetcher-providers";
 
 interface ZodiosBase<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider
 > {
   readonly api: Api;
   readonly _typeProvider: TypeProvider;
@@ -52,8 +53,8 @@ interface ZodiosBase<
  */
 export class ZodiosClass<
   Api extends ZodiosEndpointDefinitions,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > implements ZodiosBase<Api, FetcherProvider, TypeProvider>
 {
   public readonly options: PickRequired<
@@ -99,19 +100,26 @@ export class ZodiosClass<
    */
   constructor(
     api: Narrow<Api>,
-    options?: ZodiosOptions<FetcherProvider, TypeProvider>
+    options?: ZodiosOptions<FetcherProvider, TypeProvider> &
+      TypeOfFetcherOptions<FetcherProvider>
   );
   constructor(
     baseUrl: string,
     api: Narrow<Api>,
-    options?: ZodiosOptions<FetcherProvider, TypeProvider>
+    options?: ZodiosOptions<FetcherProvider, TypeProvider> &
+      TypeOfFetcherOptions<FetcherProvider>
   );
   constructor(
     arg1?: Api | string,
-    arg2?: Api | ZodiosOptions<FetcherProvider, TypeProvider>,
-    arg3?: ZodiosOptions<FetcherProvider, TypeProvider>
+    arg2?:
+      | Api
+      | (ZodiosOptions<FetcherProvider, TypeProvider> &
+          TypeOfFetcherOptions<FetcherProvider>),
+    arg3?: ZodiosOptions<FetcherProvider, TypeProvider> &
+      TypeOfFetcherOptions<FetcherProvider>
   ) {
-    let options: ZodiosOptions<FetcherProvider, TypeProvider>;
+    let options: ZodiosOptions<FetcherProvider, TypeProvider> &
+      TypeOfFetcherOptions<FetcherProvider>;
     if (!arg1) {
       if (Array.isArray(arg2)) {
         throw new Error("Zodios: missing base url");
@@ -137,15 +145,17 @@ export class ZodiosClass<
       transform: true,
       sendDefaults: false,
       typeProvider: zodTypeProvider as any,
-      fetcherProvider: axiosProvider({ baseURL }) as any,
+      fetcherProvider: axiosProvider,
       ...options,
     };
     this._typeProvider = undefined as any;
     this._fetcherProvider = undefined as any;
+    this.options.fetcherProvider.create({ baseURL, ...this.options });
 
     this.injectAliasEndpoints();
     this.initPlugins();
     if ([true, "all", "request", "response"].includes(this.options.validate)) {
+      // @ts-expect-error
       this.use(zodValidationPlugin(this.options));
     }
   }
@@ -204,12 +214,15 @@ export class ZodiosClass<
    * @param plugin - the plugin to use
    * @returns an id to allow you to unregister the plugin
    */
-  use(plugin: ZodiosPlugin): PluginId;
-  use<Alias extends Aliases<Api>>(alias: Alias, plugin: ZodiosPlugin): PluginId;
+  use(plugin: ZodiosPlugin<FetcherProvider>): PluginId;
+  use<Alias extends Aliases<Api>>(
+    alias: Alias,
+    plugin: ZodiosPlugin<FetcherProvider>
+  ): PluginId;
   use<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
     method: M,
     path: Path,
-    plugin: ZodiosPlugin
+    plugin: ZodiosPlugin<FetcherProvider>
   ): PluginId;
   use(...args: unknown[]) {
     if (typeof args[0] === "object") {
@@ -284,12 +297,14 @@ export class ZodiosClass<
     M extends Method,
     Path extends ZodiosPathsByMethod<Api, M>,
     TConfig = ReadonlyDeep<
-      ZodiosRequestOptions<Api, M, Path, true, TypeProvider>
+      ZodiosRequestOptions<Api, M, Path, true, TypeProvider, FetcherProvider>
     >
   >(
     config: TConfig
   ): Promise<ZodiosResponseByPath<Api, M, Path, true, TypeProvider>> {
-    let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
+    let conf = config as unknown as ReadonlyDeep<
+      AnyZodiosRequestOptions<FetcherProvider>
+    >;
     const anyPlugin = this.getAnyEndpointPlugins()!;
     const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
     conf = await anyPlugin.interceptRequest(this.api, conf);
@@ -317,7 +332,8 @@ export class ZodiosClass<
       "get",
       Path,
       true,
-      TypeProvider
+      TypeProvider,
+      FetcherProvider
     >
   >(
     path: Path,
@@ -349,7 +365,8 @@ export class ZodiosClass<
       "post",
       Path,
       true,
-      TypeProvider
+      TypeProvider,
+      FetcherProvider
     >
   >(
     path: Path,
@@ -383,7 +400,8 @@ export class ZodiosClass<
       "put",
       Path,
       true,
-      TypeProvider
+      TypeProvider,
+      FetcherProvider
     >
   >(
     path: Path,
@@ -417,7 +435,8 @@ export class ZodiosClass<
       "patch",
       Path,
       true,
-      TypeProvider
+      TypeProvider,
+      FetcherProvider
     >
   >(
     path: Path,
@@ -452,7 +471,8 @@ export class ZodiosClass<
       "delete",
       Path,
       true,
-      TypeProvider
+      TypeProvider,
+      FetcherProvider
     >
   >(
     path: Path,
@@ -472,29 +492,31 @@ export class ZodiosClass<
 
 export type ZodiosInstance<
   Api extends ZodiosEndpointDefinitions,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = ZodiosClass<Api, FetcherProvider, TypeProvider> &
-  ZodiosAliases<Api, true, TypeProvider>;
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+> = ZodiosClass<Api, TypeProvider, FetcherProvider> &
+  ZodiosAliases<Api, true, TypeProvider, FetcherProvider>;
 
 export type ZodiosConstructor = {
   new <
     Api extends ZodiosEndpointDefinitions,
-    FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
-    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+    FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
   >(
     api: Narrow<Api>,
-    options?: ZodiosOptions<FetcherProvider, TypeProvider>
-  ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
+    options?: ZodiosOptions<FetcherProvider, TypeProvider> &
+      TypeOfFetcherOptions<FetcherProvider>
+  ): ZodiosInstance<Api, TypeProvider, FetcherProvider>;
   new <
     Api extends ZodiosEndpointDefinitions,
-    FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
-    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
+    FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
   >(
     baseUrl: string,
     api: Narrow<Api>,
-    options?: ZodiosOptions<FetcherProvider, TypeProvider>
-  ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
+    options?: ZodiosOptions<FetcherProvider, TypeProvider> &
+      TypeOfFetcherOptions<FetcherProvider>
+  ): ZodiosInstance<Api, TypeProvider, FetcherProvider>;
 };
 
 export const Zodios = ZodiosClass as ZodiosConstructor;
@@ -503,9 +525,13 @@ export const Zodios = ZodiosClass as ZodiosConstructor;
  * Get the Api description type from zodios
  * @param Z - zodios type
  */
-export type ApiOf<Z extends ZodiosBase<any, any>> = Z["api"];
+export type ApiOf<Z extends ZodiosBase<any, any, any>> = Z["api"];
 /**
  * Get the type provider type from zodios
  * @param Z - zodios type
  */
-export type TypeProviderOf<Z extends ZodiosBase<any, any>> = Z["_typeProvider"];
+export type TypeProviderOf<Z extends ZodiosBase<any, any, any>> =
+  Z["_typeProvider"];
+
+export type FetcherProviderOf<Z extends ZodiosBase<any, any, any>> =
+  Z["_fetcherProvider"];

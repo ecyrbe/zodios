@@ -3,7 +3,8 @@ import { apiBuilder } from "../api";
 import { ReadonlyDeep } from "../utils.types";
 import { AnyZodiosRequestOptions } from "../zodios.types";
 import { zodValidationPlugin } from "./zod-validation.plugin";
-import { zodTypeProvider } from "../type-providers";
+import { AnyZodiosTypeProvider, zodTypeProvider } from "../type-providers";
+import { AnyZodiosFetcherProvider } from "../fetcher-providers";
 
 describe("zodValidationPlugin", () => {
   const plugin = zodValidationPlugin({
@@ -258,12 +259,16 @@ received:
     });
   });
 
-  const notExistingConfig: ReadonlyDeep<AnyZodiosRequestOptions> = {
+  const notExistingConfig: ReadonlyDeep<
+    AnyZodiosRequestOptions<AnyZodiosFetcherProvider>
+  > = {
     method: "get",
     url: "/notExisting",
   };
 
-  const createSampleConfig = (url: string): AnyZodiosRequestOptions => ({
+  const createSampleConfig = (
+    url: string
+  ): AnyZodiosRequestOptions<AnyZodiosFetcherProvider> => ({
     method: "post",
     url,
     data: "123",
@@ -275,7 +280,9 @@ received:
     },
   });
 
-  const createEmptySampleConfig = (url: string): AnyZodiosRequestOptions => ({
+  const createEmptySampleConfig = (
+    url: string
+  ): AnyZodiosRequestOptions<AnyZodiosFetcherProvider> => ({
     method: "post",
     url,
     data: "",
@@ -289,7 +296,7 @@ received:
 
   const createUndefinedSampleConfig = (
     url: string
-  ): AnyZodiosRequestOptions => ({
+  ): AnyZodiosRequestOptions<AnyZodiosFetcherProvider> => ({
     method: "get",
     url,
   });
