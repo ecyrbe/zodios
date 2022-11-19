@@ -56,9 +56,10 @@ export const axiosProvider: ZodiosRuntimeFetcherProvider<AxiosProvider> & {
   },
   fetch(config: AnyZodiosRequestOptions<AxiosProvider>) {
     const requestConfig: AxiosRequestConfig = {
-      ...omit(config, ["params", "queries"]),
+      ...omit(config, ["params", "queries", "body"]),
       url: replacePathParams(config),
       params: config.queries,
+      data: config.body,
     };
     return this.instance.request(requestConfig);
   },
