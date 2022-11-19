@@ -5,12 +5,12 @@ import axios, {
   AxiosResponse,
 } from "axios";
 import {
+  AnyZodiosRequestOptions,
   AnyZodiosFetcherProvider,
   ZodiosRuntimeFetcherProvider,
 } from "@zodios/core";
-import { Merge } from "../../utils.types";
-import { omit, replacePathParams } from "../../utils";
-import { AnyZodiosRequestOptions } from "../../zodios.types";
+import { Merge } from "@zodios/core/lib/utils.types";
+import { omit, replacePathParams } from "./utils";
 
 type AxiosErrorStatus<Response, Status> = Merge<
   Omit<AxiosError, "status" | "response">,

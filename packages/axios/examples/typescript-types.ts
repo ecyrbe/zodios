@@ -6,7 +6,8 @@ import {
   TypeProviderOf,
   tsSchema,
   tsTypeProvider,
-} from "../src/index";
+  FetcherProviderOf,
+} from "../src";
 
 // you can also predefine your API
 const jsonplaceholderUrl = "https://jsonplaceholder.typicode.com";
@@ -62,6 +63,8 @@ async function bootstrap() {
   type Api = ApiOf<typeof apiClient>;
   //    ^?
   type Provider = TypeProviderOf<typeof apiClient>;
+  //    ^?
+  type FetcherProvider = FetcherProviderOf<typeof apiClient>;
   //    ^?
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
   //    ^?
