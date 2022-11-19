@@ -7,7 +7,7 @@ import axios, {
 import {
   AnyZodiosFetcherProvider,
   ZodiosRuntimeFetcherProvider,
-} from "../fetcher-provider.types";
+} from "@zodios/core";
 import { Merge } from "../../utils.types";
 import { omit, replacePathParams } from "../../utils";
 import { AnyZodiosRequestOptions } from "../../zodios.types";
