@@ -1,6 +1,11 @@
-export { Zodios } from "./zodios";
-export type { ApiOf, TypeProviderOf } from "./zodios";
-export type { ZodiosInstance, ZodiosClass, ZodiosConstructor } from "./zodios";
+export { ZodiosCore, ZodiosCoreImpl } from "./zodios";
+export type {
+  ApiOf,
+  TypeProviderOf,
+  FetcherProviderOf,
+  ZodiosInstance,
+  ZodiosBase,
+} from "./zodios";
 export { ZodiosError } from "./zodios-error";
 export type {
   AnyZodiosMethodOptions,
