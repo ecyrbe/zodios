@@ -6,7 +6,7 @@
     "test": "turbo run test",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
-    "publish-packages": "turbo run build test && changeset version && changeset publish"
+    "pub": "turbo run build test && changeset version && changeset publish"
   },
   "private": true,
   "devDependencies": {
