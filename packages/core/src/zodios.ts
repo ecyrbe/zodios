@@ -1,7 +1,6 @@
 import type {
   AnyZodiosRequestOptions,
   ZodiosRequestOptions,
-  ZodiosBodyByPath,
   Method,
   ZodiosPathsByMethod,
   ZodiosResponseByPath,
@@ -40,7 +39,7 @@ import {
 } from "./fetcher-providers";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 
-interface ZodiosBase<
+export interface ZodiosBase<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
@@ -53,7 +52,7 @@ interface ZodiosBase<
 /**
  * zodios api client
  */
-export class ZodiosClass<
+export class ZodiosCoreImpl<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -530,10 +529,10 @@ export type ZodiosInstance<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = ZodiosClass<Api, FetcherProvider, TypeProvider> &
+> = ZodiosCoreImpl<Api, FetcherProvider, TypeProvider> &
   ZodiosAliases<Api, FetcherProvider, true, TypeProvider>;
 
-export type ZodiosConstructor = {
+export type ZodiosCore = {
   new <
     Api extends ZodiosEndpointDefinitions,
     FetcherProvider extends AnyZodiosFetcherProvider,
@@ -555,7 +554,7 @@ export type ZodiosConstructor = {
   ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
 };
 
-export const Zodios = ZodiosClass as ZodiosConstructor;
+export const ZodiosCore = ZodiosCoreImpl as ZodiosCore;
 
 /**
  * Get the Api description type from zodios

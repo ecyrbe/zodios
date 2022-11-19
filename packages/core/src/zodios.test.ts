@@ -4,7 +4,7 @@ import { z, ZodError } from "zod";
 if (globalThis.FormData === undefined) {
   globalThis.FormData = require("form-data");
 }
-import { Zodios } from "./zodios";
+import { ZodiosCore } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
 import { ZodiosPlugin } from "./zodios.types";
@@ -85,32 +85,36 @@ describe("Zodios", () => {
   });
 
   it("should be defined", () => {
-    expect(Zodios).toBeDefined();
+    expect(ZodiosCore).toBeDefined();
   });
 
   it("should throw if baseUrl is not provided", () => {
     // @ts-ignore
-    expect(() => new Zodios(undefined, [])).toThrowError(
+    expect(() => new ZodiosCore(undefined, [])).toThrowError(
       "Zodios: missing base url"
     );
   });
 
   it("should throw if api is not provided", () => {
     // @ts-ignore
-    expect(() => new Zodios()).toThrowError("Zodios: missing api description");
+    expect(() => new ZodiosCore()).toThrowError(
+      "Zodios: missing api description"
+    );
   });
 
   it("should throw if api is not an array", () => {
     // @ts-ignore
-    expect(() => new Zodios({})).toThrowError("Zodios: api must be an array");
+    expect(() => new ZodiosCore({})).toThrowError(
+      "Zodios: api must be an array"
+    );
   });
 
   it("should create a new instance of Zodios", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     expect(zodios).toBeDefined();
   });
   it("should create a new instance when providing an api", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -126,7 +130,7 @@ describe("Zodios", () => {
   it("should should throw with duplicate api endpoints", () => {
     expect(
       () =>
-        new Zodios(`http://localhost:${port}`, [
+        new ZodiosCore(`http://localhost:${port}`, [
           {
             method: "get",
             path: "/:id",
@@ -148,7 +152,7 @@ describe("Zodios", () => {
   });
 
   it("should create a new instance whithout base URL", () => {
-    const zodios = new Zodios([
+    const zodios = new ZodiosCore([
       {
         method: "get",
         path: "/:id",
@@ -162,13 +166,13 @@ describe("Zodios", () => {
   });
 
   it("should register have validation plugin automatically installed", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     // @ts-ignore
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
   it("should register a plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     zodios.use({
       request: async (_, config) => config,
     });
@@ -177,7 +181,7 @@ describe("Zodios", () => {
   });
 
   it("should unregister a plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     const id = zodios.use({
       request: async (_, config) => config,
     });
@@ -189,7 +193,7 @@ describe("Zodios", () => {
   });
 
   it("should replace a named plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       name: "test",
       request: async (_, config) => config,
@@ -202,7 +206,7 @@ describe("Zodios", () => {
   });
 
   it("should unregister a named plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       name: "test",
       request: async (_, config) => config,
@@ -214,13 +218,13 @@ describe("Zodios", () => {
   });
 
   it("should throw if invalide parameters when registering a plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, []);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, []);
     // @ts-ignore
     expect(() => zodios.use(0)).toThrowError("Zodios: invalid plugin");
   });
 
   it("should throw if invalid alias when registering a plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -241,7 +245,7 @@ describe("Zodios", () => {
   });
 
   it("should throw if invalid endpoint when registering a plugin", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -263,7 +267,7 @@ describe("Zodios", () => {
   });
 
   it("should register a plugin by endpoint", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -281,7 +285,7 @@ describe("Zodios", () => {
   });
 
   it("should register a plugin by alias", () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -300,7 +304,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http request", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -329,7 +333,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with standard query arrays", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/queries",
@@ -350,7 +354,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with one path params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -365,7 +369,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http alias request with one path params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -390,13 +394,13 @@ describe("Zodios", () => {
         name: z.string(),
       }),
     }).build();
-    const zodios = new Zodios(`http://localhost:${port}`, api);
+    const zodios = new ZodiosCore(`http://localhost:${port}`, api);
     const response = await zodios.getById({ params: { id: 7 } });
     expect(response).toEqual({ id: 7, name: "test" });
   });
 
   it("should make a get request with forgotten params and get back a zod error", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -415,7 +419,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with multiples path params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id/address/:address",
@@ -432,7 +436,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http post with body param", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/",
@@ -456,7 +460,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http post with transformed body param", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/",
@@ -495,7 +499,7 @@ describe("Zodios", () => {
   });
 
   it("should throw a zodios error if params are not correct", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/",
@@ -536,7 +540,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http mutation alias request with body param", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/",
@@ -561,7 +565,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http put", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "put",
         path: "/",
@@ -586,7 +590,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http put alias", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "put",
         path: "/",
@@ -612,7 +616,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http patch", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "patch",
         path: "/",
@@ -639,7 +643,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http patch alias", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "patch",
         path: "/",
@@ -665,7 +669,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http delete", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "delete",
         path: "/:id",
@@ -681,7 +685,7 @@ describe("Zodios", () => {
   });
 
   it("should make an http delete alias", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "delete",
         path: "/:id",
@@ -698,7 +702,7 @@ describe("Zodios", () => {
   });
 
   it("should validate uuid in path params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/path/:uuid",
@@ -723,7 +727,7 @@ describe("Zodios", () => {
   });
 
   it("should not validate bad path params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/path/:uuid",
@@ -755,7 +759,7 @@ describe("Zodios", () => {
   });
 
   it("should not validate bad formatted responses", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/:id",
@@ -804,7 +808,7 @@ received:
   });
 
   it("should match Expected error", async () => {
-    const zodios = new Zodios(
+    const zodios = new ZodiosCore(
       `http://localhost:${port}`,
       [
         {
@@ -894,7 +898,7 @@ received:
   });
 
   it("should match Unexpected error", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         alias: "getError502",
@@ -920,7 +924,7 @@ received:
   });
 
   it("should return response when disabling validation", async () => {
-    const zodios = new Zodios(
+    const zodios = new ZodiosCore(
       `http://localhost:${port}`,
       [
         {
@@ -943,7 +947,7 @@ received:
   });
 
   it("should trigger an error with error response", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "get",
         path: "/error502",
@@ -965,7 +969,7 @@ received:
   });
 
   it("should send a form data request", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/form-data",
@@ -993,7 +997,7 @@ received:
   });
 
   it("should send a form data request a second time under 100 ms", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/form-data",
@@ -1022,7 +1026,7 @@ received:
   }, 100);
 
   it("should not send an array as form data request", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/form-data",
@@ -1052,7 +1056,7 @@ received:
   });
 
   it("should send a form url request", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/form-url",
@@ -1080,7 +1084,7 @@ received:
   });
 
   it("should not send an array as form url request", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/form-url",
@@ -1110,7 +1114,7 @@ received:
   });
 
   it("should send a text request", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost:${port}`, [
       {
         method: "post",
         path: "/text",
