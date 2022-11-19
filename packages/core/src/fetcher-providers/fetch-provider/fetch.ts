@@ -49,11 +49,14 @@ export const advancedFetch = async <Data = unknown>(
 
 function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
   const headers = new Headers(config.headers);
-  if (
-    (isFormData(config.body) || isBlob(config.body) || isFile(config.body)) &&
-    headers.get("Content-Type")
-  ) {
-    headers.delete("Content-Type");
+  if (isFormData(config.body) || isBlob(config.body) || isFile(config.body)) {
+    if (headers.has("Content-Type")) {
+      headers.delete("Content-Type");
+    }
+  } else if (typeof config.body === "object") {
+    headers.set("Content-Type", "application/json");
+    headers.set("Accept", "application/json");
+    config.body = JSON.stringify(config.body);
   }
 
   if (config.auth) {
@@ -72,7 +75,11 @@ function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
   }
 
   const url = buildURL(config);
-  return new Request(url, { ...config, headers });
+  return new Request(url, {
+    ...config,
+    method: config.method.toUpperCase(),
+    headers,
+  });
 }
 
 async function fetchRequest(request: Request, config: FetchProviderConfig) {

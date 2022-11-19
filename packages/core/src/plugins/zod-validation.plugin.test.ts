@@ -43,7 +43,7 @@ describe("zodValidationPlugin", () => {
         createSampleConfig("/parse")
       );
 
-      expect(transformed.data).toBe("123");
+      expect(transformed.body).toBe("123");
       expect(transformed.queries).toStrictEqual({
         sampleQueryParam: "456",
       });
@@ -58,7 +58,7 @@ describe("zodValidationPlugin", () => {
         createSampleConfig("/transform")
       );
 
-      expect(transformed.data).toBe("123_transformed");
+      expect(transformed.body).toBe("123_transformed");
       expect(transformed.queries).toStrictEqual({
         sampleQueryParam: "456_transformed",
       });
@@ -73,7 +73,7 @@ describe("zodValidationPlugin", () => {
         createEmptySampleConfig("/transform")
       );
 
-      expect(transformed.data).toBe("_transformed");
+      expect(transformed.body).toBe("_transformed");
       expect(transformed.queries).toStrictEqual({
         sampleQueryParam: "_transformed",
       });
@@ -102,7 +102,7 @@ describe("zodValidationPlugin", () => {
         createSampleConfig("/transform")
       );
 
-      expect(notTransformed.data).toBe("123");
+      expect(notTransformed.body).toBe("123");
       expect(notTransformed.queries).toStrictEqual({
         sampleQueryParam: "456",
       });
@@ -117,7 +117,7 @@ describe("zodValidationPlugin", () => {
         createSampleConfig("/transformAsync")
       );
 
-      expect(transformed.data).toBe("123_transformed");
+      expect(transformed.body).toBe("123_transformed");
       expect(transformed.queries).toStrictEqual({
         sampleQueryParam: "456_transformed",
       });
@@ -132,7 +132,7 @@ describe("zodValidationPlugin", () => {
         createSampleConfig("/transformAsync")
       );
 
-      expect(notTransformed.data).toBe("123");
+      expect(notTransformed.body).toBe("123");
       expect(notTransformed.queries).toStrictEqual({
         sampleQueryParam: "456",
       });
@@ -271,7 +271,7 @@ received:
   ): AnyZodiosRequestOptions<AnyZodiosFetcherProvider> => ({
     method: "post",
     url,
-    data: "123",
+    body: "123",
     queries: {
       sampleQueryParam: "456",
     },
@@ -285,7 +285,7 @@ received:
   ): AnyZodiosRequestOptions<AnyZodiosFetcherProvider> => ({
     method: "post",
     url,
-    data: "",
+    body: "",
     queries: {
       sampleQueryParam: "",
     },

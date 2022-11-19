@@ -39,16 +39,16 @@ export function formDataPlugin<
   return {
     name: "form-data",
     request: async (_, config) => {
-      if (typeof config.data !== "object" || Array.isArray(config.data)) {
+      if (typeof config.body !== "object" || Array.isArray(config.body)) {
         throw new ZodiosError(
           "Zodios: multipart/form-data body must be an object",
           config
         );
       }
-      const result = getFormDataStream(config.data);
+      const result = getFormDataStream(config.body);
       return {
         ...config,
-        data: result.data,
+        body: result.data,
         headers: {
           ...config.headers,
           ...result.headers,
