@@ -1,10 +1,4 @@
-import { AxiosError } from "axios";
-import type { ReadonlyDeep } from "./utils.types";
-import type {
-  AnyZodiosRequestOptions,
-  ZodiosEndpointDefinition,
-  ZodiosEndpointDefinitions,
-} from "./zodios.types";
+import type { ReadonlyDeep } from "@zodios/core/lib/utils.types";
 
 /**
  * omit properties from an object
@@ -42,15 +36,6 @@ export function pick<T, K extends keyof T>(
   return ret;
 }
 
-/**
- * set first letter of a string to uppercase
- * @param str - the string to capitalize
- * @returns - the string with the first letter uppercased
- */
-export function capitalize<T extends string>(str: T): Capitalize<T> {
-  return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
-}
-
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
 export function replacePathParams(
@@ -64,59 +49,4 @@ export function replacePathParams(
     );
   }
   return result;
-}
-
-export function findEndpoint(
-  api: ZodiosEndpointDefinitions,
-  method: string,
-  path: string
-) {
-  return api.find((e) => e.method === method && e.path === path);
-}
-
-export function findEndpointByAlias(
-  api: ZodiosEndpointDefinitions,
-  alias: string
-) {
-  return api.find((e) => e.alias === alias);
-}
-
-export function findEndpointErrors(
-  endpoint: ZodiosEndpointDefinition,
-  err: AxiosError
-) {
-  const matchingErrors = endpoint.errors?.filter(
-    (error) => error.status === err.response!.status
-  );
-  if (matchingErrors && matchingErrors.length > 0) return matchingErrors;
-  return endpoint.errors?.filter((error) => error.status === "default");
-}
-
-export function findEndpointErrorsByPath(
-  api: ZodiosEndpointDefinitions,
-  method: string,
-  path: string,
-  err: AxiosError
-) {
-  const endpoint = findEndpoint(api, method, path);
-  return endpoint &&
-    err.config &&
-    endpoint.method === err.config.method &&
-    endpoint.path === err.config.url
-    ? findEndpointErrors(endpoint, err)
-    : undefined;
-}
-
-export function findEndpointErrorsByAlias(
-  api: ZodiosEndpointDefinitions,
-  alias: string,
-  err: AxiosError
-) {
-  const endpoint = findEndpointByAlias(api, alias);
-  return endpoint &&
-    err.config &&
-    endpoint.method === err.config.method &&
-    endpoint.path === err.config.url
-    ? findEndpointErrors(endpoint, err)
-    : undefined;
 }
