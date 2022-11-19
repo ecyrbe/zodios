@@ -5,5 +5,8 @@
     "@zodios/core": "11.0.0-beta.0",
     "@zodios/axios": "11.0.0-beta.0"
   },
-  "changesets": []
+  "changesets": [
+    "lucky-brooms-fry",
+    "silent-garlics-scream"
+  ]
 }
