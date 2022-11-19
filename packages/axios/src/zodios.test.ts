@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { AxiosError } from "axios";
 import express from "express";
 import { AddressInfo } from "net";
@@ -6,9 +7,15 @@ import { z, ZodError } from "zod";
 globalThis.FormData = require("form-data");
 //}
 import { Zodios } from "./zodios";
-import { ZodiosError, AnyZodiosFetcherProvider } from "@zodios/core";
+import {
+  ZodiosError,
+  AnyZodiosFetcherProvider,
+  ZodiosPlugin,
+  apiBuilder,
+} from "@zodios/core";
 import multer from "multer";
-import { Assert } from "./utils.types";
+import { Assert } from "@zodios/core/lib/utils.types";
+import { AxiosProvider } from "./axios-provider";
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -845,7 +852,7 @@ received:
     }
     expect(error).toBeInstanceOf(Error);
     expect((error as AxiosError).response?.status).toBe(502);
-    if (isErrorFromPath(zodios.api, "get", "/error502", error)) {
+    if (zodios.isErrorFromPath(zodios.api, "get", "/error502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
@@ -855,7 +862,7 @@ received:
         error: { message: "bad gateway" },
       });
     }
-    if (isErrorFromAlias(zodios.api, "getError502", error)) {
+    if (zodios.isErrorFromAlias(zodios.api, "getError502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
@@ -902,8 +909,12 @@ received:
 
     expect(error).toBeInstanceOf(Error);
     expect((error as AxiosError).response?.status).toBe(502);
-    expect(isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(false);
-    expect(isErrorFromAlias(zodios.api, "getError502", error)).toBe(false);
+    expect(zodios.isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(
+      false
+    );
+    expect(zodios.isErrorFromAlias(zodios.api, "getError502", error)).toBe(
+      false
+    );
   });
 
   it("should return response when disabling validation", async () => {
