@@ -1,5 +1,19 @@
 # @zodios/core
 
+## 11.0.0-beta.4
+
+### Major Changes
+
+- 6c10dc2: rename exports
+- 679a267: update axios
+
+### Patch Changes
+
+- 14ce00b: add fetch implementation
+- c9cae0a: autocommit on changesets
+- 3ac25a1: add fetcher provider and axios impl
+- 90108a5: body is now part of the config
+
 ## 11.0.0-beta.3
 
 ### Patch Changes
