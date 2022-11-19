@@ -2,12 +2,8 @@
   "mode": "pre",
   "tag": "beta",
   "initialVersions": {
-    "@zodios/core": "11.0.0-rc.0"
+    "@zodios/core": "11.0.0-beta.0",
+    "@zodios/axios": "11.0.0-beta.0"
   },
-  "changesets": [
-    "dry-worms-smell",
-    "shy-games-beg",
-    "thin-dots-know",
-    "warm-beans-do"
-  ]
+  "changesets": []
 }
