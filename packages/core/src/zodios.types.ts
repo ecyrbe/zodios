@@ -10,7 +10,6 @@ import type {
   FilterArrayByKey,
   IfEquals,
   RequiredKeys,
-  UndefinedIfNever,
 } from "./utils.types";
 import type {
   AnyZodiosTypeProvider,
@@ -25,7 +24,6 @@ import {
   TypeOfFetcherError,
   TypeOfFetcherResponse,
   ZodiosRuntimeFetcherProvider,
-  AxiosProvider,
 } from "./fetcher-providers";
 
 type AxiosRequestConfig = Parameters<typeof axios.request>[0];
@@ -205,7 +203,7 @@ export type ZodiosErrorByPath<
 export type InferFetcherErrors<
   T,
   TypeProvider extends AnyZodiosTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   Acc extends unknown[] = []
 > = T extends [infer Head, ...infer Tail]
   ? Head extends {
@@ -232,19 +230,23 @@ export type ZodiosMatchingErrorsByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = InferFetcherErrors<
   ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
-  TypeProvider
+  TypeProvider,
+  FetcherProvider
 >[number];
 
 export type ZodiosMatchingErrorsByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = InferFetcherErrors<
   ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
-  TypeProvider
+  TypeProvider,
+  FetcherProvider
 >[number];
 
 export type ZodiosErrorByAlias<
@@ -538,9 +540,9 @@ export type ZodiosHeaderParamsByAlias<
 export type ZodiosRequestOptionsByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = Merge<
   TypeOfFetcherConfig<FetcherProvider>,
   TransitiveOptional<
@@ -565,9 +567,9 @@ export type ZodiosAliasRequest<Config, Response> =
 
 export type ZodiosAliases<
   Api extends ZodiosEndpointDefinition[],
+  FetcherProvider extends AnyZodiosFetcherProvider,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = {
   [Alias in Aliases<Api>]: ZodiosEndpointDefinitionByAlias<
     Api,
@@ -577,9 +579,9 @@ export type ZodiosAliases<
         ZodiosRequestOptionsByAlias<
           Api,
           Alias,
+          FetcherProvider,
           Frontend,
-          TypeProvider,
-          FetcherProvider
+          TypeProvider
         >,
         ZodiosResponseByAlias<Api, Alias, Frontend, TypeProvider>
       >
@@ -587,9 +589,9 @@ export type ZodiosAliases<
         ZodiosRequestOptionsByAlias<
           Api,
           Alias,
+          FetcherProvider,
           Frontend,
-          TypeProvider,
-          FetcherProvider
+          TypeProvider
         >,
         ZodiosResponseByAlias<Api, Alias, Frontend, TypeProvider>
       >;
@@ -621,9 +623,9 @@ export type ZodiosRequestOptionsByPath<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = Merge<
   TypeOfFetcherConfig<FetcherProvider>,
   TransitiveOptional<
@@ -640,9 +642,9 @@ export type ZodiosRequestOptions<
   Api extends ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = Merge<
   {
     method: M;
@@ -653,9 +655,9 @@ export type ZodiosRequestOptions<
     Api,
     M,
     Path,
+    FetcherProvider,
     Frontend,
-    TypeProvider,
-    FetcherProvider
+    TypeProvider
   >
 >;
 
@@ -663,7 +665,7 @@ export type ZodiosRequestOptions<
  * Zodios options
  */
 export type ZodiosOptions<
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider,
+  FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = {
   /**
