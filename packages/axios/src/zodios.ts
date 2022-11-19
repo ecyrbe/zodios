@@ -11,12 +11,13 @@ import { ZodiosCore } from "@zodios/core";
 import { axiosProvider, AxiosProvider } from "./axios-provider";
 
 function ZodiosAxios(...args: any[]) {
-  // get last argument
-  let options: ZodiosOptions<AxiosProvider> = args[args.length - 1];
-  if (!Array.isArray(options) && typeof options === "object") {
-    args[args.length - 1] = { ...options, fetcherProvider: axiosProvider };
-  } else {
-    args.push({ fetcherProvider: axiosProvider });
+  if (args.length !== 0) {
+    let options: ZodiosOptions<AxiosProvider> = args[args.length - 1];
+    if (!Array.isArray(options) && typeof options === "object") {
+      args[args.length - 1] = { ...options, fetcherProvider: axiosProvider };
+    } else {
+      args.push({ fetcherProvider: axiosProvider });
+    }
   }
   // @ts-ignore
   return new ZodiosCore(...args);
