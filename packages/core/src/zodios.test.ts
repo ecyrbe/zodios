@@ -1,9 +1,10 @@
-import express from "express";
-import { AddressInfo } from "net";
-import { z, ZodError } from "zod";
 if (globalThis.FormData === undefined) {
   globalThis.FormData = require("form-data");
 }
+import "cross-fetch/polyfill";
+import express from "express";
+import { AddressInfo } from "net";
+import { z, ZodError } from "zod";
 import { ZodiosCore } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
