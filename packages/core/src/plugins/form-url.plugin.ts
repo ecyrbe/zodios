@@ -39,7 +39,7 @@ export function formURLPlugin<
   return {
     name: "form-url",
     request: async (_, config) => {
-      if (typeof config.data !== "object" || Array.isArray(config.data)) {
+      if (typeof config.body !== "object" || Array.isArray(config.body)) {
         throw new ZodiosError(
           "Zodios: application/x-www-form-urlencoded body must be an object",
           config
@@ -48,7 +48,7 @@ export function formURLPlugin<
 
       return {
         ...config,
-        data: new URLSearchParams(config.data).toString(),
+        body: new URLSearchParams(config.body).toString(),
         headers: {
           ...config.headers,
           "Content-Type": "application/x-www-form-urlencoded",

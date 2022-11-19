@@ -2,7 +2,9 @@ import { AxiosError } from "axios";
 import express from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
+//if (globalThis.FormData === undefined) {
 globalThis.FormData = require("form-data");
+//}
 import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
@@ -461,7 +463,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.post("/", { name: "post" });
+    const response = await zodios.post("/", { body: { name: "post" } });
     expect(response).toEqual({ id: 3, name: "post" });
   });
 
@@ -493,13 +495,13 @@ describe("Zodios", () => {
     const config = {
       method: "post",
       url: "/",
-      data: { firstname: "post", lastname: "test" },
+      body: { firstname: "post", lastname: "test" },
     } as const;
     const response = await zodios.request(config);
     expect(config).toEqual({
       method: "post",
       url: "/",
-      data: { firstname: "post", lastname: "test" },
+      body: { firstname: "post", lastname: "test" },
     });
     expect(response).toEqual({ id: 3, name: "post test" });
   });
@@ -532,7 +534,9 @@ describe("Zodios", () => {
     let error: ZodiosError | undefined;
     try {
       response = await zodios.post("/", {
-        email: "post",
+        body: {
+          email: "post",
+        },
       });
     } catch (err) {
       error = err as ZodiosError;
@@ -564,7 +568,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.create({ name: "post" });
+    const response = await zodios.create({ body: { name: "post" } });
     expect(response).toEqual({ id: 3, name: "post" });
   });
 
@@ -589,7 +593,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.put("/", { id: 5, name: "put" });
+    const response = await zodios.put("/", { body: { id: 5, name: "put" } });
     expect(response).toEqual({ id: 5, name: "put" });
   });
 
@@ -615,7 +619,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.update({ id: 5, name: "put" });
+    const response = await zodios.update({ body: { id: 5, name: "put" } });
     expect(response).toEqual({ id: 5, name: "put" });
   });
 
@@ -640,7 +644,9 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.patch("/", { id: 4, name: "patch" });
+    const response = await zodios.patch("/", {
+      body: { id: 4, name: "patch" },
+    });
     expect(response).toEqual({ id: 4, name: "patch" });
   });
 
@@ -666,7 +672,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.update({ id: 4, name: "patch" });
+    const response = await zodios.update({ body: { id: 4, name: "patch" } });
     expect(response).toEqual({ id: 4, name: "patch" });
   });
 
@@ -680,7 +686,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.delete("/:id", undefined, {
+    const response = await zodios.delete("/:id", {
       params: { id: 6 },
     });
     expect(response).toEqual({ id: 6 });
@@ -697,7 +703,7 @@ describe("Zodios", () => {
         }),
       },
     ]);
-    const response = await zodios.remove(undefined, {
+    const response = await zodios.remove({
       params: { id: 6 },
     });
     expect(response).toEqual({ id: 6 });
@@ -878,7 +884,7 @@ received:
     } catch (e) {
       error = e;
     }
-    expect(error).toBeInstanceOf(AxiosError);
+    expect(error).toBeInstanceOf(Error);
     expect((error as AxiosError).response?.status).toBe(502);
     if (isErrorFromPath(zodios.api, "get", "/error502", error)) {
       expect(error.response.status).toBe(502);
@@ -1092,7 +1098,7 @@ received:
       error = e;
     }
 
-    expect(error).toBeInstanceOf(AxiosError);
+    expect(error).toBeInstanceOf(Error);
     expect((error as AxiosError).response?.status).toBe(502);
     expect(isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(false);
     expect(isErrorFromAlias(zodios.api, "getError502", error)).toBe(false);
@@ -1165,7 +1171,9 @@ received:
         }),
       },
     ]);
-    const response = await zodios.post("/form-data", { id: 4, name: "post" });
+    const response = await zodios.post("/form-data", {
+      body: { id: 4, name: "post" },
+    });
     expect(response).toEqual({ id: "4", name: "post" });
   });
 
@@ -1180,7 +1188,7 @@ received:
             name: "body",
             type: "Body",
             schema: z.object({
-              id: z.number(),
+              id: z.string(),
               name: z.string(),
             }),
           },
@@ -1191,7 +1199,10 @@ received:
         }),
       },
     ]);
-    const response = await zodios.post("/form-data", { id: 4, name: "post" });
+    const response = await zodios.post("/form-data", {
+      // @ts-ignore
+      body: { id: "4", name: "post" },
+    });
     expect(response).toEqual({ id: "4", name: "post" });
   }, 100);
 
@@ -1214,7 +1225,7 @@ received:
     let error: Error | undefined;
     let response: string | undefined;
     try {
-      response = await zodios.post("/form-data", ["test", "test2"]);
+      response = await zodios.post("/form-data", { body: ["test", "test2"] });
     } catch (err) {
       error = err as Error;
     }
@@ -1247,7 +1258,9 @@ received:
         }),
       },
     ]);
-    const response = await zodios.post("/form-url", { id: 4, name: "post" });
+    const response = await zodios.post("/form-url", {
+      body: { id: 4, name: "post" },
+    });
     expect(response).toEqual({ id: "4", name: "post" });
   });
 
@@ -1270,7 +1283,7 @@ received:
     let error: Error | undefined;
     let response: string | undefined;
     try {
-      response = await zodios.post("/form-url", ["test", "test2"]);
+      response = await zodios.post("/form-url", { body: ["test", "test2"] });
     } catch (err) {
       error = err as Error;
     }
@@ -1297,7 +1310,7 @@ received:
         response: z.string(),
       },
     ]);
-    const response = await zodios.post("/text", "test");
+    const response = await zodios.post("/text", { body: "test" });
     expect(response).toEqual("test");
   });
 });
