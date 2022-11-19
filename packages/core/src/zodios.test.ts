@@ -1,18 +1,17 @@
-import { AxiosError } from "axios";
 import express from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
-//if (globalThis.FormData === undefined) {
-globalThis.FormData = require("form-data");
-//}
+if (globalThis.FormData === undefined) {
+  globalThis.FormData = require("form-data");
+}
 import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import multer from "multer";
 import { ZodiosPlugin } from "./zodios.types";
 import { apiBuilder } from "./api";
-import { isErrorFromPath, isErrorFromAlias } from "./zodios-error.utils";
 import { Assert } from "./utils.types";
-import { AnyZodiosFetcherProvider } from "./fetcher-providers";
+import { AnyZodiosFetcherProvider, fetchProvider } from "./fetcher-providers";
+import { FetchError } from "./fetcher-providers/fetch-provider/fetch";
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -810,42 +809,48 @@ received:
   });
 
   it("should match Expected error", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new Zodios(
+      `http://localhost:${port}`,
+      [
+        {
+          method: "get",
+          alias: "getError502",
+          path: "/error502",
+          response: z.void(),
+          errors: [
+            {
+              status: 502,
+              schema: z.object({
+                error: z.object({
+                  message: z.string(),
+                }),
+              }),
+            },
+            {
+              status: 401,
+              schema: z.object({
+                error: z.object({
+                  message: z.string(),
+                  _401: z.literal(true),
+                }),
+              }),
+            },
+            {
+              status: "default",
+              schema: z.object({
+                error: z.object({
+                  message: z.string(),
+                  _default: z.literal(true),
+                }),
+              }),
+            },
+          ],
+        },
+      ],
       {
-        method: "get",
-        alias: "getError502",
-        path: "/error502",
-        response: z.void(),
-        errors: [
-          {
-            status: 502,
-            schema: z.object({
-              error: z.object({
-                message: z.string(),
-              }),
-            }),
-          },
-          {
-            status: 401,
-            schema: z.object({
-              error: z.object({
-                message: z.string(),
-                _401: z.literal(true),
-              }),
-            }),
-          },
-          {
-            status: "default",
-            schema: z.object({
-              error: z.object({
-                message: z.string(),
-                _default: z.literal(true),
-              }),
-            }),
-          },
-        ],
-      },
-    ]);
+        fetcherProvider: fetchProvider,
+      }
+    );
     let error;
     try {
       await zodios.get("/error502");
@@ -853,8 +858,8 @@ received:
       error = e;
     }
     expect(error).toBeInstanceOf(Error);
-    expect((error as AxiosError).response?.status).toBe(502);
-    if (isErrorFromPath(zodios.api, "get", "/error502", error)) {
+    expect((error as FetchError<any>).response?.status).toBe(502);
+    if (zodios.isErrorFromPath(zodios.api, "get", "/error502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
@@ -864,7 +869,7 @@ received:
         error: { message: "bad gateway" },
       });
     }
-    if (isErrorFromAlias(zodios.api, "getError502", error)) {
+    if (zodios.isErrorFromAlias(zodios.api, "getError502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
@@ -910,9 +915,13 @@ received:
     }
 
     expect(error).toBeInstanceOf(Error);
-    expect((error as AxiosError).response?.status).toBe(502);
-    expect(isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(false);
-    expect(isErrorFromAlias(zodios.api, "getError502", error)).toBe(false);
+    expect((error as FetchError<any>).response?.status).toBe(502);
+    expect(zodios.isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(
+      false
+    );
+    expect(zodios.isErrorFromAlias(zodios.api, "getError502", error)).toBe(
+      false
+    );
   });
 
   it("should return response when disabling validation", async () => {
@@ -938,7 +947,7 @@ received:
     });
   });
 
-  it("should trigger an axios error with error response", async () => {
+  it("should trigger an error with error response", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
         method: "get",
@@ -952,7 +961,7 @@ received:
     try {
       await zodios.get("/error502");
     } catch (e) {
-      expect((e as AxiosError).response?.data).toEqual({
+      expect((e as FetchError<any>).response?.data).toEqual({
         error: {
           message: "bad gateway",
         },

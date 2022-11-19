@@ -2,7 +2,7 @@ import { findEndpoint } from "../utils";
 import { ZodiosError } from "../zodios-error";
 import type { AnyZodiosTypeProvider } from "../type-providers";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
-import { AnyZodiosFetcherProvider, AxiosProvider } from "../fetcher-providers";
+import { AnyZodiosFetcherProvider } from "../fetcher-providers";
 
 type Options<
   FetcherProvider extends AnyZodiosFetcherProvider,

@@ -11,6 +11,9 @@ import type {
   ZodiosAliases,
   ZodiosPlugin,
   Aliases,
+  ZodiosEndpointError,
+  ZodiosMatchingErrorsByPath,
+  ZodiosMatchingErrorsByAlias,
 } from "./zodios.types";
 import {
   PluginId,
@@ -32,11 +35,10 @@ import type { AnyZodiosTypeProvider, ZodTypeProvider } from "./type-providers";
 import { zodTypeProvider } from "./type-providers";
 import {
   AnyZodiosFetcherProvider,
-  axiosProvider,
-  AxiosProvider,
   fetchProvider,
   TypeOfFetcherOptions,
 } from "./fetcher-providers";
+import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 
 interface ZodiosBase<
   Api extends ZodiosEndpointDefinitions,
@@ -49,12 +51,12 @@ interface ZodiosBase<
 }
 
 /**
- * zodios api client based on axios
+ * zodios api client
  */
 export class ZodiosClass<
   Api extends ZodiosEndpointDefinitions,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+  FetcherProvider extends AnyZodiosFetcherProvider,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > implements ZodiosBase<Api, FetcherProvider, TypeProvider>
 {
   public readonly options: PickRequired<
@@ -145,7 +147,7 @@ export class ZodiosClass<
       transform: true,
       sendDefaults: false,
       typeProvider: zodTypeProvider as any,
-      fetcherProvider: axiosProvider,
+      fetcherProvider: fetchProvider,
       ...options,
     };
     this._typeProvider = undefined as any;
@@ -286,7 +288,7 @@ export class ZodiosClass<
     M extends Method,
     Path extends ZodiosPathsByMethod<Api, M>,
     TConfig = ReadonlyDeep<
-      ZodiosRequestOptions<Api, M, Path, true, TypeProvider, FetcherProvider>
+      ZodiosRequestOptions<Api, M, Path, FetcherProvider, true, TypeProvider>
     >
   >(
     config: TConfig
@@ -311,7 +313,7 @@ export class ZodiosClass<
   /**
    * make a get request to the api
    * @param path - the path to api endpoint
-   * @param config - the config to setup axios options and parameters
+   * @param config - the config to setup options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async get<
@@ -320,9 +322,9 @@ export class ZodiosClass<
       Api,
       "get",
       Path,
+      FetcherProvider,
       true,
-      TypeProvider,
-      FetcherProvider
+      TypeProvider
     >
   >(
     path: Path,
@@ -341,7 +343,7 @@ export class ZodiosClass<
    * make a post request to the api
    * @param path - the path to api endpoint
    * @param data - the data to send
-   * @param config - the config to setup axios options and parameters
+   * @param config - the config to setup options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async post<
@@ -350,9 +352,9 @@ export class ZodiosClass<
       Api,
       "post",
       Path,
+      FetcherProvider,
       true,
-      TypeProvider,
-      FetcherProvider
+      TypeProvider
     >
   >(
     path: Path,
@@ -371,7 +373,7 @@ export class ZodiosClass<
    * make a put request to the api
    * @param path - the path to api endpoint
    * @param data - the data to send
-   * @param config - the config to setup axios options and parameters
+   * @param config - the config to setup options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async put<
@@ -380,9 +382,9 @@ export class ZodiosClass<
       Api,
       "put",
       Path,
+      FetcherProvider,
       true,
-      TypeProvider,
-      FetcherProvider
+      TypeProvider
     >
   >(
     path: Path,
@@ -401,7 +403,7 @@ export class ZodiosClass<
    * make a patch request to the api
    * @param path - the path to api endpoint
    * @param data - the data to send
-   * @param config - the config to setup axios options and parameters
+   * @param config - the config to setup options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async patch<
@@ -410,9 +412,9 @@ export class ZodiosClass<
       Api,
       "patch",
       Path,
+      FetcherProvider,
       true,
-      TypeProvider,
-      FetcherProvider
+      TypeProvider
     >
   >(
     path: Path,
@@ -430,7 +432,7 @@ export class ZodiosClass<
   /**
    * make a delete request to the api
    * @param path - the path to api endpoint
-   * @param config - the config to setup axios options and parameters
+   * @param config - the config to setup options and parameters
    * @returns response validated with zod schema provided in the api description
    */
   async delete<
@@ -439,9 +441,9 @@ export class ZodiosClass<
       Api,
       "delete",
       Path,
+      FetcherProvider,
       true,
-      TypeProvider,
-      FetcherProvider
+      TypeProvider
     >
   >(
     path: Path,
@@ -455,35 +457,102 @@ export class ZodiosClass<
       url: path,
     });
   }
+
+  private isDefinedError(
+    error: unknown,
+    findEndpointErrors: (error: unknown) => ZodiosEndpointError[] | undefined
+  ): boolean {
+    if (error && typeof error === "object" && "response" in error) {
+      const response = error.response;
+      if (response && typeof response === "object" && "data" in response) {
+        const endpointErrors = findEndpointErrors(error);
+        if (endpointErrors) {
+          return endpointErrors.some(
+            (desc) =>
+              this.options.typeProvider.validate(desc.schema, response.data)
+                .success
+          );
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * check if the error is matching the endpoint errors definitions
+   * @param api - the api definition
+   * @param method - http method of the endpoint
+   * @param path - path of the endpoint
+   * @param error - the error to check
+   * @returns - if true, the error type is narrowed to the matching endpoint errors
+   */
+  isErrorFromPath<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
+    api: Api,
+    method: M,
+    path: Path,
+    error: unknown
+  ): error is ZodiosMatchingErrorsByPath<
+    Api,
+    M,
+    Path,
+    FetcherProvider,
+    TypeProvider
+  > {
+    return this.isDefinedError(error, (err) =>
+      findEndpointErrorsByPath(api, method, path, err)
+    );
+  }
+
+  /**
+   * check if the error is matching the endpoint errors definitions
+   * @param api - the api definition
+   * @param alias - alias of the endpoint
+   * @param error - the error to check
+   * @returns - if true, the error type is narrowed to the matching endpoint errors
+   */
+  isErrorFromAlias<Alias extends Aliases<Api>>(
+    api: Api,
+    alias: Alias,
+    error: unknown
+  ): error is ZodiosMatchingErrorsByAlias<
+    Api,
+    Alias,
+    FetcherProvider,
+    TypeProvider
+  > {
+    return this.isDefinedError(error, (err) =>
+      findEndpointErrorsByAlias(api, alias, err)
+    );
+  }
 }
 
 export type ZodiosInstance<
   Api extends ZodiosEndpointDefinitions,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
-> = ZodiosClass<Api, TypeProvider, FetcherProvider> &
-  ZodiosAliases<Api, true, TypeProvider, FetcherProvider>;
+  FetcherProvider extends AnyZodiosFetcherProvider,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+> = ZodiosClass<Api, FetcherProvider, TypeProvider> &
+  ZodiosAliases<Api, FetcherProvider, true, TypeProvider>;
 
 export type ZodiosConstructor = {
   new <
     Api extends ZodiosEndpointDefinitions,
-    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-    FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+    FetcherProvider extends AnyZodiosFetcherProvider,
+    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     api: Narrow<Api>,
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
-  ): ZodiosInstance<Api, TypeProvider, FetcherProvider>;
+  ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
   new <
     Api extends ZodiosEndpointDefinitions,
-    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-    FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
+    FetcherProvider extends AnyZodiosFetcherProvider,
+    TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     baseUrl: string,
     api: Narrow<Api>,
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
-  ): ZodiosInstance<Api, TypeProvider, FetcherProvider>;
+  ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
 };
 
 export const Zodios = ZodiosClass as ZodiosConstructor;
