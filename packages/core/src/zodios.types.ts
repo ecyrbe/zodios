@@ -540,26 +540,21 @@ export type ZodiosRequestOptionsByAlias<
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
   FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > = Merge<
+  TypeOfFetcherConfig<FetcherProvider>,
   TransitiveOptional<
     PickDefined<{
       params: ZodiosPathParamByAlias<Api, Alias, Frontend, TypeProvider>;
       queries: ZodiosQueryParamsByAlias<Api, Alias, Frontend, TypeProvider>;
       headers: ZodiosHeaderParamsByAlias<Api, Alias, Frontend, TypeProvider>;
+      body: ZodiosBodyByAlias<Api, Alias, Frontend, TypeProvider>;
     }>
-  >,
-  TypeOfFetcherConfig<FetcherProvider>
+  >
 >;
 
-export type ZodiosMutationAliasRequest<Body, Config, Response> =
+export type ZodiosMutationAliasRequest<Config, Response> =
   RequiredKeys<Config> extends never
-    ? (
-        body: ReadonlyDeep<UndefinedIfNever<Body>>,
-        configOptions?: ReadonlyDeep<Config>
-      ) => Promise<Response>
-    : (
-        body: ReadonlyDeep<UndefinedIfNever<Body>>,
-        configOptions: ReadonlyDeep<Config>
-      ) => Promise<Response>;
+    ? (configOptions?: ReadonlyDeep<Config>) => Promise<Response>
+    : (configOptions: ReadonlyDeep<Config>) => Promise<Response>;
 
 export type ZodiosAliasRequest<Config, Response> =
   RequiredKeys<Config> extends never
@@ -577,7 +572,6 @@ export type ZodiosAliases<
     Alias
   >[number]["method"] extends MutationMethod
     ? ZodiosMutationAliasRequest<
-        ZodiosBodyByAlias<Api, Alias, Frontend, TypeProvider>,
         ZodiosRequestOptionsByAlias<
           Api,
           Alias,
@@ -602,12 +596,13 @@ export type ZodiosAliases<
 export type AnyZodiosMethodOptions<
   FetcherProvider extends AnyZodiosFetcherProvider
 > = Merge<
+  TypeOfFetcherConfig<FetcherProvider>,
   {
     params?: Record<string, unknown>;
     queries?: Record<string, unknown>;
     headers?: Record<string, string>;
-  },
-  TypeOfFetcherConfig<FetcherProvider>
+    body?: unknown;
+  }
 >;
 
 export type AnyZodiosRequestOptions<
@@ -628,14 +623,15 @@ export type ZodiosRequestOptionsByPath<
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
   FetcherProvider extends AnyZodiosFetcherProvider = AxiosProvider
 > = Merge<
+  TypeOfFetcherConfig<FetcherProvider>,
   TransitiveOptional<
     PickDefined<{
       params: ZodiosPathParamsByPath<Api, M, Path, Frontend, TypeProvider>;
       queries: ZodiosQueryParamsByPath<Api, M, Path, Frontend, TypeProvider>;
       headers: ZodiosHeaderParamsByPath<Api, M, Path, Frontend, TypeProvider>;
+      body: ZodiosBodyByPath<Api, M, Path, Frontend, TypeProvider>;
     }>
-  >,
-  TypeOfFetcherConfig<FetcherProvider>
+  >
 >;
 
 export type ZodiosRequestOptions<

@@ -35,7 +35,7 @@ export function zodValidationPlugin<
   transform,
   sendDefaults,
   typeProvider,
-}: Options<FetcherProvider, TypeProvider>): ZodiosPlugin<AxiosProvider> {
+}: Options<FetcherProvider, TypeProvider>): ZodiosPlugin<FetcherProvider> {
   return {
     name: "zod-validation",
     request: shouldRequest(validate)
@@ -61,16 +61,17 @@ export function zodValidationPlugin<
             params: {
               ...config.params,
             },
+            body: config.body,
           };
           const paramsOf = {
             Query: (name: string) => conf.queries?.[name],
-            Body: (_: string) => conf.data,
+            Body: (_: string) => conf.body,
             Header: (name: string) => conf.headers?.[name],
             Path: (name: string) => conf.params?.[name],
           };
           const setParamsOf = {
             Query: (name: string, value: any) => (conf.queries![name] = value),
-            Body: (_: string, value: any) => (conf.data = value),
+            Body: (_: string, value: any) => (conf.body = value),
             Header: (name: string, value: any) => (conf.headers![name] = value),
             Path: (name: string, value: any) => (conf.params![name] = value),
           };
