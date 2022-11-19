@@ -12,7 +12,6 @@ import type {
   ZodiosPlugin,
   Aliases,
 } from "./zodios.types";
-import { omit, replacePathParams } from "./utils";
 import {
   PluginId,
   ZodiosPlugins,
@@ -35,6 +34,7 @@ import {
   AnyZodiosFetcherProvider,
   axiosProvider,
   AxiosProvider,
+  fetchProvider,
   TypeOfFetcherOptions,
 } from "./fetcher-providers";
 
@@ -155,7 +155,6 @@ export class ZodiosClass<
     this.injectAliasEndpoints();
     this.initPlugins();
     if ([true, "all", "request", "response"].includes(this.options.validate)) {
-      // @ts-expect-error
       this.use(zodValidationPlugin(this.options));
     }
   }
@@ -268,22 +267,12 @@ export class ZodiosClass<
   private injectAliasEndpoints() {
     this.api.forEach((endpoint) => {
       if (endpoint.alias) {
-        if (["post", "put", "patch", "delete"].includes(endpoint.method)) {
-          (this as any)[endpoint.alias] = (data: any, config: any) =>
-            this.request({
-              ...config,
-              method: endpoint.method,
-              url: endpoint.path,
-              data,
-            });
-        } else {
-          (this as any)[endpoint.alias] = (config: any) =>
-            this.request({
-              ...config,
-              method: endpoint.method,
-              url: endpoint.path,
-            });
-        }
+        (this as any)[endpoint.alias] = (config: any) =>
+          this.request({
+            ...config,
+            method: endpoint.method,
+            url: endpoint.path,
+          });
       }
     });
   }
@@ -357,9 +346,6 @@ export class ZodiosClass<
    */
   async post<
     Path extends ZodiosPathsByMethod<Api, "post">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "post", Path, true, TypeProvider>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<
       Api,
       "post",
@@ -370,7 +356,6 @@ export class ZodiosClass<
     >
   >(
     path: Path,
-    data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -379,7 +364,6 @@ export class ZodiosClass<
       ...config,
       method: "post",
       url: path,
-      data,
     });
   }
 
@@ -392,9 +376,6 @@ export class ZodiosClass<
    */
   async put<
     Path extends ZodiosPathsByMethod<Api, "put">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "put", Path, true, TypeProvider>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<
       Api,
       "put",
@@ -405,7 +386,6 @@ export class ZodiosClass<
     >
   >(
     path: Path,
-    data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -414,7 +394,6 @@ export class ZodiosClass<
       ...config,
       method: "put",
       url: path,
-      data,
     });
   }
 
@@ -427,9 +406,6 @@ export class ZodiosClass<
    */
   async patch<
     Path extends ZodiosPathsByMethod<Api, "patch">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "patch", Path, true, TypeProvider>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<
       Api,
       "patch",
@@ -440,7 +416,6 @@ export class ZodiosClass<
     >
   >(
     path: Path,
-    data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -449,7 +424,6 @@ export class ZodiosClass<
       ...config,
       method: "patch",
       url: path,
-      data,
     });
   }
 
@@ -461,11 +435,6 @@ export class ZodiosClass<
    */
   async delete<
     Path extends ZodiosPathsByMethod<Api, "delete">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<
-        ZodiosBodyByPath<Api, "delete", Path, true, TypeProvider>
-      >
-    >,
     TConfig extends ZodiosRequestOptionsByPath<
       Api,
       "delete",
@@ -476,7 +445,6 @@ export class ZodiosClass<
     >
   >(
     path: Path,
-    data: TBody,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -485,7 +453,6 @@ export class ZodiosClass<
       ...config,
       method: "delete",
       url: path,
-      data,
     });
   }
 }
