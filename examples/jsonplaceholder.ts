@@ -42,7 +42,7 @@ async function bootstrap() {
       path: "/users/:id",
       alias: "deleteUser",
       description: "Delete a user",
-      response: z.void(),
+      response: z.object({ }),
     },
     {
       method: "post",
