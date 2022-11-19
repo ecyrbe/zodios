@@ -4,13 +4,21 @@ import {
 } from "../fetcher-provider.types";
 import { omit, replacePathParams } from "../../utils";
 import { FetchProviderConfig, FetchProviderResponse } from "./fetch.types";
-import { advancedFetch } from "./fetch";
+import { advancedFetch, FetchError } from "./fetch";
 import { AnyZodiosRequestOptions } from "../../zodios.types";
+import { Merge } from "../../utils.types";
 
-type FetchErrorStatus<TResponse, Status> = {
-  status: Status extends "default" ? 0 & { error: "default" } : Status;
-  response: TResponse;
-};
+type FetchErrorStatus<TResponse, Status> = Merge<
+  Omit<FetchError<TResponse>, "status" | "response">,
+  {
+    response: Merge<
+      FetchError<TResponse>["response"],
+      {
+        status: Status extends "default" ? 0 & { error: "default" } : Status;
+      }
+    >;
+  }
+>;
 
 type FetchProviderOptions = {
   fetchConfig?: FetchProviderConfig;

@@ -1,7 +1,5 @@
-import { AxiosError } from "axios";
 import type { ReadonlyDeep } from "./utils.types";
 import type {
-  AnyZodiosRequestOptions,
   ZodiosEndpointDefinition,
   ZodiosEndpointDefinitions,
 } from "./zodios.types";
@@ -83,7 +81,7 @@ export function findEndpointByAlias(
 
 export function findEndpointErrors(
   endpoint: ZodiosEndpointDefinition,
-  err: AxiosError
+  err: any
 ) {
   const matchingErrors = endpoint.errors?.filter(
     (error) => error.status === err.response!.status
@@ -96,7 +94,7 @@ export function findEndpointErrorsByPath(
   api: ZodiosEndpointDefinitions,
   method: string,
   path: string,
-  err: AxiosError
+  err: any
 ) {
   const endpoint = findEndpoint(api, method, path);
   return endpoint &&
@@ -110,7 +108,7 @@ export function findEndpointErrorsByPath(
 export function findEndpointErrorsByAlias(
   api: ZodiosEndpointDefinitions,
   alias: string,
-  err: AxiosError
+  err: any
 ) {
   const endpoint = findEndpointByAlias(api, alias);
   return endpoint &&
