@@ -3,7 +3,7 @@ import { FetchProviderResponse, FetchProviderConfig } from "./fetch.types";
 import { buildURL, isBlob, isFile, isFormData } from "./fetch.utils";
 import { FetchProvider } from "./fetcher-provider.fetch";
 
-export class FetchError extends Error {
+export class FetchError<Data> extends Error {
   /**
    * constructore with same signature as AxiosError
    */
@@ -12,7 +12,7 @@ export class FetchError extends Error {
     public code?: string,
     public config?: FetchProviderConfig,
     public request?: Request,
-    public response?: FetchProviderResponse
+    public response?: FetchProviderResponse<Data>
   ) {
     super(message);
   }

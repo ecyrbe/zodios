@@ -2,7 +2,6 @@ export { Zodios } from "./zodios";
 export type { ApiOf, TypeProviderOf } from "./zodios";
 export type { ZodiosInstance, ZodiosClass, ZodiosConstructor } from "./zodios";
 export { ZodiosError } from "./zodios-error";
-export { isErrorFromPath, isErrorFromAlias } from "./zodios-error.utils";
 export type {
   AnyZodiosMethodOptions,
   AnyZodiosRequestOptions,
@@ -58,6 +57,14 @@ export {
   tsSchema,
   tsFnSchema,
 } from "./type-providers";
+export type {
+  AnyZodiosFetcherProvider,
+  TypeOfFetcherConfig,
+  TypeOfFetcherError,
+  TypeOfFetcherOptions,
+  TypeOfFetcherResponse,
+  ZodiosRuntimeFetcherProvider,
+} from "./fetcher-providers";
 export {
   PluginId,
   zodValidationPlugin,
