@@ -1,5 +1,18 @@
 # @zodios/core
 
+## 11.0.0-beta.5
+
+### Major Changes
+
+- 1b67309: fix axios tests
+- c7c03bc: sync axios and core versions
+
+### Patch Changes
+
+- Updated dependencies [1b67309]
+- Updated dependencies [c7c03bc]
+  - @zodios/core@11.0.0-beta.5
+
 ## 11.0.0-beta.4
 
 ### Major Changes
