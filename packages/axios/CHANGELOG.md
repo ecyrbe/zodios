@@ -1,5 +1,21 @@
 # @zodios/core
 
+## 11.0.0-beta.4
+
+### Major Changes
+
+- 679a267: update axios
+
+### Patch Changes
+
+- Updated dependencies [14ce00b]
+- Updated dependencies [c9cae0a]
+- Updated dependencies [3ac25a1]
+- Updated dependencies [6c10dc2]
+- Updated dependencies [679a267]
+- Updated dependencies [90108a5]
+  - @zodios/core@11.0.0-beta.4
+
 ## 11.0.0-beta.3
 
 ### Patch Changes
