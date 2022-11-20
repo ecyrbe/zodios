@@ -23,13 +23,16 @@ function ZodiosAxios(...args: any[]) {
   return new ZodiosCore(...args);
 }
 
-export type ZodiosAxiosConstructor = {
+export interface Zodios {
   new <
     Api extends ZodiosEndpointDefinitions,
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     api: Narrow<Api>,
-    options?: ZodiosOptions<AxiosProvider, TypeProvider> &
+    options?: Omit<
+      ZodiosOptions<AxiosProvider, TypeProvider>,
+      "fetcherProvider"
+    > &
       TypeOfFetcherOptions<AxiosProvider>
   ): ZodiosInstance<Api, AxiosProvider, TypeProvider>;
   new <
@@ -38,11 +41,14 @@ export type ZodiosAxiosConstructor = {
   >(
     baseUrl: string,
     api: Narrow<Api>,
-    options?: ZodiosOptions<AxiosProvider, TypeProvider> &
+    options?: Omit<
+      ZodiosOptions<AxiosProvider, TypeProvider>,
+      "fetcherProvider"
+    > &
       TypeOfFetcherOptions<AxiosProvider>
   ): ZodiosInstance<Api, AxiosProvider, TypeProvider>;
-};
+}
 
-const Zodios = ZodiosAxios as unknown as ZodiosAxiosConstructor;
+const Zodios = ZodiosAxios as unknown as Zodios;
 
 export { Zodios };
