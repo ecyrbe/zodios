@@ -160,6 +160,14 @@ export class ZodiosCoreImpl<
     }
   }
 
+  public get typeProvider() {
+    return this.options.typeProvider;
+  }
+
+  public get fetcherProvider() {
+    return this.options.fetcherProvider;
+  }
+
   private initPlugins() {
     this.endpointPlugins.set("any-any", new ZodiosPlugins("any", "any"));
 
@@ -532,7 +540,7 @@ export type ZodiosInstance<
 > = ZodiosCoreImpl<Api, FetcherProvider, TypeProvider> &
   ZodiosAliases<Api, FetcherProvider, true, TypeProvider>;
 
-export type ZodiosCore = {
+export interface ZodiosCore {
   new <
     Api extends ZodiosEndpointDefinitions,
     FetcherProvider extends AnyZodiosFetcherProvider,
@@ -552,7 +560,7 @@ export type ZodiosCore = {
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
   ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
-};
+}
 
 export const ZodiosCore = ZodiosCoreImpl as ZodiosCore;
 

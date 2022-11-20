@@ -1,4 +1,4 @@
-export { ZodiosCore, ZodiosCoreImpl } from "./zodios";
+export { ZodiosCore } from "./zodios";
 export type {
   ApiOf,
   TypeProviderOf,
