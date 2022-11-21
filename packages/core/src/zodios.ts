@@ -27,15 +27,14 @@ import type {
   PickRequired,
   ReadonlyDeep,
   RequiredKeys,
-  UndefinedIfNever,
 } from "./utils.types";
 import { checkApi } from "./api";
 import type { AnyZodiosTypeProvider, ZodTypeProvider } from "./type-providers";
 import { zodTypeProvider } from "./type-providers";
 import {
   AnyZodiosFetcherProvider,
-  fetchProvider,
   TypeOfFetcherOptions,
+  defaults,
 } from "./fetcher-providers";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 
@@ -60,11 +59,7 @@ export class ZodiosCoreImpl<
 {
   public readonly options: PickRequired<
     ZodiosOptions<FetcherProvider, TypeProvider>,
-    | "validate"
-    | "transform"
-    | "sendDefaults"
-    | "typeProvider"
-    | "fetcherProvider"
+    "validate" | "transform" | "sendDefaults" | "typeProvider"
   >;
   public readonly api: Api;
   public readonly _typeProvider: TypeProvider;
@@ -146,12 +141,12 @@ export class ZodiosCoreImpl<
       transform: true,
       sendDefaults: false,
       typeProvider: zodTypeProvider as any,
-      fetcherProvider: fetchProvider,
       ...options,
     };
     this._typeProvider = undefined as any;
     this._fetcherProvider = undefined as any;
-    this.options.fetcherProvider.create({ baseURL, ...this.options });
+
+    this.options.fetcherProvider?.init({ baseURL, ...this.options });
 
     this.injectAliasEndpoints();
     this.initPlugins();
@@ -309,7 +304,14 @@ export class ZodiosCoreImpl<
     if (endpointPlugin) {
       conf = await endpointPlugin.interceptRequest(this.api, conf);
     }
-    let response = this.options.fetcherProvider.fetch(conf);
+    let response: Promise<any>;
+    if (defaults.fetcherProvider) {
+      response = defaults.fetcherProvider.fetch(conf);
+    } else if (this.options.fetcherProvider) {
+      response = this.options.fetcherProvider.fetch(conf);
+    } else {
+      throw new Error("Zodios: no fetcher provider provided");
+    }
     if (endpointPlugin) {
       response = endpointPlugin.interceptResponse(this.api, conf, response);
     }
