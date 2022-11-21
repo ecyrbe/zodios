@@ -1,4 +1,3 @@
-import type { ReadonlyDeep } from "./utils.types";
 import type {
   ZodiosEndpointDefinition,
   ZodiosEndpointDefinitions,
@@ -38,30 +37,6 @@ export function pick<T, K extends keyof T>(
     }
   }
   return ret;
-}
-
-/**
- * set first letter of a string to uppercase
- * @param str - the string to capitalize
- * @returns - the string with the first letter uppercased
- */
-export function capitalize<T extends string>(str: T): Capitalize<T> {
-  return (str.charAt(0).toUpperCase() + str.slice(1)) as Capitalize<T>;
-}
-
-const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
-
-export function replacePathParams(
-  config: ReadonlyDeep<{ url: string; params?: Record<string, any> }>
-) {
-  let result: string = config.url;
-  const params = config.params;
-  if (params) {
-    result = result.replace(paramsRegExp, (match, key) =>
-      key in params ? `${params[key]}` : match
-    );
-  }
-  return result;
 }
 
 export function findEndpoint(
