@@ -44,6 +44,6 @@ export type ZodiosRuntimeFetcherProvider<
 > = {
   readonly _provider?: FetcherProvider;
   baseURL?: string;
-  create(options: any): void;
+  init(options: any): void;
   fetch(params: any): Promise<any>;
 };
