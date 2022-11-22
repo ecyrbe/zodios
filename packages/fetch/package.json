@@ -1,7 +1,7 @@
 {
   "name": "@zodios/fetch",
   "description": "Typescript API client with fetch",
-  "version": "11.0.0-beta.6",
+  "version": "11.0.0-beta.7",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
