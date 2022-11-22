@@ -1,5 +1,12 @@
 # @zodios/core
 
+## 11.0.0-beta.6
+
+### Major Changes
+
+- da4ddab: add fetch package
+- 535c76b: add basic mocks helpers
+
 ## 11.0.0-beta.5
 
 ### Major Changes
