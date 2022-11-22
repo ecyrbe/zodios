@@ -3,10 +3,13 @@
   "tag": "beta",
   "initialVersions": {
     "@zodios/core": "11.0.0-beta.0",
-    "@zodios/axios": "11.0.0-beta.0"
+    "@zodios/axios": "11.0.0-beta.0",
+    "@zodios/fetch": "11.0.0-beta.5"
   },
   "changesets": [
+    "blue-hounds-sort",
     "lucky-brooms-fry",
+    "short-hounds-mix",
     "silent-garlics-scream"
   ]
 }
