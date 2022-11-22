@@ -36,10 +36,6 @@
     "prebuild": "rimraf lib",
     "example": "ts-node examples/jsonplaceholder.ts",
     "example:dev.to": "ts-node examples/dev.to/example.ts",
-    "major-rc": "npm version premajor --preid=rc",
-    "minor-rc": "npm version preminor --preid=rc",
-    "patch-rc": "npm version prepatch --preid=rc",
-    "rc": "npm version prerelease --preid=rc",
     "build": "tsup",
     "test": "jest --coverage"
   },

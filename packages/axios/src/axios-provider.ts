@@ -42,7 +42,7 @@ export const axiosProvider: ZodiosRuntimeFetcherProvider<AxiosProvider> & {
   instance: AxiosInstance;
 } = {
   instance: undefined as any,
-  create(
+  init(
     options: {
       baseURL?: string;
     } & AxiosProviderOptions
