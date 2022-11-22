@@ -1,5 +1,11 @@
 # @zodios/core
 
+## 11.0.0-beta.7
+
+### Major Changes
+
+- 7dcbb0c: chore(fetch): fix deps
+
 ## 11.0.0-beta.6
 
 ### Major Changes
