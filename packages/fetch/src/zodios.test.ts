@@ -6,6 +6,7 @@ import { z, ZodError } from "zod";
 if (globalThis.FormData === undefined) {
   globalThis.FormData = require("form-data");
 }
+import "cross-fetch/polyfill";
 import { Zodios } from "./zodios";
 import {
   ZodiosError,
