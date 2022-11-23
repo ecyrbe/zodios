@@ -1,4 +1,3 @@
-import qs from "qs";
 import { AnyZodiosRequestOptions } from "@zodios/core";
 import { FetchProvider } from "./fetcher-provider.fetch";
 
@@ -28,6 +27,27 @@ export const isFile = isKindOf("File");
 // istanbul ignore next
 export const isSearchParams = isKindOf("URLSearchParams");
 
+function queriesToSearchString(
+  queries?: Record<string, any>
+): string | undefined {
+  if (queries) {
+    const searchParams = new URLSearchParams();
+    Object.entries(queries).forEach(([key, value]) => {
+      if (Array.isArray(value)) {
+        value.forEach((v) =>
+          searchParams.append(`${key}[]`, JSON.stringify(v))
+        );
+      } else if (typeof value === "string") {
+        searchParams.append(key, value);
+      } else {
+        searchParams.append(key, JSON.stringify(value));
+      }
+    });
+    return searchParams.toString();
+  }
+  return "";
+}
+
 // istanbul ignore next
 function getFullURL(config: AnyZodiosRequestOptions<FetchProvider>) {
   if (config.url?.startsWith("http") || !config.baseURL) {
@@ -43,10 +63,7 @@ function getFullURL(config: AnyZodiosRequestOptions<FetchProvider>) {
 
 export function buildURL(config: AnyZodiosRequestOptions<FetchProvider>) {
   let fullURL = getFullURL(config) || "/";
-  const serializedParams = qs.stringify(config.queries, {
-    arrayFormat: "brackets",
-    encodeValuesOnly: true,
-  });
+  const serializedParams = queriesToSearchString(config.queries);
   if (serializedParams) {
     fullURL += fullURL.indexOf("?") === -1 ? "?" : "&";
   }
