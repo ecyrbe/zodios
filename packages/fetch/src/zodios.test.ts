@@ -16,7 +16,6 @@ import {
 } from "@zodios/core";
 import multer from "multer";
 import { Assert } from "@zodios/core/lib/utils.types";
-import { FetchProvider } from "./fetch-provider";
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -42,7 +41,7 @@ describe("Zodios", () => {
     });
     app.get("/queries", (req, res) => {
       res.status(200).json({
-        queries: req.query.id,
+        queries: req.query,
       });
     });
     app.get("/:id", (req, res) => {
@@ -340,18 +339,28 @@ describe("Zodios", () => {
         path: "/queries",
         parameters: [
           {
-            name: "id",
+            name: "ids",
             type: "Query",
             schema: z.array(z.number()),
           },
+          {
+            name: "q",
+            type: "Query",
+            schema: z.string(),
+          },
         ],
         response: z.object({
-          queries: z.array(z.string()),
+          queries: z.object({
+            ids: z.array(z.string()),
+            q: z.string(),
+          }),
         }),
       },
     ]);
-    const response = await zodios.get("/queries", { queries: { id: [1, 2] } });
-    expect(response).toEqual({ queries: ["1", "2"] });
+    const response = await zodios.get("/queries", {
+      queries: { ids: [1, 2], q: "hello" },
+    });
+    expect(response).toEqual({ queries: { ids: ["1", "2"], q: "hello" } });
   });
 
   it("should make an http get with one path params", async () => {
