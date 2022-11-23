@@ -1,7 +1,36 @@
-if (globalThis.FormData === undefined) {
-  globalThis.FormData = require("form-data");
-}
 import { z, ZodError } from "zod";
+
+//Mock form data
+globalThis.FormData = class FormData {
+  data = new Map<string, string | File>();
+  append(name: string, value: string | Blob, fileName?: string): void {
+    this.data.set(name, `${value}`);
+  }
+  delete(name: string): void {
+    this.data.delete(name);
+  }
+  get(name: string): string | File | null {
+    return this.data.get(name) || null;
+  }
+  getAll(name: string): (string | File)[] {
+    return this.data.has(name) ? [this.data.get(name)!] : [];
+  }
+  has(name: string): boolean {
+    return this.data.has(name);
+  }
+  set(name: string, value: string | Blob, fileName?: string): void {
+    if (typeof value === "string") {
+      this.data.set(name, value);
+    }
+  }
+  forEach(
+    callbackfn: (value: string | File, key: string, parent: FormData) => void,
+    thisArg?: any
+  ): void {
+    this.data.forEach((value, key) => callbackfn(value, key, this));
+  }
+};
+
 import { ZodiosCore } from "./zodios";
 import { ZodiosError } from "./zodios-error";
 import { ZodiosPlugin } from "./zodios.types";
