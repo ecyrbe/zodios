@@ -1,5 +1,12 @@
 # @zodios/core
 
+## 11.0.0-beta.8
+
+### Major Changes
+
+- e67fa49: feat(fetch): remove qs dependency
+- 731e399: tests(core): fix tests
+
 ## 11.0.0-beta.7
 
 ### Major Changes
