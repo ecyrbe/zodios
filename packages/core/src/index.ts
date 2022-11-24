@@ -72,8 +72,7 @@ export type {
   TypeOfFetcherResponse,
   ZodiosRuntimeFetcherProvider,
 } from "./fetcher-providers";
-export type { MockProvider, MockResponse } from "./fetcher-providers";
-export { zodiosMocks, mockProvider } from "./fetcher-providers";
+export { hooks } from "./hooks";
 export {
   PluginId,
   zodValidationPlugin,
