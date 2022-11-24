@@ -1,8 +1,8 @@
 import {
   AnyZodiosFetcherProvider,
   ZodiosRuntimeFetcherProvider,
-} from "./fetcher-provider.types";
+} from "./fetcher-providers/fetcher-provider.types";
 
-export const defaults: {
+export const hooks: {
   fetcherProvider?: ZodiosRuntimeFetcherProvider<AnyZodiosFetcherProvider>;
 } = {};

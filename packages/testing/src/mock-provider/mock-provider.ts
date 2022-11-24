@@ -2,8 +2,8 @@ import type {
   AnyZodiosFetcherProvider,
   AnyZodiosRequestOptions,
   ZodiosRuntimeFetcherProvider,
-} from "../../index";
-import { defaults } from "../default-provider";
+} from "../../../core/src/index";
+import { hooks } from "../../../core/src/hooks";
 
 export interface MockProvider extends AnyZodiosFetcherProvider {
   options: {};
@@ -26,7 +26,7 @@ export const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
       ...config,
       baseURL: this.baseURL,
     };
-    for (const [{ method, url }, callback] of zodiosMocks.mocks) {
+    for (const [{ method, url }, callback] of registeredMocks) {
       if (method === requestConfig.method && url === requestConfig.url) {
         const result = (await callback(
           requestConfig
@@ -57,20 +57,35 @@ export type MockResponse<Data = unknown> = {
   readonly data?: Data;
 };
 
-export const zodiosMocks = {
-  mocks: new Map<
-    { method: string; url: string },
-    (config: AnyZodiosRequestOptions<MockProvider>) => Promise<MockResponse>
-  >(),
+interface ZodiosMockBase {
+  install(): void;
+  uninstall(): void;
+  reset(): void;
+  mockRequest(
+    method: string,
+    path: string,
+    callback: (
+      config: AnyZodiosRequestOptions<MockProvider>
+    ) => Promise<MockResponse>
+  ): void;
+  mockResponse(method: string, path: string, response: MockResponse): void;
+}
+
+const registeredMocks = new Map<
+  { method: string; url: string },
+  (config: AnyZodiosRequestOptions<MockProvider>) => Promise<MockResponse>
+>();
+
+export const zodiosMocks: ZodiosMockBase = {
   install() {
-    defaults.fetcherProvider = mockProvider;
+    hooks.fetcherProvider = mockProvider;
   },
   uninstall() {
-    this.mocks.clear();
-    defaults.fetcherProvider = undefined;
+    registeredMocks.clear();
+    hooks.fetcherProvider = undefined;
   },
   reset() {
-    this.mocks.clear();
+    registeredMocks.clear();
   },
   mockRequest(
     method: string,
@@ -79,10 +94,10 @@ export const zodiosMocks = {
       config: AnyZodiosRequestOptions<MockProvider>
     ) => Promise<MockResponse>
   ) {
-    this.mocks.set({ method, url: path }, callback);
+    registeredMocks.set({ method, url: path }, callback);
   },
   mockResponse(method: string, path: string, response: MockResponse) {
-    this.mocks.set(
+    registeredMocks.set(
       {
         method,
         url: path,

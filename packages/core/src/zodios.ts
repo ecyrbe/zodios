@@ -34,9 +34,9 @@ import { zodTypeProvider } from "./type-providers";
 import {
   AnyZodiosFetcherProvider,
   TypeOfFetcherOptions,
-  defaults,
 } from "./fetcher-providers";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
+import { hooks } from "./hooks";
 
 export interface ZodiosBase<
   Api extends ZodiosEndpointDefinitions,
@@ -305,8 +305,8 @@ export class ZodiosCoreImpl<
       conf = await endpointPlugin.interceptRequest(this.api, conf);
     }
     let response: Promise<any>;
-    if (defaults.fetcherProvider) {
-      response = defaults.fetcherProvider.fetch(conf);
+    if (hooks.fetcherProvider) {
+      response = hooks.fetcherProvider.fetch(conf);
     } else if (this.options.fetcherProvider) {
       response = this.options.fetcherProvider.fetch(conf);
     } else {
