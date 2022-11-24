@@ -198,6 +198,46 @@ export type ZodiosErrorByPath<
       >
     >;
 
+export type ZodiosErrorsByPath<
+  Api extends ZodiosEndpointDefinition[],
+  M extends Method,
+  Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+> = Frontend extends true
+  ? InferOutputTypeFromSchema<
+      TypeProvider,
+      ZodiosEndpointDefinitionByPath<
+        Api,
+        M,
+        Path
+      >[number]["errors"][number]["schema"]
+    >
+  : InferInputTypeFromSchema<
+      TypeProvider,
+      ZodiosEndpointDefinitionByPath<
+        Api,
+        M,
+        Path
+      >[number]["errors"][number]["schema"]
+    >;
+
+export type ZodiosErrorsByAlias<
+  Api extends ZodiosEndpointDefinition[],
+  M extends Method,
+  Path extends ZodiosPathsByMethod<Api, M>,
+  Frontend extends boolean = true,
+  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+> = Frontend extends true
+  ? InferOutputTypeFromSchema<
+      TypeProvider,
+      ZodiosEndpointDefinitionByAlias<Api, Path>[number]["errors"]
+    >
+  : InferInputTypeFromSchema<
+      TypeProvider,
+      ZodiosEndpointDefinitionByAlias<Api, Path>[number]["errors"]
+    >;
+
 export type InferFetcherErrors<
   T,
   TypeProvider extends AnyZodiosTypeProvider,
