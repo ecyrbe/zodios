@@ -2,8 +2,8 @@ import type {
   AnyZodiosFetcherProvider,
   AnyZodiosRequestOptions,
   ZodiosRuntimeFetcherProvider,
-} from "../../../core/src/index";
-import { hooks } from "../../../core/src/hooks";
+} from "@zodios/core";
+import { hooks } from "@zodios/core";
 
 export interface MockProvider extends AnyZodiosFetcherProvider {
   options: {};
