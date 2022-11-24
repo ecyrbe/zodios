@@ -1,5 +1,11 @@
 # @zodios/core
 
+## 11.0.0-beta.10
+
+### Major Changes
+
+- c360c52: feat(testing): add response testing handlers
+
 ## 11.0.0-beta.9
 
 ### Major Changes
