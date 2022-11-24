@@ -44,6 +44,7 @@
     "@types/jest": "29.2.2",
     "@types/node": "18.11.9",
     "@zodios/core": "workspace:*",
+    "@zodios/fetch": "workspace:*",
     "form-data": "^4.0.0",
     "fp-ts": "2.13.1",
     "io-ts": "2.2.19",

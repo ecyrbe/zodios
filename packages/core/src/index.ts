@@ -72,7 +72,7 @@ export type {
   TypeOfFetcherResponse,
   ZodiosRuntimeFetcherProvider,
 } from "./fetcher-providers";
-export { hooks } from "./hooks";
+export { setFetcherHook, clearFetcherHook } from "./hooks";
 export {
   PluginId,
   zodValidationPlugin,
