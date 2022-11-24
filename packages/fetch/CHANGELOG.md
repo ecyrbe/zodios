@@ -1,5 +1,18 @@
 # @zodios/core
 
+## 11.0.0-beta.11
+
+### Major Changes
+
+- a753f07: fix(testing): import types from core instead of relaive directory
+- 33b5de0: refactor(testing): move base hooks to testing
+
+### Patch Changes
+
+- Updated dependencies [a753f07]
+- Updated dependencies [33b5de0]
+  - @zodios/core@11.0.0-beta.11
+
 ## 11.0.0-beta.10
 
 ### Major Changes
