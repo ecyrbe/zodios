@@ -8,10 +8,9 @@ import type {
   AnyZodiosFetcherProvider,
   ZodiosBase,
   ZodiosErrorsByPath,
-  MockResponse,
 } from "@zodios/core";
 import type { ReadonlyDeep } from "@zodios/core/lib/utils.types";
-import { zodiosMocks } from "@zodios/core";
+import { zodiosMocks, MockResponse } from "./mock-provider";
 /**
  * zodios mock service
  */
