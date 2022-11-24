@@ -90,18 +90,23 @@ describe("Zodios", () => {
     zodiosMocks.mockRequest("post", "/", async (config) => ({
       data: {
         id: 3,
-        name: config.body!.name,
+        // @ts-ignore
+        name: config.body.name, // @ts-ignore
       },
     }));
     zodiosMocks.mockRequest("put", "/", async (config) => ({
       data: {
+        // @ts-ignore
         id: config.body.id,
+        // @ts-ignore
         name: config.body.name,
       },
     }));
     zodiosMocks.mockRequest("patch", "/", async (config) => ({
       data: {
+        // @ts-ignore
         id: config.body.id,
+        // @ts-ignore
         name: config.body.name,
       },
     }));
