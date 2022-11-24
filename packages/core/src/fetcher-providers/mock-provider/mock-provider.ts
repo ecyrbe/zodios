@@ -5,21 +5,21 @@ import type {
 } from "../../index";
 import { defaults } from "../default-provider";
 
-interface MockProvider extends AnyZodiosFetcherProvider {
+export interface MockProvider extends AnyZodiosFetcherProvider {
   options: {};
   config: {
     baseURL?: string;
-    body?: any;
+    body?: unknown;
     auth?: { username: string; password: string };
     validateStatus?: (status: number) => boolean;
     timeout?: number;
     responseType?: "arraybuffer" | "blob" | "json" | "text" | "stream";
   };
-  response: any;
-  error: any;
+  response: unknown;
+  error: unknown;
 }
 
-const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
+export const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
   init() {},
   async fetch(config: AnyZodiosRequestOptions<MockProvider>) {
     const requestConfig = {
@@ -50,11 +50,11 @@ const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
   },
 };
 
-type MockResponse = {
+export type MockResponse<Data = unknown> = {
   readonly headers?: Record<string, string>;
   readonly status?: number;
   readonly statusText?: string;
-  readonly data?: any;
+  readonly data?: Data;
 };
 
 export const zodiosMocks = {

@@ -33,6 +33,8 @@ export type {
   ZodiosErrorForEndpoint,
   ZodiosErrorByPath,
   ZodiosErrorByAlias,
+  ZodiosErrorsByPath,
+  ZodiosErrorsByAlias,
   ZodiosEndpointDefinition,
   ZodiosEndpointDefinitions,
   ZodiosEndpointParameter,
@@ -70,7 +72,8 @@ export type {
   TypeOfFetcherResponse,
   ZodiosRuntimeFetcherProvider,
 } from "./fetcher-providers";
-export { zodiosMocks } from "./fetcher-providers";
+export type { MockProvider, MockResponse } from "./fetcher-providers";
+export { zodiosMocks, mockProvider } from "./fetcher-providers";
 export {
   PluginId,
   zodValidationPlugin,
