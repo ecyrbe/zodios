@@ -32,6 +32,10 @@ export class ZodiosMocks<
     zodiosMocks.uninstall();
   }
 
+  static reset() {
+    zodiosMocks.reset();
+  }
+
   get<
     Path extends ZodiosPathsByMethod<Api, "get">,
     TConfig extends ZodiosRequestOptionsByPath<
@@ -54,6 +58,16 @@ export class ZodiosMocks<
     >
   ) {
     zodiosMocks.mockRequest("get", path, callback as any);
+  }
+
+  getResponse<Path extends ZodiosPathsByMethod<Api, "get">>(
+    path: Path,
+    response: MockResponse<
+      | ZodiosResponseByPath<Api, "get", Path, false, TypeProvider>
+      | ZodiosErrorsByPath<Api, "get", Path, false, TypeProvider>
+    >
+  ) {
+    zodiosMocks.mockResponse("get", path, response);
   }
 
   post<
@@ -80,6 +94,16 @@ export class ZodiosMocks<
     zodiosMocks.mockRequest("post", path, callback as any);
   }
 
+  postResponse<Path extends ZodiosPathsByMethod<Api, "post">>(
+    path: Path,
+    response: MockResponse<
+      | ZodiosResponseByPath<Api, "post", Path, false, TypeProvider>
+      | ZodiosErrorsByPath<Api, "post", Path, false, TypeProvider>
+    >
+  ) {
+    zodiosMocks.mockResponse("post", path, response);
+  }
+
   put<
     Path extends ZodiosPathsByMethod<Api, "put">,
     TConfig extends ZodiosRequestOptionsByPath<
@@ -102,6 +126,16 @@ export class ZodiosMocks<
     >
   ) {
     zodiosMocks.mockRequest("put", path, callback as any);
+  }
+
+  putResponse<Path extends ZodiosPathsByMethod<Api, "put">>(
+    path: Path,
+    response: MockResponse<
+      | ZodiosResponseByPath<Api, "put", Path, false, TypeProvider>
+      | ZodiosErrorsByPath<Api, "put", Path, false, TypeProvider>
+    >
+  ) {
+    zodiosMocks.mockResponse("put", path, response);
   }
 
   patch<
@@ -128,6 +162,16 @@ export class ZodiosMocks<
     zodiosMocks.mockRequest("patch", path, callback as any);
   }
 
+  patchResponse<Path extends ZodiosPathsByMethod<Api, "patch">>(
+    path: Path,
+    response: MockResponse<
+      | ZodiosResponseByPath<Api, "patch", Path, false, TypeProvider>
+      | ZodiosErrorsByPath<Api, "patch", Path, false, TypeProvider>
+    >
+  ) {
+    zodiosMocks.mockResponse("patch", path, response);
+  }
+
   delete<
     Path extends ZodiosPathsByMethod<Api, "delete">,
     TConfig extends ZodiosRequestOptionsByPath<
@@ -150,5 +194,15 @@ export class ZodiosMocks<
     >
   ) {
     zodiosMocks.mockRequest("delete", path, callback as any);
+  }
+
+  deleteResponse<Path extends ZodiosPathsByMethod<Api, "delete">>(
+    path: Path,
+    response: MockResponse<
+      | ZodiosResponseByPath<Api, "delete", Path, false, TypeProvider>
+      | ZodiosErrorsByPath<Api, "delete", Path, false, TypeProvider>
+    >
+  ) {
+    zodiosMocks.mockResponse("delete", path, response);
   }
 }
