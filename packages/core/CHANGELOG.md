@@ -1,5 +1,11 @@
 # @zodios/core
 
+## 11.0.0-beta.12
+
+### Major Changes
+
+- 29dcf47: fix(testing): safely export hooks
+
 ## 11.0.0-beta.11
 
 ### Major Changes
