@@ -1,5 +1,18 @@
 # @zodios/core
 
+## 11.0.0-beta.9
+
+### Major Changes
+
+- c4c00a1: chore(deps): upgrade axios
+- c6a4d0e: feat(testing): add testing package
+
+### Patch Changes
+
+- Updated dependencies [c4c00a1]
+- Updated dependencies [c6a4d0e]
+  - @zodios/core@11.0.0-beta.9
+
 ## 11.0.0-beta.8
 
 ### Major Changes
