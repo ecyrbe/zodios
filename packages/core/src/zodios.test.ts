@@ -36,7 +36,7 @@ import { ZodiosError } from "./zodios-error";
 import { ZodiosPlugin } from "./zodios.types";
 import { apiBuilder } from "./api";
 import { AnyZodiosFetcherProvider } from "./fetcher-providers";
-import { zodiosMocks } from "./fetcher-providers/mock-provider";
+import { zodiosMocks } from "../../testing/src/mock-provider";
 
 describe("Zodios", () => {
   beforeAll(async () => {
