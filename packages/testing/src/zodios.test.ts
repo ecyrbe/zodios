@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import { z } from "zod";
-import { makeApi, makeErrors, ZodiosCore } from "@zodios/core";
-import { ZodiosMocks, mockProvider } from "./index";
+import { makeApi, makeErrors, Zodios } from "@zodios/fetch";
+import { ZodiosMocks } from "./index";
 
 const userSchema = z.object({
   id: z.number(),
@@ -78,7 +78,7 @@ const api = makeApi([
   },
 ]);
 
-const zodios = new ZodiosCore(api, { fetcherProvider: mockProvider });
+const zodios = new Zodios(api);
 const mocks = new ZodiosMocks(zodios);
 
 describe("Zodios", () => {
