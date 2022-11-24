@@ -3,7 +3,7 @@ import type {
   AnyZodiosRequestOptions,
   ZodiosRuntimeFetcherProvider,
 } from "@zodios/core";
-import { hooks } from "@zodios/core";
+import { setFetcherHook, clearFetcherHook } from "@zodios/core";
 
 export interface MockProvider extends AnyZodiosFetcherProvider {
   options: {};
@@ -78,11 +78,11 @@ const registeredMocks = new Map<
 
 export const zodiosMocks: ZodiosMockBase = {
   install() {
-    hooks.fetcherProvider = mockProvider;
+    setFetcherHook(mockProvider);
   },
   uninstall() {
     registeredMocks.clear();
-    hooks.fetcherProvider = undefined;
+    clearFetcherHook();
   },
   reset() {
     registeredMocks.clear();
