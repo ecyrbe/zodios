@@ -85,7 +85,7 @@ describe("Zodios", () => {
   describe("dynamic mocks", () => {
     beforeAll(() => {
       ZodiosMocks.install();
-      mocks.get("/users", async (config) => {
+      mocks.get("/users", (config) => {
         return {
           data: [
             {
@@ -96,7 +96,7 @@ describe("Zodios", () => {
           ],
         };
       });
-      mocks.get("/users/:id", async (config) => {
+      mocks.get("/users/:id", (config) => {
         if (config.params.id === 1) {
           return {
             data: {
@@ -113,7 +113,7 @@ describe("Zodios", () => {
           },
         };
       });
-      mocks.post("/users", async (config) => {
+      mocks.post("/users", (config) => {
         return {
           data: {
             id: 1,
@@ -121,7 +121,7 @@ describe("Zodios", () => {
           },
         };
       });
-      mocks.put("/users/:id", async (config) => {
+      mocks.put("/users/:id", (config) => {
         if (config.params.id === 1) {
           return {
             data: {
@@ -136,7 +136,7 @@ describe("Zodios", () => {
           },
         };
       });
-      mocks.patch("/users/:id", async (config) => {
+      mocks.patch("/users/:id", (config) => {
         if (config.params.id === 1) {
           return {
             data: {
@@ -151,7 +151,7 @@ describe("Zodios", () => {
           },
         };
       });
-      mocks.delete("/users/:id", async (config) => {
+      mocks.delete("/users/:id", (config) => {
         if (config.params.id === 1) {
           return {
             data: {
