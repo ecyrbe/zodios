@@ -10,7 +10,7 @@ import type {
   ZodiosErrorsByPath,
 } from "@zodios/core";
 import type { ReadonlyDeep } from "@zodios/core/lib/utils.types";
-import { zodiosMocks, MockResponse } from "./mock-provider";
+import { zodiosMocks, MockResponse, MaybePromise } from "./mock-provider";
 /**
  * zodios mock service
  */
@@ -49,7 +49,7 @@ export class ZodiosMocks<
     path: Path,
     callback: (
       config: ReadonlyDeep<TConfig>
-    ) => Promise<
+    ) => MaybePromise<
       MockResponse<
         | ZodiosResponseByPath<Api, "get", Path, false, TypeProvider>
         | ZodiosErrorsByPath<Api, "get", Path, false, TypeProvider>
@@ -83,7 +83,7 @@ export class ZodiosMocks<
     path: Path,
     callback: (
       config: ReadonlyDeep<TConfig>
-    ) => Promise<
+    ) => MaybePromise<
       MockResponse<
         | ZodiosResponseByPath<Api, "post", Path, false, TypeProvider>
         | ZodiosErrorsByPath<Api, "post", Path, false, TypeProvider>
@@ -117,7 +117,7 @@ export class ZodiosMocks<
     path: Path,
     callback: (
       config: ReadonlyDeep<TConfig>
-    ) => Promise<
+    ) => MaybePromise<
       MockResponse<
         | ZodiosResponseByPath<Api, "put", Path, false, TypeProvider>
         | ZodiosErrorsByPath<Api, "put", Path, false, TypeProvider>
@@ -151,7 +151,7 @@ export class ZodiosMocks<
     path: Path,
     callback: (
       config: ReadonlyDeep<TConfig>
-    ) => Promise<
+    ) => MaybePromise<
       MockResponse<
         | ZodiosResponseByPath<Api, "patch", Path, false, TypeProvider>
         | ZodiosErrorsByPath<Api, "patch", Path, false, TypeProvider>
@@ -185,7 +185,7 @@ export class ZodiosMocks<
     path: Path,
     callback: (
       config: ReadonlyDeep<TConfig>
-    ) => Promise<
+    ) => MaybePromise<
       MockResponse<
         | ZodiosResponseByPath<Api, "delete", Path, false, TypeProvider>
         | ZodiosErrorsByPath<Api, "delete", Path, false, TypeProvider>
