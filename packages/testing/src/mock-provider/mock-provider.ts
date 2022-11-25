@@ -28,9 +28,12 @@ export const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
     };
     for (const [{ method, url }, callback] of registeredMocks) {
       if (method === requestConfig.method && url === requestConfig.url) {
-        const result = (await callback(
-          requestConfig
-        )) as Required<MockResponse>;
+        const result = {
+          headers: {},
+          status: 200,
+          statusText: "OK",
+          ...(await callback(requestConfig)),
+        };
         if (
           (config.validateStatus && !config.validateStatus(result.status)) ||
           result.status > 299
@@ -54,8 +57,10 @@ export type MockResponse<Data = unknown> = {
   readonly headers?: Record<string, string>;
   readonly status?: number;
   readonly statusText?: string;
-  readonly data?: Data;
+  readonly data: Data;
 };
+
+export type MaybePromise<T> = T | Promise<T>;
 
 interface ZodiosMockBase {
   install(): void;
@@ -66,14 +71,14 @@ interface ZodiosMockBase {
     path: string,
     callback: (
       config: AnyZodiosRequestOptions<MockProvider>
-    ) => Promise<MockResponse>
+    ) => MaybePromise<MockResponse>
   ): void;
   mockResponse(method: string, path: string, response: MockResponse): void;
 }
 
 const registeredMocks = new Map<
   { method: string; url: string },
-  (config: AnyZodiosRequestOptions<MockProvider>) => Promise<MockResponse>
+  (config: AnyZodiosRequestOptions<MockProvider>) => MaybePromise<MockResponse>
 >();
 
 export const zodiosMocks: ZodiosMockBase = {
@@ -92,7 +97,7 @@ export const zodiosMocks: ZodiosMockBase = {
     path: string,
     callback: (
       config: AnyZodiosRequestOptions<MockProvider>
-    ) => Promise<MockResponse>
+    ) => MaybePromise<MockResponse>
   ) {
     registeredMocks.set({ method, url: path }, callback);
   },
@@ -102,14 +107,7 @@ export const zodiosMocks: ZodiosMockBase = {
         method,
         url: path,
       },
-      () =>
-        Promise.resolve({
-          headers: {},
-          data: {},
-          status: 200,
-          statusText: "OK",
-          ...response,
-        })
+      () => response
     );
   },
 };
