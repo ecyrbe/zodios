@@ -689,7 +689,6 @@ export type ZodiosRequestOptions<
   {
     method: M;
     url: Path;
-    data?: ZodiosBodyByPath<Api, M, Path, Frontend, TypeProvider>;
   },
   ZodiosRequestOptionsByPath<
     Api,
