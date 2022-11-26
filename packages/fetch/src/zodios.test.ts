@@ -1,5 +1,4 @@
 /// <reference lib="dom" />
-import { AxiosError } from "axios";
 import express from "express";
 import { AddressInfo } from "net";
 import { z, ZodError } from "zod";
@@ -861,7 +860,7 @@ received:
       error = e;
     }
     expect(error).toBeInstanceOf(Error);
-    expect((error as AxiosError).response?.status).toBe(502);
+    expect((error as any).response?.status).toBe(502);
     if (zodios.isErrorFromPath(zodios.api, "get", "/error502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
@@ -918,7 +917,7 @@ received:
     }
 
     expect(error).toBeInstanceOf(Error);
-    expect((error as AxiosError).response?.status).toBe(502);
+    expect((error as any).response?.status).toBe(502);
     expect(zodios.isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(
       false
     );
@@ -964,7 +963,7 @@ received:
     try {
       await zodios.get("/error502");
     } catch (e) {
-      expect((e as AxiosError).response?.data).toEqual({
+      expect((e as any).response?.data).toEqual({
         error: {
           message: "bad gateway",
         },
