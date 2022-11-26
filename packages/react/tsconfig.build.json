@@ -1,0 +1,20 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES6",
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "coverage",
+    "examples",
+    "**/*.config.js",
+    "**/*.config.ts",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.d.ts"
+  ]
+}
