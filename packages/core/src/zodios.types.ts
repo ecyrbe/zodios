@@ -692,7 +692,7 @@ export type ZodiosRequestOptionsByPath<
 >;
 
 export type ZodiosRequestOptions<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends ZodiosEndpointDefinitions,
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   FetcherProvider extends AnyZodiosFetcherProvider,
@@ -716,10 +716,10 @@ export type ZodiosRequestOptions<
 /**
  * Zodios options
  */
-export type ZodiosOptions<
+export interface ZodiosOptions<
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
-> = {
+> {
   /**
    * Should zodios validate parameters and response? Default: true
    */
@@ -740,9 +740,9 @@ export type ZodiosOptions<
    * set a custom type provider. Default: ZodTypeProvider
    */
   typeProvider?: ZodiosRuntimeTypeProvider<TypeProvider>;
-};
+}
 
-export type ZodiosEndpointParameter = {
+export interface ZodiosEndpointParameter {
   /**
    * name of the parameter
    */
@@ -760,11 +760,11 @@ export type ZodiosEndpointParameter = {
    * you can use zod `transform` to transform the value of the parameter before sending it to the server
    */
   schema: unknown;
-};
+}
 
 export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
 
-export type ZodiosEndpointError = {
+export interface ZodiosEndpointError {
   /**
    * status code of the error
    * use 'default' to declare a default error
@@ -778,14 +778,14 @@ export type ZodiosEndpointError = {
    * schema of the error
    */
   schema: unknown;
-};
+}
 
 export type ZodiosEndpointErrors = ZodiosEndpointError[];
 
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
-export type ZodiosEndpointDefinition = {
+export interface ZodiosEndpointDefinition {
   /**
    * http method : get, post, put, patch, delete
    */
@@ -841,14 +841,16 @@ export type ZodiosEndpointDefinition = {
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
   errors?: Array<ZodiosEndpointError>;
-};
+}
 
 export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses
  */
-export type ZodiosPlugin<FetcherProvider extends AnyZodiosFetcherProvider> = {
+export interface ZodiosPlugin<
+  FetcherProvider extends AnyZodiosFetcherProvider
+> {
   /**
    * Optional name of the plugin
    * naming a plugin allows to remove it or replace it later
@@ -889,4 +891,4 @@ export type ZodiosPlugin<FetcherProvider extends AnyZodiosFetcherProvider> = {
     config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     error: Error
   ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;
-};
+}
