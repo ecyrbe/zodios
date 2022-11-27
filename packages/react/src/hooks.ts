@@ -12,16 +12,13 @@ import {
   QueryKey,
   UseInfiniteQueryResult,
 } from "@tanstack/react-query";
-import {
-  AnyZodiosFetcherProvider,
-  AnyZodiosTypeProvider,
-  ZodiosError,
-  ZodiosInstance,
-  ZodTypeProvider,
-} from "@zodios/core";
+import { ZodiosError, HTTP_MUTATION_METHODS } from "@zodios/core";
 import type {
+  AnyZodiosFetcherProvider,
   AnyZodiosMethodOptions,
+  AnyZodiosTypeProvider,
   Method,
+  ZodiosInstance,
   ZodiosPathsByMethod,
   ZodiosResponseByPath,
   ZodiosResponseByAlias,
@@ -33,18 +30,15 @@ import type {
   ZodiosBodyByAlias,
   ZodiosQueryParamsByPath,
   ZodiosRequestOptionsByAlias,
+  ZodTypeProvider,
 } from "@zodios/core";
-import type {
-  Aliases,
-  MutationMethod,
-  ZodiosAliases,
-} from "@zodios/core/lib/zodios.types";
 import type {
   IfEquals,
   PathParamNames,
   ReadonlyDeep,
   RequiredKeys,
 } from "@zodios/core/lib/utils.types";
+import type { Aliases, MutationMethod } from "@zodios/core/lib/zodios.types";
 import { capitalize, pick, omit, hasObjectBody } from "./utils";
 
 type UndefinedIfNever<T> = IfEquals<T, never, undefined, T>;
@@ -107,6 +101,7 @@ export class ZodiosHooksClass<
     private readonly zodios: ZodiosInstance<Api, FetcherProvider, TypeProvider>
   ) {
     this.injectAliasEndpoints();
+    this.injectMutationEndpoints();
   }
 
   private injectAliasEndpoints() {
@@ -145,6 +140,16 @@ export class ZodiosHooksClass<
     });
   }
 
+  private injectMutationEndpoints() {
+    HTTP_MUTATION_METHODS.forEach((method) => {
+      (this as any)[`use${capitalize(method)}`] = (
+        path: any,
+        config: any,
+        mutationOptions: any
+      ) => this.useMutation(method, path, config, mutationOptions);
+    });
+  }
+
   private getEndpointByPath(method: string, path: string) {
     return this.zodios.api.find(
       (endpoint) => endpoint.method === method && endpoint.path === path
@@ -180,7 +185,7 @@ export class ZodiosHooksClass<
     if (config) {
       const params = pick(
         config as AnyZodiosMethodOptions<FetcherProvider> | undefined,
-        ["params", "queries"]
+        ["params", "queries", "body"]
       );
       return [{ api: this.apiName, path: endpoint.path }, params] as QueryKey;
     }
@@ -193,9 +198,7 @@ export class ZodiosHooksClass<
    * @param config - parameters of the api to the endpoint
    * @returns - QueryKey
    */
-  getKeyByAlias<
-    Alias extends keyof ZodiosAliases<Api, FetcherProvider, true, TypeProvider>
-  >(
+  getKeyByAlias<Alias extends Aliases<Api>>(
     alias: Alias extends string ? Alias : never,
     config?: Alias extends string
       ? ZodiosRequestOptionsByAlias<
@@ -212,7 +215,7 @@ export class ZodiosHooksClass<
     if (config) {
       const params = pick(
         config as AnyZodiosMethodOptions<FetcherProvider> | undefined,
-        ["params", "queries"]
+        ["params", "queries", "body"]
       );
       return [{ api: this.apiName, path: endpoint.path }, params] as QueryKey;
     }
@@ -602,150 +605,6 @@ export class ZodiosHooksClass<
   } {
     return this.useQuery(path, ...(rest as any[]));
   }
-
-  usePost<
-    Path extends ZodiosPathsByMethod<Api, "post">,
-    TConfig extends Omit<
-      ZodiosRequestOptionsByPath<
-        Api,
-        "post",
-        Path,
-        FetcherProvider,
-        true,
-        TypeProvider
-      >,
-      "body"
-    >,
-    MutationVariables = UndefinedIfNever<
-      ZodiosBodyByPath<Api, "post", Path, true, TypeProvider>
-    >
-  >(
-    path: Path,
-    ...rest: RequiredKeys<TConfig> extends never
-      ? [
-          config?: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "post", Path, TypeProvider>
-        ]
-      : [
-          config: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "post", Path, TypeProvider>
-        ]
-  ): UseMutationResult<
-    ZodiosResponseByPath<Api, "post", Path, true, TypeProvider>,
-    Errors,
-    MutationVariables
-  > {
-    // @ts-expect-error
-    return this.useMutation("post", path, ...rest);
-  }
-
-  usePut<
-    Path extends ZodiosPathsByMethod<Api, "put">,
-    TConfig extends Omit<
-      ZodiosRequestOptionsByPath<
-        Api,
-        "put",
-        Path,
-        FetcherProvider,
-        true,
-        TypeProvider
-      >,
-      "body"
-    >,
-    MutationVariables = UndefinedIfNever<
-      ZodiosBodyByPath<Api, "put", Path, true, TypeProvider>
-    >
-  >(
-    path: Path,
-    ...rest: RequiredKeys<TConfig> extends never
-      ? [
-          config?: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "put", Path, TypeProvider>
-        ]
-      : [
-          config: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "put", Path, TypeProvider>
-        ]
-  ): UseMutationResult<
-    ZodiosResponseByPath<Api, "put", Path, true, TypeProvider>,
-    Errors,
-    MutationVariables
-  > {
-    // @ts-expect-error
-    return this.useMutation("put", path, ...rest);
-  }
-
-  usePatch<
-    Path extends ZodiosPathsByMethod<Api, "patch">,
-    TConfig extends Omit<
-      ZodiosRequestOptionsByPath<
-        Api,
-        "patch",
-        Path,
-        FetcherProvider,
-        true,
-        TypeProvider
-      >,
-      "body"
-    >,
-    MutationVariables = UndefinedIfNever<
-      ZodiosBodyByPath<Api, "patch", Path, true, TypeProvider>
-    >
-  >(
-    path: Path,
-    ...rest: RequiredKeys<TConfig> extends never
-      ? [
-          config?: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "patch", Path, TypeProvider>
-        ]
-      : [
-          config: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "patch", Path, TypeProvider>
-        ]
-  ): UseMutationResult<
-    ZodiosResponseByPath<Api, "patch", Path, true, TypeProvider>,
-    Errors,
-    MutationVariables
-  > {
-    // @ts-expect-error
-    return this.useMutation("patch", path, ...rest);
-  }
-
-  useDelete<
-    Path extends ZodiosPathsByMethod<Api, "delete">,
-    TConfig extends Omit<
-      ZodiosRequestOptionsByPath<
-        Api,
-        "delete",
-        Path,
-        FetcherProvider,
-        true,
-        TypeProvider
-      >,
-      "body"
-    >,
-    MutationVariables = UndefinedIfNever<
-      ZodiosBodyByPath<Api, "delete", Path, true, TypeProvider>
-    >
-  >(
-    path: Path,
-    ...rest: RequiredKeys<TConfig> extends never
-      ? [
-          config?: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "delete", Path, TypeProvider>
-        ]
-      : [
-          config: ReadonlyDeep<TConfig>,
-          mutationOptions?: MutationOptions<Api, "delete", Path, TypeProvider>
-        ]
-  ): UseMutationResult<
-    ZodiosResponseByPath<Api, "delete", Path, true, TypeProvider>,
-    Errors,
-    MutationVariables
-  > {
-    // @ts-expect-error
-    return this.useMutation("delete", path, ...rest);
-  }
 }
 
 export type ZodiosMutationAliasHook<Body, Config, MutationOptions, Response> =
@@ -850,12 +709,52 @@ export type ZodiosHooksAliases<
     : never;
 };
 
+export type ZodiosHooksMutations<
+  Api extends ZodiosEndpointDefinitions,
+  FetcherProvider extends AnyZodiosFetcherProvider,
+  TypeProvider extends AnyZodiosTypeProvider
+> = {
+  [M in MutationMethod as `use${Capitalize<M>}`]: <
+    Path extends ZodiosPathsByMethod<Api, M>,
+    TConfig extends Omit<
+      ZodiosRequestOptionsByPath<
+        Api,
+        M,
+        Path,
+        FetcherProvider,
+        true,
+        TypeProvider
+      >,
+      "body"
+    >,
+    MutationVariables = UndefinedIfNever<
+      ZodiosBodyByPath<Api, M, Path, true, TypeProvider>
+    >
+  >(
+    path: Path,
+    ...rest: RequiredKeys<TConfig> extends never
+      ? [
+          config?: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, M, Path, TypeProvider>
+        ]
+      : [
+          config: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, M, Path, TypeProvider>
+        ]
+  ) => UseMutationResult<
+    ZodiosResponseByPath<Api, M, Path, true, TypeProvider>,
+    Errors,
+    MutationVariables
+  >;
+};
+
 export type ZodiosHooksInstance<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = ZodiosHooksClass<Api, FetcherProvider, TypeProvider> &
-  ZodiosHooksAliases<Api, FetcherProvider, TypeProvider>;
+  ZodiosHooksAliases<Api, FetcherProvider, TypeProvider> &
+  ZodiosHooksMutations<Api, FetcherProvider, TypeProvider>;
 
 export type ZodiosHooksConstructor = {
   new <
