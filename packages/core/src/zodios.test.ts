@@ -348,7 +348,7 @@ describe("Zodios", () => {
 
   it("should register have validation plugin automatically installed", () => {
     const zodios = new ZodiosCore(`http://localhost`, []);
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
@@ -357,7 +357,7 @@ describe("Zodios", () => {
     zodios.use({
       request: async (_, config) => config,
     });
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
   });
 
@@ -366,10 +366,10 @@ describe("Zodios", () => {
     const id = zodios.use({
       request: async (_, config) => config,
     });
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
     zodios.eject(id);
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
@@ -382,7 +382,7 @@ describe("Zodios", () => {
     zodios.use(plugin);
     zodios.use(plugin);
     zodios.use(plugin);
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
   });
 
@@ -394,13 +394,13 @@ describe("Zodios", () => {
     };
     zodios.use(plugin);
     zodios.eject("test");
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
   it("should throw if invalide parameters when registering a plugin", () => {
     const zodios = new ZodiosCore(`http://localhost`, []);
-    // @ts-ignore
+    // @ts-expect-error
     expect(() => zodios.use(0)).toThrowError("Zodios: invalid plugin");
   });
 
@@ -417,9 +417,9 @@ describe("Zodios", () => {
       },
     ]);
     expect(() =>
-      // @ts-ignore
+      // @ts-expect-error
       zodios.use("tests", {
-        // @ts-ignore
+        // @ts-expect-error
         request: async (_, config) => config,
       })
     ).toThrowError("Zodios: no alias 'tests' found to register plugin");
@@ -437,9 +437,9 @@ describe("Zodios", () => {
       },
     ]);
     expect(() =>
-      // @ts-ignore
+      // @ts-expect-error
       zodios.use("get", "/test/:id", {
-        // @ts-ignore
+        // @ts-expect-error
         request: async (_, config) => config,
       })
     ).toThrowError(
@@ -461,7 +461,7 @@ describe("Zodios", () => {
     zodios.use("get", "/:id", {
       request: async (_, config) => config,
     });
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("get-/:id").count()).toBe(1);
   });
 
@@ -480,31 +480,35 @@ describe("Zodios", () => {
     zodios.use("test", {
       request: async (_, config) => config,
     });
-    // @ts-ignore
+    // @ts-expect-error
     expect(zodios.endpointPlugins.get("get-/:id").count()).toBe(1);
   });
 
   it("should make an http request", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-      {
-        method: "get",
-        path: "/users",
-        response: z.array(
-          z.object({
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/:id",
+          response: z.object({
             id: z.number(),
             name: z.string(),
-          })
-        ),
-      },
-    ]);
+          }),
+        },
+        {
+          method: "get",
+          path: "/users",
+          response: z.array(
+            z.object({
+              id: z.number(),
+              name: z.string(),
+            })
+          ),
+        },
+      ],
+      { fetcherProvider: mockProvider }
+    );
     const response = await zodios.request({
       method: "get",
       url: "/:id",
@@ -514,22 +518,36 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with standard query arrays", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/queries",
-        parameters: [
-          {
-            name: "id",
-            type: "Query",
-            schema: z.array(z.number()),
-          },
-        ],
-        response: z.object({
-          queries: z.array(z.string()),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/queries",
+          parameters: [
+            {
+              name: "id",
+              type: "Query",
+              schema: z.array(z.number()),
+            },
+          ],
+          response: z.object({
+            queries: z.array(z.string()),
+          }),
+        },
+        {
+          method: "get",
+          path: "/users",
+          response: z.array(
+            z.object({
+              id: z.number(),
+              name: z.string(),
+            })
+          ),
+        },
+      ],
+      { fetcherProvider: mockProvider }
+    );
     const response = await zodios.get("/queries", { queries: { id: [1, 2] } });
     expect(response).toEqual({ queries: [1, 2] });
   });

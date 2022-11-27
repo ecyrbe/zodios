@@ -26,9 +26,21 @@ import {
   ZodiosRuntimeFetcherProvider,
 } from "./fetcher-providers";
 
-export type MutationMethod = "post" | "put" | "patch" | "delete";
+export const HTTP_QUERY_METHODS = ["get", "head"] as const;
+export const HTTP_MUTATION_METHODS = [
+  "post",
+  "put",
+  "patch",
+  "delete",
+] as const;
+export const HTTP_METHODS = [
+  ...HTTP_QUERY_METHODS,
+  ...HTTP_MUTATION_METHODS,
+] as const;
 
-export type Method = "get" | "head" | "options" | MutationMethod;
+export type QueryMethod = typeof HTTP_QUERY_METHODS[number];
+export type MutationMethod = typeof HTTP_MUTATION_METHODS[number];
+export type Method = typeof HTTP_METHODS[number];
 
 export type RequestFormat =
   | "json" // default
@@ -593,11 +605,6 @@ export type ZodiosRequestOptionsByAlias<
   >
 >;
 
-export type ZodiosMutationAliasRequest<Config, Response> =
-  RequiredKeys<Config> extends never
-    ? (configOptions?: ReadonlyDeep<Config>) => Promise<Response>
-    : (configOptions: ReadonlyDeep<Config>) => Promise<Response>;
-
 export type ZodiosAliasRequest<Config, Response> =
   RequiredKeys<Config> extends never
     ? (configOptions?: ReadonlyDeep<Config>) => Promise<Response>
@@ -606,33 +613,41 @@ export type ZodiosAliasRequest<Config, Response> =
 export type ZodiosAliases<
   Api extends ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
-  Frontend extends boolean = true,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider
 > = {
-  [Alias in Aliases<Api>]: ZodiosEndpointDefinitionByAlias<
-    Api,
-    Alias
-  >[number]["method"] extends MutationMethod
-    ? ZodiosMutationAliasRequest<
-        ZodiosRequestOptionsByAlias<
-          Api,
-          Alias,
-          FetcherProvider,
-          Frontend,
-          TypeProvider
-        >,
-        ZodiosResponseByAlias<Api, Alias, Frontend, TypeProvider>
-      >
-    : ZodiosAliasRequest<
-        ZodiosRequestOptionsByAlias<
-          Api,
-          Alias,
-          FetcherProvider,
-          Frontend,
-          TypeProvider
-        >,
-        ZodiosResponseByAlias<Api, Alias, Frontend, TypeProvider>
-      >;
+  [Alias in Aliases<Api>]: ZodiosAliasRequest<
+    ZodiosRequestOptionsByAlias<
+      Api,
+      Alias,
+      FetcherProvider,
+      true,
+      TypeProvider
+    >,
+    ZodiosResponseByAlias<Api, Alias, true, TypeProvider>
+  >;
+};
+
+export type ZodiosVerbs<
+  Api extends ZodiosEndpointDefinition[],
+  FetcherProvider extends AnyZodiosFetcherProvider,
+  TypeProvider extends AnyZodiosTypeProvider
+> = {
+  [M in Method]: <
+    Path extends ZodiosPathsByMethod<Api, M>,
+    TConfig extends ZodiosRequestOptionsByPath<
+      Api,
+      M,
+      Path,
+      FetcherProvider,
+      true,
+      TypeProvider
+    >
+  >(
+    path: Path,
+    ...[config]: RequiredKeys<TConfig> extends never
+      ? [config?: ReadonlyDeep<TConfig>]
+      : [config: ReadonlyDeep<TConfig>]
+  ) => Promise<ZodiosResponseByPath<Api, M, Path, true, TypeProvider>>;
 };
 
 export type AnyZodiosMethodOptions<

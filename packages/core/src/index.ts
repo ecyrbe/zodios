@@ -47,6 +47,11 @@ export type {
   ZodiosRequestOptionsByAlias,
   ZodiosPlugin,
 } from "./zodios.types";
+export {
+  HTTP_METHODS,
+  HTTP_MUTATION_METHODS,
+  HTTP_QUERY_METHODS,
+} from "./zodios.types";
 export type {
   AnyZodiosTypeProvider,
   InferInputTypeFromSchema,
