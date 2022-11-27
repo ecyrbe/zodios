@@ -1,5 +1,12 @@
 # @zodios/core
 
+## 11.0.0-beta.14
+
+### Major Changes
+
+- 422221b: refactor: factor http verbs
+- 13247c6: chore: fix type exports for nodenext
+
 ## 11.0.0-beta.13
 
 ### Major Changes
