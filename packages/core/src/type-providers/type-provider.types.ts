@@ -18,10 +18,10 @@ export type ZodiosValidateResult =
   | { success: true; data: any }
   | { success: false; error: any };
 
-export type ZodiosRuntimeTypeProvider<
+export interface ZodiosRuntimeTypeProvider<
   TypeProvider extends AnyZodiosTypeProvider
-> = {
+> {
   readonly _provider?: TypeProvider;
   validate: (schema: any, input: unknown) => ZodiosValidateResult;
   validateAsync: (schema: any, input: unknown) => Promise<ZodiosValidateResult>;
-};
+}
