@@ -1,7 +1,7 @@
 {
   "name": "@zodios/axios",
   "description": "Typescript API client with axios",
-  "version": "11.0.0-beta.13",
+  "version": "11.0.0-beta.14",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
