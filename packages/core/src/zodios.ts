@@ -6,14 +6,15 @@ import type {
   ZodiosResponseByPath,
   ZodiosOptions,
   ZodiosEndpointDefinitions,
-  ZodiosRequestOptionsByPath,
   ZodiosAliases,
   ZodiosPlugin,
   Aliases,
   ZodiosEndpointError,
   ZodiosMatchingErrorsByPath,
   ZodiosMatchingErrorsByAlias,
+  ZodiosVerbs,
 } from "./zodios.types";
+import { HTTP_METHODS } from "./zodios.types";
 import {
   PluginId,
   ZodiosPlugins,
@@ -149,6 +150,7 @@ export class ZodiosCoreImpl<
     this.options.fetcherProvider?.init({ baseURL, ...this.options });
 
     this.injectAliasEndpoints();
+    this.injectHttpVerbEndpoints();
     this.initPlugins();
     if ([true, "all", "request", "response"].includes(this.options.validate)) {
       this.use(zodValidationPlugin(this.options));
@@ -281,19 +283,26 @@ export class ZodiosCoreImpl<
     });
   }
 
+  private injectHttpVerbEndpoints() {
+    HTTP_METHODS.forEach((method) => {
+      (this as any)[method] = (path: string, config: any) =>
+        this.request({
+          ...config,
+          method,
+          url: path,
+        });
+    });
+  }
+
   /**
    * make a request to the api
    * @param config - the config to setup zodios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async request<
-    M extends Method,
-    Path extends ZodiosPathsByMethod<Api, M>,
-    TConfig = ReadonlyDeep<
+  async request<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
+    config: ReadonlyDeep<
       ZodiosRequestOptions<Api, M, Path, FetcherProvider, true, TypeProvider>
     >
-  >(
-    config: TConfig
   ): Promise<ZodiosResponseByPath<Api, M, Path, true, TypeProvider>> {
     let conf = config as unknown as ReadonlyDeep<
       AnyZodiosRequestOptions<FetcherProvider>
@@ -317,154 +326,6 @@ export class ZodiosCoreImpl<
     }
     response = anyPlugin.interceptResponse(this.api, conf, response);
     return (await response).data;
-  }
-
-  /**
-   * make a get request to the api
-   * @param path - the path to api endpoint
-   * @param config - the config to setup options and parameters
-   * @returns response validated with zod schema provided in the api description
-   */
-  async get<
-    Path extends ZodiosPathsByMethod<Api, "get">,
-    TConfig extends ZodiosRequestOptionsByPath<
-      Api,
-      "get",
-      Path,
-      FetcherProvider,
-      true,
-      TypeProvider
-    >
-  >(
-    path: Path,
-    ...[config]: RequiredKeys<TConfig> extends never
-      ? [config?: ReadonlyDeep<TConfig>]
-      : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "get", Path, true, TypeProvider>> {
-    return this.request({
-      ...config,
-      method: "get",
-      url: path,
-    });
-  }
-
-  /**
-   * make a post request to the api
-   * @param path - the path to api endpoint
-   * @param data - the data to send
-   * @param config - the config to setup options and parameters
-   * @returns response validated with zod schema provided in the api description
-   */
-  async post<
-    Path extends ZodiosPathsByMethod<Api, "post">,
-    TConfig extends ZodiosRequestOptionsByPath<
-      Api,
-      "post",
-      Path,
-      FetcherProvider,
-      true,
-      TypeProvider
-    >
-  >(
-    path: Path,
-    ...[config]: RequiredKeys<TConfig> extends never
-      ? [config?: ReadonlyDeep<TConfig>]
-      : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "post", Path, true, TypeProvider>> {
-    return this.request({
-      ...config,
-      method: "post",
-      url: path,
-    });
-  }
-
-  /**
-   * make a put request to the api
-   * @param path - the path to api endpoint
-   * @param data - the data to send
-   * @param config - the config to setup options and parameters
-   * @returns response validated with zod schema provided in the api description
-   */
-  async put<
-    Path extends ZodiosPathsByMethod<Api, "put">,
-    TConfig extends ZodiosRequestOptionsByPath<
-      Api,
-      "put",
-      Path,
-      FetcherProvider,
-      true,
-      TypeProvider
-    >
-  >(
-    path: Path,
-    ...[config]: RequiredKeys<TConfig> extends never
-      ? [config?: ReadonlyDeep<TConfig>]
-      : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "put", Path, true, TypeProvider>> {
-    return this.request({
-      ...config,
-      method: "put",
-      url: path,
-    });
-  }
-
-  /**
-   * make a patch request to the api
-   * @param path - the path to api endpoint
-   * @param data - the data to send
-   * @param config - the config to setup options and parameters
-   * @returns response validated with zod schema provided in the api description
-   */
-  async patch<
-    Path extends ZodiosPathsByMethod<Api, "patch">,
-    TConfig extends ZodiosRequestOptionsByPath<
-      Api,
-      "patch",
-      Path,
-      FetcherProvider,
-      true,
-      TypeProvider
-    >
-  >(
-    path: Path,
-    ...[config]: RequiredKeys<TConfig> extends never
-      ? [config?: ReadonlyDeep<TConfig>]
-      : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "patch", Path, true, TypeProvider>> {
-    return this.request({
-      ...config,
-      method: "patch",
-      url: path,
-    });
-  }
-
-  /**
-   * make a delete request to the api
-   * @param path - the path to api endpoint
-   * @param config - the config to setup options and parameters
-   * @returns response validated with zod schema provided in the api description
-   */
-  async delete<
-    Path extends ZodiosPathsByMethod<Api, "delete">,
-    TConfig extends ZodiosRequestOptionsByPath<
-      Api,
-      "delete",
-      Path,
-      FetcherProvider,
-      true,
-      TypeProvider
-    >
-  >(
-    path: Path,
-    ...[config]: RequiredKeys<TConfig> extends never
-      ? [config?: ReadonlyDeep<TConfig>]
-      : [config: ReadonlyDeep<TConfig>]
-  ): Promise<ZodiosResponseByPath<Api, "delete", Path, true, TypeProvider>> {
-    return this.request({
-      ...config,
-      method: "delete",
-      url: path,
-    });
   }
 
   private isDefinedError(
@@ -538,9 +399,10 @@ export class ZodiosCoreImpl<
 export type ZodiosInstance<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
-  TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
+  TypeProvider extends AnyZodiosTypeProvider
 > = ZodiosCoreImpl<Api, FetcherProvider, TypeProvider> &
-  ZodiosAliases<Api, FetcherProvider, true, TypeProvider>;
+  ZodiosAliases<Api, FetcherProvider, TypeProvider> &
+  ZodiosVerbs<Api, FetcherProvider, TypeProvider>;
 
 export interface ZodiosCore {
   new <
