@@ -91,7 +91,7 @@ export type ImmutableInfiniteQueryOptions<TQueryFnData, TData> = Omit<
   "queryKey" | "queryFn"
 >;
 
-export class ZodiosHooksClass<
+export class ZodiosHooksImpl<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -752,11 +752,11 @@ export type ZodiosHooksInstance<
   Api extends ZodiosEndpointDefinitions,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
-> = ZodiosHooksClass<Api, FetcherProvider, TypeProvider> &
+> = ZodiosHooksImpl<Api, FetcherProvider, TypeProvider> &
   ZodiosHooksAliases<Api, FetcherProvider, TypeProvider> &
   ZodiosHooksMutations<Api, FetcherProvider, TypeProvider>;
 
-export type ZodiosHooksConstructor = {
+export type ZodiosHooks = {
   new <
     Api extends ZodiosEndpointDefinitions,
     FetcherProvider extends AnyZodiosFetcherProvider,
@@ -767,4 +767,4 @@ export type ZodiosHooksConstructor = {
   ): ZodiosHooksInstance<Api, FetcherProvider, TypeProvider>;
 };
 
-export const ZodiosHooks = ZodiosHooksClass as ZodiosHooksConstructor;
+export const ZodiosHooks = ZodiosHooksImpl as ZodiosHooks;
