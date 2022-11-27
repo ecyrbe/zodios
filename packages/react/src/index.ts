@@ -1,6 +1,1 @@
-export {
-  ZodiosHooks,
-  ZodiosHooksClass,
-  ZodiosHooksConstructor,
-  ZodiosHooksInstance,
-} from "./hooks";
+export { ZodiosHooks, ZodiosHooksInstance } from "./hooks";
