@@ -44,13 +44,13 @@ import z from "zod";
 import { userApi } from "../../common/api";
 import { userMiddleware } from "./userMiddleware";
 
-const ctx = zodiosContext({
+const ctx = zodiosContext(z.object({
   user: z.object({
     id: z.number(),
     name: z.string(),
     isAdmin: z.boolean(),
   }),
-});
+}));
 
 const app = ctx.app();
 // middleware that adds the user to the context
