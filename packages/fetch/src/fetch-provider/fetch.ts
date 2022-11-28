@@ -112,12 +112,18 @@ function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
   });
 }
 
+function isErrorLike(error: unknown): error is Error {
+  return (
+    error instanceof Error ||
+    (!!error && typeof error === "object" && "message" in error)
+  );
+}
+
 async function fetchRequest(request: Request, config: FetchProviderConfig) {
   try {
     return await fetch(request);
   } catch (error) {
-    // istanbul ignore next
-    if (error instanceof Error) {
+    if (isErrorLike(error)) {
       throw new FetchError(error.message, "ERR_NETWORK", config, request);
     } else {
       throw new FetchError("Network Error", "ERR_NETWORK", config, request);
