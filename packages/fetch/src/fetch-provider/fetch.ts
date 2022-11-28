@@ -1,6 +1,12 @@
 import { AnyZodiosRequestOptions } from "@zodios/core";
 import { FetchProviderResponse, FetchProviderConfig } from "./fetch.types";
-import { buildURL, isBlob, isFile, isFormData } from "./fetch.utils";
+import {
+  buildURL,
+  combineSignals,
+  isBlob,
+  isFile,
+  isFormData,
+} from "./fetch.utils";
 import { FetchProvider } from "./fetcher-provider.fetch";
 
 export class FetchError<Data> extends Error {
@@ -50,6 +56,16 @@ export const advancedFetch = async <Data = unknown>(
   return response;
 };
 
+// istanbul ignore next
+function getAbortTimeout(ms: number): AbortSignal {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), ms);
+  controller.signal.addEventListener("abort", () => {
+    clearTimeout(id);
+  });
+  return controller.signal;
+}
+
 function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
   const headers = new Headers(config.headers);
   if (isFormData(config.body) || isBlob(config.body) || isFile(config.body)) {
@@ -72,12 +88,20 @@ function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
     headers.set("Authorization", `Basic ${btoa(username + ":" + password)}`);
   }
 
-  // istanbul ignore next
-  if (config.timeout && !config.signal) {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), config.timeout);
-    config.signal = controller.signal;
-    config.signal.addEventListener("abort", () => clearTimeout(timeout));
+  if (config.timeout) {
+    if (!globalThis.AbortController) {
+      console.warn("Timeout is not supported in this environment");
+    } else if (globalThis.AbortSignal && "timeout" in globalThis.AbortSignal) {
+      config.signal = combineSignals(
+        config.signal,
+        AbortSignal.timeout(config.timeout)
+      );
+    } else {
+      config.signal = combineSignals(
+        config.signal,
+        getAbortTimeout(config.timeout)
+      );
+    }
   }
 
   const url = buildURL(config);

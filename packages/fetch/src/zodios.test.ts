@@ -79,6 +79,10 @@ describe("Zodios", () => {
     app.post("/text", express.text(), (req, res) => {
       res.status(200).send(req.body);
     });
+    app.get("/cancel", async (req, res) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      res.status(200).json({ shouldNotBeReturned: true });
+    });
     server = app.listen(0);
     port = (server.address() as AddressInfo).port;
   });
@@ -814,6 +818,108 @@ received:
         params: { id: 1 },
       });
     }
+  });
+
+  it("should cancel request on timeout", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/cancel",
+        response: z.object({
+          shouldNotBeReturned: z.boolean(),
+        }),
+      },
+    ]);
+    let error: Error | undefined;
+    let result;
+    try {
+      result = await zodios.get("/cancel", { timeout: 1 });
+    } catch (e) {
+      error = e as Error;
+    }
+    expect(result).toBeUndefined();
+    expect(error).toBeInstanceOf(Error);
+    expect(error!.message).toBe("The user aborted a request.");
+  });
+
+  it("should cancel request on abort", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/cancel",
+        response: z.object({
+          shouldNotBeReturned: z.boolean(),
+        }),
+      },
+    ]);
+    let error: Error | undefined;
+    let result;
+    const controller = new AbortController();
+    try {
+      const promise = zodios.get("/cancel", { signal: controller.signal });
+      controller.abort();
+      result = await promise;
+    } catch (e) {
+      error = e as Error;
+    }
+    expect(result).toBeUndefined();
+    expect(error).toBeInstanceOf(Error);
+    expect(error!.message).toBe("The user aborted a request.");
+  });
+
+  it("should cancel request on abort with timeout", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/cancel",
+        response: z.object({
+          shouldNotBeReturned: z.boolean(),
+        }),
+      },
+    ]);
+    let error: Error | undefined;
+    let result;
+    const controller = new AbortController();
+    try {
+      const promise = zodios.get("/cancel", {
+        signal: controller.signal,
+        timeout: 1000,
+      });
+      controller.abort();
+      result = await promise;
+    } catch (e) {
+      error = e as Error;
+    }
+    expect(result).toBeUndefined();
+    expect(error).toBeInstanceOf(Error);
+    expect(error!.message).toBe("The user aborted a request.");
+  });
+
+  it("should cancel request on timeout with abort", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        path: "/cancel",
+        response: z.object({
+          shouldNotBeReturned: z.boolean(),
+        }),
+      },
+    ]);
+    let error: Error | undefined;
+    let result;
+    const controller = new AbortController();
+    try {
+      const promise = zodios.get("/cancel", {
+        signal: controller.signal,
+        timeout: 1,
+      });
+      result = await promise;
+    } catch (e) {
+      error = e as Error;
+    }
+    expect(result).toBeUndefined();
+    expect(error).toBeInstanceOf(Error);
+    expect(error!.message).toBe("The user aborted a request.");
   });
 
   it("should match Expected error", async () => {
