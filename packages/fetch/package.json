@@ -38,7 +38,7 @@
     "example": "ts-node examples/jsonplaceholder.ts",
     "example:dev.to": "ts-node examples/dev.to/example.ts",
     "build": "tsup",
-    "test": "jest --coverage"
+    "test": "NODE_OPTIONS=--experimental-abortcontroller jest --coverage"
   },
   "peerDependencies": {
     "fp-ts": "2.x",
