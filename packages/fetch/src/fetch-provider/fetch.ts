@@ -69,8 +69,8 @@ function getAbortTimeout(ms: number): AbortSignal {
 function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
   const headers = new Headers(config.headers);
   if (isFormData(config.body) || isBlob(config.body) || isFile(config.body)) {
+    // istanbul ignore next
     if (headers.has("Content-Type")) {
-      // istanbul ignore next
       headers.delete("Content-Type");
     }
   } else if (typeof config.body === "object") {
@@ -88,6 +88,7 @@ function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
     headers.set("Authorization", `Basic ${btoa(username + ":" + password)}`);
   }
 
+  // istanbul ignore next
   if (config.timeout) {
     if (!globalThis.AbortController) {
       console.warn("Timeout is not supported in this environment");
@@ -112,6 +113,7 @@ function createFetchRequest(config: AnyZodiosRequestOptions<FetchProvider>) {
   });
 }
 
+// istanbul ignore next
 function isErrorLike(error: unknown): error is Error {
   return (
     error instanceof Error ||
@@ -123,6 +125,7 @@ async function fetchRequest(request: Request, config: FetchProviderConfig) {
   try {
     return await fetch(request);
   } catch (error) {
+    // istanbul ignore next
     if (isErrorLike(error)) {
       throw new FetchError(error.message, "ERR_NETWORK", config, request);
     } else {
