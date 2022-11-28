@@ -159,6 +159,15 @@ const api = makeApi([
       name: z.string(),
     }),
   },
+  {
+    method: "get",
+    path: "/users/:id/cancel",
+    alias: "getUserCancel",
+    response: z.object({
+      id: z.number(),
+      name: z.string(),
+    }),
+  },
 ]);
 
 const queryClient = new QueryClient({
@@ -317,6 +326,10 @@ describe("zodios hooks", () => {
       });
       app.get("/users/:id/error", (req, res) => {
         res.status(200).json({ id: Number(req.params.id), names: "test" });
+      });
+      app.get("/users/:id/cancel", async (req, res) => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        res.status(200).json({ id: Number(req.params.id), name: "test" });
       });
 
       server = app.listen(0);
@@ -553,6 +566,97 @@ describe("zodios hooks", () => {
       result.current.apiMutations.mutate(undefined);
       await waitFor(() => result.current.apiMutations.isSuccess);
       expect(result.current.userDeleted).toEqual({ id: 3 });
+    });
+
+    it("should cancel request with signal", async () => {
+      const apiClient = new Zodios(`http://localhost:${port}`, api);
+      const apiHooks = new ZodiosHooks("test", apiClient, {
+        shouldAbortOnUnmount: true,
+      });
+      const { result, waitFor } = renderHook(
+        () => {
+          const controller = new AbortController();
+          const apiCancel = apiHooks.useGet("/users/:id/cancel", {
+            params: { id: 1 },
+            signal: controller.signal,
+            timeout: 1000,
+          });
+          return { apiCancel, controller };
+        },
+        { wrapper }
+      );
+      result.current.controller.abort();
+      await waitFor(() => result.current.apiCancel.isError);
+      expect(result.current.apiCancel.error!.message).toEqual(
+        "The user aborted a request."
+      );
+    });
+
+    it("should cancel request early with signal", async () => {
+      const apiClient = new Zodios(`http://localhost:${port}`, api);
+      const apiHooks = new ZodiosHooks("test", apiClient, {
+        shouldAbortOnUnmount: true,
+      });
+      const { result, waitFor } = renderHook(
+        () => {
+          const controller = new AbortController();
+          controller.abort();
+          const apiCancel = apiHooks.useGet("/users/:id/cancel", {
+            params: { id: 1 },
+            signal: controller.signal,
+          });
+          return { apiCancel };
+        },
+        { wrapper }
+      );
+      await waitFor(() => result.current.apiCancel.isError);
+      expect(result.current.apiCancel.error!.message).toEqual(
+        "The user aborted a request."
+      );
+    });
+
+    it("should cancel request with timeout and signal", async () => {
+      const apiClient = new Zodios(`http://localhost:${port}`, api);
+      const apiHooks = new ZodiosHooks("test", apiClient, {
+        shouldAbortOnUnmount: true,
+      });
+      const { result, waitFor } = renderHook(
+        () => {
+          const controller = new AbortController();
+          const apiCancel = apiHooks.useGet("/users/:id/cancel", {
+            params: { id: 1 },
+            signal: controller.signal,
+            timeout: 1,
+          });
+          return { apiCancel };
+        },
+        { wrapper }
+      );
+      await waitFor(() => result.current.apiCancel.isError);
+      expect(result.current.apiCancel.error!.message).toEqual(
+        "The user aborted a request."
+      );
+    });
+
+    it("should cancel request with timeout", async () => {
+      const apiClient = new Zodios(`http://localhost:${port}`, api);
+      const apiHooks = new ZodiosHooks("test", apiClient, {
+        shouldAbortOnUnmount: true,
+      });
+      const { result, waitFor } = renderHook(
+        () => {
+          const apiCancel = apiHooks.useGet("/users/:id/cancel", {
+            params: { id: 1 },
+            timeout: 1,
+          });
+          return { apiCancel };
+        },
+        { wrapper }
+      );
+      await waitFor(() => result.current.apiCancel.isError);
+      expect(result.current.apiCancel.error!.message).toEqual(
+        "The user aborted a request."
+      );
     });
 
     it("should infinite load users", async () => {

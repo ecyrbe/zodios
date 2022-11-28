@@ -69,3 +69,40 @@ export function buildURL(config: AnyZodiosRequestOptions<FetchProvider>) {
   }
   return `${fullURL}${serializedParams}`;
 }
+
+function isDefinedSignal(
+  signal: AbortSignal | undefined | null
+): signal is AbortSignal {
+  return Boolean(signal);
+}
+
+/**
+ * combine multiple abort signals into one
+ * @param signals - the signals to listen to
+ * @returns - the combined signal
+ */
+export function combineSignals(
+  ...signals: (AbortSignal | undefined | null)[]
+): AbortSignal | undefined {
+  const definedSignals: AbortSignal[] = signals.filter(isDefinedSignal);
+  if (definedSignals.length < 2) {
+    return definedSignals[0];
+  }
+  const controller = new AbortController();
+
+  function onAbort() {
+    controller.abort();
+    definedSignals.forEach((signal) => {
+      signal.removeEventListener("abort", onAbort);
+    });
+  }
+
+  definedSignals.forEach((signal) => {
+    if (signal.aborted) {
+      onAbort();
+    } else {
+      signal.addEventListener("abort", onAbort);
+    }
+  });
+  return controller.signal;
+}
