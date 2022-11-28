@@ -40,6 +40,7 @@ function queriesToSearchString(
       } else if (typeof value === "string") {
         searchParams.append(key, value);
       } else {
+        // istanbul ignore next
         searchParams.append(key, JSON.stringify(value));
       }
     });
