@@ -39,7 +39,7 @@ import type {
   RequiredKeys,
 } from "@zodios/core/lib/utils.types";
 import type { Aliases, MutationMethod } from "@zodios/core/lib/zodios.types";
-import { capitalize, pick, omit, hasObjectBody } from "./utils";
+import { capitalize, pick, omit, hasObjectBody, combineSignals } from "./utils";
 
 type UndefinedIfNever<T> = IfEquals<T, never, undefined, T>;
 type Errors = Error | ZodiosError;
@@ -98,7 +98,8 @@ export class ZodiosHooksImpl<
 > {
   constructor(
     private readonly apiName: string,
-    private readonly zodios: ZodiosInstance<Api, FetcherProvider, TypeProvider>
+    private readonly zodios: ZodiosInstance<Api, FetcherProvider, TypeProvider>,
+    private readonly options: { shouldAbortOnUnmount?: boolean } = {}
   ) {
     this.injectAliasEndpoints();
     this.injectMutationEndpoints();
@@ -254,8 +255,13 @@ export class ZodiosHooksImpl<
       ["params", "queries", "body"]
     );
     const key = [{ api: this.apiName, path }, params] as QueryKey;
-    // @ts-expect-error
-    const query = () => this.zodios.get(path, config);
+    const query = ({ signal }: { signal?: AbortSignal }) =>
+      this.zodios.get(path, {
+        ...(config as any),
+        signal: this.options.shouldAbortOnUnmount
+          ? combineSignals(signal, (config as any)?.signal)
+          : (config as any)?.signal,
+      });
     const queryClient = useQueryClient();
     const invalidate = () => queryClient.invalidateQueries(key);
     return {
@@ -298,7 +304,13 @@ export class ZodiosHooksImpl<
       ["params", "queries", "body"]
     );
     const key = [{ api: this.apiName, path }, params] as QueryKey;
-    const query = () => this.zodios.post(path, config as any);
+    const query = ({ signal }: { signal?: AbortSignal }) =>
+      this.zodios.post(path, {
+        ...(config as any),
+        signal: this.options.shouldAbortOnUnmount
+          ? combineSignals(signal, (config as any)?.signal)
+          : (config as any)?.signal,
+      });
     const queryClient = useQueryClient();
     const invalidate = () => queryClient.invalidateQueries(key);
     return {
@@ -381,7 +393,7 @@ export class ZodiosHooksImpl<
       );
     }
     const key = [{ api: this.apiName, path }, params];
-    const query = ({ pageParam = undefined }: QueryFunctionContext) =>
+    const query = ({ pageParam = undefined, signal }: QueryFunctionContext) =>
       this.zodios.get(path, {
         ...config,
         queries: {
@@ -400,6 +412,9 @@ export class ZodiosHooksImpl<
                 ...pageParam?.body,
               }
             : config?.body,
+        signal: this.options.shouldAbortOnUnmount
+          ? combineSignals(signal, (config as any)?.signal)
+          : (config as any)?.signal,
       } as unknown as ReadonlyDeep<TConfig>);
     const queryClient = useQueryClient();
     const invalidate = () => queryClient.invalidateQueries(key);
@@ -496,7 +511,7 @@ export class ZodiosHooksImpl<
       );
     }
     const key = [{ api: this.apiName, path }, params];
-    const query = ({ pageParam = undefined }: QueryFunctionContext) =>
+    const query = ({ pageParam = undefined, signal }: QueryFunctionContext) =>
       this.zodios.post(path, {
         ...config,
         queries: {
@@ -515,6 +530,9 @@ export class ZodiosHooksImpl<
                 ...pageParam?.body,
               }
             : config?.body,
+        signal: this.options.shouldAbortOnUnmount
+          ? combineSignals(signal, (config as any)?.signal)
+          : (config as any)?.signal,
       } as unknown as ReadonlyDeep<TConfig>);
     const queryClient = useQueryClient();
     const invalidate = () => queryClient.invalidateQueries(key);
@@ -763,7 +781,8 @@ export type ZodiosHooks = {
     TypeProvider extends AnyZodiosTypeProvider
   >(
     name: string,
-    zodios: ZodiosInstance<Api, FetcherProvider, TypeProvider>
+    zodios: ZodiosInstance<Api, FetcherProvider, TypeProvider>,
+    options?: { shouldAbortOnUnmount?: boolean }
   ): ZodiosHooksInstance<Api, FetcherProvider, TypeProvider>;
 };
 
