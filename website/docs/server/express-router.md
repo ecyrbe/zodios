@@ -50,13 +50,13 @@ import z from "zod";
 import { userApi } from "../../common/api";
 import { userMiddleware } from "./userMiddleware";
 
-const ctx = zodiosContext({
+const ctx = zodiosContext(z.object({
   user: z.object({
     id: z.number(),
     name: z.string(),
     isAdmin: z.boolean(),
   }),
-});
+}));
 
 const router = ctx.router();
 
@@ -83,13 +83,13 @@ or context aware
 ```ts
 import { zodiosContext } from "@zodios/express";
 
-const ctx = zodiosContext({
+const ctx = zodiosContext(z.object({
   user: z.object({
     id: z.number(),
     name: z.string(),
     isAdmin: z.boolean(),
   }),
-});
+}));
 
 const app = ctx.app();
 const userRouter = ctx.router(userApi);
