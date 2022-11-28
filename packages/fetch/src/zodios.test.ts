@@ -839,7 +839,7 @@ received:
     }
     expect(result).toBeUndefined();
     expect(error).toBeInstanceOf(Error);
-    expect(error!.message).toBe("The user aborted a request.");
+    expect(error!.message).toContain("aborted");
   });
 
   it("should cancel request on abort", async () => {
@@ -864,7 +864,7 @@ received:
     }
     expect(result).toBeUndefined();
     expect(error).toBeInstanceOf(Error);
-    expect(error!.message).toBe("The user aborted a request.");
+    expect(error!.message).toContain("aborted");
   });
 
   it("should cancel request on abort with timeout", async () => {
@@ -892,7 +892,7 @@ received:
     }
     expect(result).toBeUndefined();
     expect(error).toBeInstanceOf(Error);
-    expect(error!.message).toBe("The user aborted a request.");
+    expect(error!.message).toContain("aborted");
   });
 
   it("should cancel request on timeout with abort", async () => {
@@ -919,7 +919,7 @@ received:
     }
     expect(result).toBeUndefined();
     expect(error).toBeInstanceOf(Error);
-    expect(error!.message).toBe("The user aborted a request.");
+    expect(error!.message).toContain("aborted");
   });
 
   it("should match Expected error", async () => {
