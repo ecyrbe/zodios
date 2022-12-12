@@ -40,7 +40,8 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": "4.x",
-    "@zodios/core": "11.0.0-beta.14",
+    "@zodios/axios": "11.0.0-beta.14",
+    "@zodios/fetch": "11.0.0-beta.14",
     "react": ">=16.8.0"
   },
   "devDependencies": {
@@ -57,11 +58,13 @@
     "@types/jest": "29.2.3",
     "@types/node": "18.11.9",
     "@types/react": "18.0.25",
-    "@zodios/core": "workspace:*",
+    "@zodios/axios": "workspace:*",
     "@zodios/fetch": "workspace:*",
     "cors": "2.8.5",
     "cross-fetch": "3.1.5",
     "express": "4.18.2",
+    "fp-ts": "2.13.1",
+    "io-ts": "2.2.20",
     "jest": "29.3.1",
     "jest-environment-jsdom": "29.3.1",
     "react": "18.2.0",
@@ -76,6 +79,5 @@
   },
   "resolutions": {
     "@types/react": "18.0.25"
-  },
-  "dependencies": {}
+  }
 }
