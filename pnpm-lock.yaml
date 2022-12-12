@@ -24,7 +24,7 @@ importers:
       axios: 1.2.0
       express: 4.18.2
       fp-ts: 2.13.1
-      io-ts: 2.2.19
+      io-ts: 2.2.20
       jest: 29.3.0
       multer: 1.4.5-lts.1
       rimraf: 3.0.2
@@ -45,7 +45,7 @@ importers:
       axios: 1.2.0
       express: 4.18.2
       fp-ts: 2.13.1
-      io-ts: 2.2.19_fp-ts@2.13.1
+      io-ts: 2.2.20_fp-ts@2.13.1
       jest: 29.3.0_odkjkoia5xunhxkdrka32ib6vi
       multer: 1.4.5-lts.1
       rimraf: 3.0.2
@@ -63,7 +63,7 @@ importers:
       '@types/node': 18.11.9
       form-data: ^4.0.0
       fp-ts: 2.13.1
-      io-ts: 2.2.19
+      io-ts: 2.2.20
       jest: 29.3.0
       rimraf: 3.0.2
       ts-jest: 29.0.3
@@ -78,7 +78,7 @@ importers:
       '@types/node': 18.11.9
       form-data: 4.0.0
       fp-ts: 2.13.1
-      io-ts: 2.2.19_fp-ts@2.13.1
+      io-ts: 2.2.20_fp-ts@2.13.1
       jest: 29.3.0_odkjkoia5xunhxkdrka32ib6vi
       rimraf: 3.0.2
       ts-jest: 29.0.3_rhbpodbq4tgi7dsfkb4juhkp3y
@@ -99,7 +99,7 @@ importers:
       cross-fetch: 3.1.5
       express: 4.18.2
       fp-ts: 2.13.1
-      io-ts: 2.2.19
+      io-ts: 2.2.20
       jest: 29.3.0
       multer: 1.4.5-lts.1
       rimraf: 3.0.2
@@ -120,7 +120,7 @@ importers:
       cross-fetch: 3.1.5
       express: 4.18.2
       fp-ts: 2.13.1
-      io-ts: 2.2.19_fp-ts@2.13.1
+      io-ts: 2.2.20_fp-ts@2.13.1
       jest: 29.3.0_odkjkoia5xunhxkdrka32ib6vi
       multer: 1.4.5-lts.1
       rimraf: 3.0.2
@@ -145,11 +145,13 @@ importers:
       '@types/jest': 29.2.3
       '@types/node': 18.11.9
       '@types/react': 18.0.25
-      '@zodios/core': workspace:*
+      '@zodios/axios': workspace:*
       '@zodios/fetch': workspace:*
       cors: 2.8.5
       cross-fetch: 3.1.5
       express: 4.18.2
+      fp-ts: 2.13.1
+      io-ts: 2.2.20
       jest: 29.3.1
       jest-environment-jsdom: 29.3.1
       react: 18.2.0
@@ -175,11 +177,13 @@ importers:
       '@types/jest': 29.2.3
       '@types/node': 18.11.9
       '@types/react': 18.0.25
-      '@zodios/core': link:../core
+      '@zodios/axios': link:../axios
       '@zodios/fetch': link:../fetch
       cors: 2.8.5
       cross-fetch: 3.1.5
       express: 4.18.2
+      fp-ts: 2.13.1
+      io-ts: 2.2.20_fp-ts@2.13.1
       jest: 29.3.1_odkjkoia5xunhxkdrka32ib6vi
       jest-environment-jsdom: 29.3.1
       react: 18.2.0
@@ -202,7 +206,7 @@ importers:
       '@zodios/fetch': workspace:*
       form-data: ^4.0.0
       fp-ts: 2.13.1
-      io-ts: 2.2.19
+      io-ts: 2.2.20
       jest: 29.3.0
       rimraf: 3.0.2
       ts-jest: 29.0.3
@@ -219,7 +223,7 @@ importers:
       '@zodios/fetch': link:../fetch
       form-data: 4.0.0
       fp-ts: 2.13.1
-      io-ts: 2.2.19_fp-ts@2.13.1
+      io-ts: 2.2.20_fp-ts@2.13.1
       jest: 29.3.0_odkjkoia5xunhxkdrka32ib6vi
       rimraf: 3.0.2
       ts-jest: 29.0.3_rhbpodbq4tgi7dsfkb4juhkp3y
@@ -3078,8 +3082,8 @@ packages:
       side-channel: 1.0.4
     dev: true
 
-  /io-ts/2.2.19_fp-ts@2.13.1:
-    resolution: {integrity: sha512-ED0GQwvKRr5C2jqOOJCkuJW2clnbzqFexQ8V7Qsb+VB36S1Mk/OKH7k0FjSe4mjKy9qBRA3OqgVGyFMUEKIubw==}
+  /io-ts/2.2.20_fp-ts@2.13.1:
+    resolution: {integrity: sha512-Rq2BsYmtwS5vVttie4rqrOCIfHCS9TgpRLFpKQCM1wZBBRY9nWVGmEvm2FnDbSE2un1UE39DvFpTR5UL47YDcA==}
     peerDependencies:
       fp-ts: ^2.5.0
     dependencies:
