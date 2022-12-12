@@ -32,7 +32,7 @@ importers:
       ts-node: 10.9.1
       tsup: 6.3.0
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
     dependencies:
       '@zodios/core': link:../core
     devDependencies:
@@ -53,7 +53,7 @@ importers:
       ts-node: 10.9.1_wup25etrarvlqkprac7h35hj7u
       tsup: 6.3.0_2dtigtkb225m7ii7q45utxqwgi
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
 
   packages/core:
     specifiers:
@@ -70,7 +70,7 @@ importers:
       ts-node: 10.9.1
       tsup: 6.3.0
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
@@ -85,7 +85,7 @@ importers:
       ts-node: 10.9.1_wup25etrarvlqkprac7h35hj7u
       tsup: 6.3.0_2dtigtkb225m7ii7q45utxqwgi
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
 
   packages/fetch:
     specifiers:
@@ -107,7 +107,7 @@ importers:
       ts-node: 10.9.1
       tsup: 6.3.0
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
     dependencies:
       '@zodios/core': link:../core
     devDependencies:
@@ -128,7 +128,7 @@ importers:
       ts-node: 10.9.1_wup25etrarvlqkprac7h35hj7u
       tsup: 6.3.0_2dtigtkb225m7ii7q45utxqwgi
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
 
   packages/react:
     specifiers:
@@ -160,7 +160,7 @@ importers:
       ts-node: 10.9.1
       tsup: 6.3.0
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
@@ -190,7 +190,7 @@ importers:
       ts-node: 10.9.1_wup25etrarvlqkprac7h35hj7u
       tsup: 6.3.0_2dtigtkb225m7ii7q45utxqwgi
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
 
   packages/testing:
     specifiers:
@@ -209,7 +209,7 @@ importers:
       ts-node: 10.9.1
       tsup: 6.3.0
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
@@ -226,7 +226,7 @@ importers:
       ts-node: 10.9.1_wup25etrarvlqkprac7h35hj7u
       tsup: 6.3.0_2dtigtkb225m7ii7q45utxqwgi
       typescript: 4.9.3
-      zod: 3.19.1
+      zod: 3.20.1
 
 packages:
 
@@ -5752,6 +5752,6 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  /zod/3.19.1:
-    resolution: {integrity: sha512-LYjZsEDhCdYET9ikFu6dVPGp2YH9DegXjdJToSzD9rO6fy4qiRYFoyEYwps88OseJlPyl2NOe2iJuhEhL7IpEA==}
+  /zod/3.20.1:
+    resolution: {integrity: sha512-At2YngeqktnHk6L9vf6Sdt7IGcRFziasf7JyQfKwxMd2rOWIUvURP6oLUTW6N0WKQ5bcIdI+IZ3+uGZCCcQcQg==}
     dev: true
