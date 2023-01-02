@@ -100,7 +100,7 @@ const config = {
             items: [
               {
                 label: "Twitter",
-                href: "https://twitter.com/ecyrbe",
+                href: "https://twitter.com/ecyrbedev",
               },
             ],
           },
