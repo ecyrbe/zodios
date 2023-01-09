@@ -35,6 +35,7 @@ import { zodTypeProvider } from "./type-providers";
 import {
   AnyZodiosFetcherProvider,
   TypeOfFetcherOptions,
+  ZodiosFetcher,
 } from "./fetcher-providers";
 import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
 import { hooks } from "./hooks";
@@ -63,6 +64,7 @@ export class ZodiosCoreImpl<
     "validate" | "transform" | "sendDefaults" | "typeProvider"
   >;
   public readonly api: Api;
+  public readonly fetcher: ZodiosFetcher<FetcherProvider> | undefined;
   public readonly _typeProvider: TypeProvider;
   public readonly _fetcherProvider: FetcherProvider;
   private endpointPlugins: Map<string, ZodiosPlugins<FetcherProvider>> =
@@ -147,7 +149,10 @@ export class ZodiosCoreImpl<
     this._typeProvider = undefined as any;
     this._fetcherProvider = undefined as any;
 
-    this.options.fetcherProvider?.init({ baseURL, ...this.options });
+    this.fetcher = this.options.fetcherFactory?.({
+      baseURL,
+      ...this.options,
+    });
 
     this.injectAliasEndpoints();
     this.injectHttpVerbEndpoints();
@@ -159,10 +164,6 @@ export class ZodiosCoreImpl<
 
   public get typeProvider() {
     return this.options.typeProvider;
-  }
-
-  public get fetcherProvider() {
-    return this.options.fetcherProvider;
   }
 
   private initPlugins() {
@@ -314,12 +315,12 @@ export class ZodiosCoreImpl<
       conf = await endpointPlugin.interceptRequest(this.api, conf);
     }
     let response: Promise<any>;
-    if (hooks.fetcherProvider) {
-      response = hooks.fetcherProvider.fetch(conf);
-    } else if (this.options.fetcherProvider) {
-      response = this.options.fetcherProvider.fetch(conf);
+    if (hooks.fetcher) {
+      response = hooks.fetcher.fetch(conf);
+    } else if (this.fetcher) {
+      response = this.fetcher.fetch(conf);
     } else {
-      throw new Error("Zodios: no fetcher provider provided");
+      throw new Error("Zodios: no fetcher provider found");
     }
     if (endpointPlugin) {
       response = endpointPlugin.interceptResponse(this.api, conf, response);
