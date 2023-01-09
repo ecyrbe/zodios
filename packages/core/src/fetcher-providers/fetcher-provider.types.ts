@@ -1,3 +1,6 @@
+import { ReadonlyDeep } from "../utils.types";
+import { AnyZodiosRequestOptions } from "../zodios.types";
+
 /**
  * A type provider for Fetcher
  * allows to define request, response and error types for a fetcher
@@ -39,11 +42,21 @@ export type TypeOfFetcherOptions<
   FetcherProvider extends AnyZodiosFetcherProvider
 > = FetcherProvider["options"];
 
-export type ZodiosRuntimeFetcherProvider<
+export interface ZodiosFetcher<
   FetcherProvider extends AnyZodiosFetcherProvider
-> = {
-  readonly _provider?: FetcherProvider;
+> {
   baseURL?: string;
-  init(options: any): void;
-  fetch(params: any): Promise<any>;
+  fetch(
+    config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>
+  ): Promise<TypeOfFetcherResponse<FetcherProvider>>;
+}
+
+export type FetcherFactoryOptions = {
+  baseURL?: string;
 };
+
+export type ZodiosFetcherFactory<
+  FetcherProvider extends AnyZodiosFetcherProvider
+> = (
+  options?: FetcherFactoryOptions & TypeOfFetcherOptions<FetcherProvider>
+) => ZodiosFetcher<FetcherProvider>;

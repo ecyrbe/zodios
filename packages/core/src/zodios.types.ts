@@ -23,7 +23,7 @@ import {
   TypeOfFetcherConfig,
   TypeOfFetcherError,
   TypeOfFetcherResponse,
-  ZodiosRuntimeFetcherProvider,
+  ZodiosFetcherFactory,
 } from "./fetcher-providers";
 
 export const HTTP_QUERY_METHODS = ["get", "head"] as const;
@@ -734,7 +734,7 @@ export interface ZodiosOptions<
    */
   sendDefaults?: boolean;
 
-  fetcherProvider?: ZodiosRuntimeFetcherProvider<FetcherProvider>;
+  fetcherFactory?: ZodiosFetcherFactory<FetcherProvider>;
 
   /**
    * set a custom type provider. Default: ZodTypeProvider

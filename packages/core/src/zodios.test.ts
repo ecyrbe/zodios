@@ -43,7 +43,7 @@ import type {
   AnyZodiosFetcherProvider,
   AnyZodiosRequestOptions,
   ZodiosPlugin,
-  ZodiosRuntimeFetcherProvider,
+  ZodiosFetcherFactory,
 } from "./index";
 
 interface MockProvider extends AnyZodiosFetcherProvider {
@@ -60,9 +60,8 @@ interface MockProvider extends AnyZodiosFetcherProvider {
   error: unknown;
 }
 
-const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
-  init() {},
-  async fetch(config: AnyZodiosRequestOptions<MockProvider>) {
+const mockFetchFactory: ZodiosFetcherFactory<MockProvider> = () => ({
+  async fetch(config) {
     const requestConfig = {
       ...config,
       baseURL: this.baseURL,
@@ -89,7 +88,7 @@ const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
     }
     throw new Error(`No mocks found for ${requestConfig.url}`);
   },
-};
+});
 
 type MockResponse<Data = unknown> = {
   readonly headers?: Record<string, string>;
@@ -119,7 +118,8 @@ const registeredMocks = new Map<
 
 const zodiosMocks: ZodiosMockBase = {
   install() {
-    setFetcherHook(mockProvider);
+    const fetcher = mockFetchFactory();
+    setFetcherHook(fetcher);
   },
   uninstall() {
     registeredMocks.clear();
@@ -507,7 +507,7 @@ describe("Zodios", () => {
           ),
         },
       ],
-      { fetcherProvider: mockProvider }
+      { fetcherFactory: mockFetchFactory }
     );
     const response = await zodios.request({
       method: "get",
@@ -546,7 +546,7 @@ describe("Zodios", () => {
           ),
         },
       ],
-      { fetcherProvider: mockProvider }
+      { fetcherFactory: mockFetchFactory }
     );
     const response = await zodios.get("/queries", { queries: { id: [1, 2] } });
     expect(response).toEqual({ queries: [1, 2] });
