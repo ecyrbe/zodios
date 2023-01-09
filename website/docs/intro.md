@@ -21,7 +21,7 @@ It's composed of multiple packages :
 | `@zodios/openapi` | Backend          | Helper that generates OpenAPI specs from Zodios [API definitions](api/api-definition.md) and allows you to easily generate swagger ui.                            |
 
 :::tip It's worth noting that frontend and backend packages can be used as standalone packages.
-Meaning that you don't need to use Zodios Backend to use Zodios Frontend packages and vice-versa. Allowing you to scale the developpement of your API between frontend and backend teams.  
+Meaning that you don't need to use Zodios Backend to use Zodios Frontend packages and vice-versa. Allowing you to scale the developement of your API between frontend and backend teams.  
   
 You only need to share the API definition between the two teams.
 :::
