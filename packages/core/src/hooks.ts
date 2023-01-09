@@ -1,18 +1,18 @@
 import {
   AnyZodiosFetcherProvider,
-  ZodiosRuntimeFetcherProvider,
+  ZodiosFetcher,
 } from "./fetcher-providers/fetcher-provider.types";
 
 export const hooks: {
-  fetcherProvider?: ZodiosRuntimeFetcherProvider<AnyZodiosFetcherProvider>;
+  fetcher?: ZodiosFetcher<any>;
 } = {};
 
-export function setFetcherHook(
-  provider: ZodiosRuntimeFetcherProvider<AnyZodiosFetcherProvider>
+export function setFetcherHook<Provider extends AnyZodiosFetcherProvider>(
+  fetcher: ZodiosFetcher<Provider>
 ) {
-  hooks.fetcherProvider = provider;
+  hooks.fetcher = fetcher;
 }
 
 export function clearFetcherHook() {
-  hooks.fetcherProvider = undefined;
+  hooks.fetcher = undefined;
 }
