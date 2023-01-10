@@ -177,11 +177,71 @@ Check out the [full documentation](https://www.zodios.org) or following shortcut
 - [@zodios/react](https://github.com/ecyrbe/zodios-react) : a react-query wrapper for zodios
 - [@zodios/solid](https://github.com/ecyrbe/zodios-solid) : a solid-query wrapper for zodios
 
-# Roadmap
+# Roadmap for v11
 
-The following will need investigation to check if it's doable :
-- implement `@zodios/nestjs` to define your API endpoints with nestjs and share it with your frontend (like tRPC)
-- generate openAPI json from your API endpoints
+for Zod` / `Io-Ts` :
+
+  - By using the TypeProvider pattern we can now make zodios validation agnostic.
+
+  - Implement at least ZodTypeProvider and IoTsTypeProvider since they both support `input` and `output` type inferrence
+
+  - openapi generation will only be compatible with zod though
+
+  - Not a breaking change so no codemod needed
+
+- [x] MonoRepo:
+
+  - Zodios will become a really large project so maybe migrate to turbo repo + pnpm
+
+  - not a breaking change
+
+- [ ] Transform:
+
+  - By default, activate transforms on backend and disable on frontend (today it's the opposite), would make server transform code simpler since with this option we could make any transforms activated not just zod defaults.
+
+  - Rationale being that transformation can be viewed as business code that should be kept on backend
+
+  - breaking change => codemod to keep current defaults by setting them explicitly
+
+- [x] Axios:
+
+  - Move Axios client to it's own package `@zodios/axios` and keep `@zodios/core` with only common types and helpers
+
+  - Move plugins to `@zodios/axios-plugins`
+
+  - breaking change => easy to do a codemod for this
+
+- [x] Fetch:
+
+  - Create a new Fetch client with almost the same features as axios, but without axios dependency `@zodios/fetch`
+
+  - Today we have fetch support with a plugin for axios instance (zodios maintains it's own axios network adapter for fetch). But since axios interceptors are not used by zodios plugins, we can make fetch implementation lighter than axios instance.
+
+  - Create plugins package `@zodios/fetch-plugins`
+
+  - Not sure it's doable without a lot of effort to keep it in sync/compatible with axios client
+
+  - new feature, so no codemod needed
+
+- [ ] React/Solid:  
+
+   - make ZodiosHooks independant of Zodios client instance (axios, fetch)
+
+   - not a breaking change, so no codemod needed
+
+- [x] Client Request Config
+
+  - uniform Query/Mutation with body sent on the config and not as a standalone object. This would allow to not do `client.deleteUser(undefined, { params: { id: 1 } })` but simply  `client.deleteUser({ params: { id: 1 } })`
+
+  - breaking change, so a codemod would be needed, but might be difficult to implement
+
+- [x] Mock/Tests:
+
+  - if we implement an abstraction layer for client instance, relying on moxios to mock APIs response will likely not work for fetch implementation.
+
+  - create a `@zodios/testing` package that work for both axios/fetch clients
+
+  - new feature, so no breaking change (no codemod needed)
 
 You have other ideas ? [Let me know !](https://github.com/ecyrbe/zodios/discussions)
 # Dependencies
