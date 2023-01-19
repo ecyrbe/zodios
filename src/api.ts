@@ -93,7 +93,7 @@ export class Builder<T extends ZodiosEndpointDefinitions> {
 
 /**
  * Advanced helper to build your api definitions
- * compared to `asApi()` you'll have better autocompletion experience and better error messages,
+ * compared to `makeApi()` you'll have better autocompletion experience and better error messages,
  * @param endpoint
  * @returns - a builder to build your api definitions
  */
