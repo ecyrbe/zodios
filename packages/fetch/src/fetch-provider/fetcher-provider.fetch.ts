@@ -1,7 +1,9 @@
 import type {
   AnyZodiosFetcherProvider,
   AnyZodiosRequestOptions,
-  ZodiosRuntimeFetcherProvider,
+  ZodiosFetcher,
+  ZodiosFetcherFactory,
+  ZodiosFetcherFactoryOptions,
 } from "@zodios/core";
 import { Merge } from "@zodios/core/lib/utils.types";
 import { replacePathParams } from "../utils";
@@ -31,28 +33,24 @@ export interface FetchProvider extends AnyZodiosFetcherProvider {
   error: FetchErrorStatus<this["arg1"], this["arg2"]>;
 }
 
-export const fetchProvider: ZodiosRuntimeFetcherProvider<FetchProvider> &
-  FetchProviderOptions = {
-  init(
-    options: {
-      baseURL?: string;
-    } & FetchProviderOptions
-  ) {
-    const { baseURL, fetchConfig } = options;
-    this.fetchConfig = fetchConfig;
-    if (baseURL) {
-      this.baseURL = baseURL;
-    }
-  },
+class Fetcher implements ZodiosFetcher<FetchProvider> {
+  constructor(
+    public baseURL: string | undefined,
+    public config: FetchProviderConfig | undefined
+  ) {}
   async fetch(config: AnyZodiosRequestOptions<FetchProvider>) {
     const requestConfig = {
-      ...this.fetchConfig,
-      ...config,
       baseURL: this.baseURL,
+      ...this.config,
+      ...config,
       url: replacePathParams(config),
     };
     return advancedFetch(
       requestConfig as AnyZodiosRequestOptions<FetchProvider>
     );
-  },
+  }
+}
+
+export const fetchFactory: ZodiosFetcherFactory<FetchProvider> = (options) => {
+  return new Fetcher(options?.baseURL, options?.fetchConfig);
 };
