@@ -87,8 +87,8 @@ describe("Zodios", () => {
     port = (server.address() as AddressInfo).port;
   });
 
-  afterAll(() => {
-    server.close();
+  afterAll((done) => {
+    server.close(done);
   });
 
   it("should be defined", () => {
