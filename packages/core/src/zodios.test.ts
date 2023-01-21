@@ -60,11 +60,11 @@ interface MockProvider extends AnyZodiosFetcherProvider {
   error: unknown;
 }
 
-const mockFetchFactory: ZodiosFetcherFactory<MockProvider> = () => ({
+const mockFetchFactory: ZodiosFetcherFactory<MockProvider> = (options) => ({
   async fetch(config) {
     const requestConfig = {
       ...config,
-      baseURL: this.baseURL,
+      baseURL: options?.baseURL,
     };
     for (const [{ method, url }, callback] of registeredMocks) {
       if (method === requestConfig.method && url === requestConfig.url) {

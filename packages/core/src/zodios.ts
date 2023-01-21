@@ -152,7 +152,7 @@ export class ZodiosCoreImpl<
     this.fetcher = this.options.fetcherFactory?.({
       baseURL,
       ...this.options,
-    });
+    } as any);
 
     this.injectAliasEndpoints();
     this.injectHttpVerbEndpoints();
