@@ -1,4 +1,4 @@
-import { ReadonlyDeep } from "../utils.types";
+import { Merge, ReadonlyDeep } from "../utils.types";
 import { AnyZodiosRequestOptions } from "../zodios.types";
 
 /**
@@ -51,12 +51,17 @@ export interface ZodiosFetcher<
   ): Promise<TypeOfFetcherResponse<FetcherProvider>>;
 }
 
-export type FetcherFactoryOptions = {
-  baseURL?: string;
-};
+export type ZodiosFetcherFactoryOptions<
+  FetcherProvider extends AnyZodiosFetcherProvider
+> = Merge<
+  {
+    baseURL?: string;
+  },
+  TypeOfFetcherOptions<FetcherProvider>
+>;
 
 export type ZodiosFetcherFactory<
   FetcherProvider extends AnyZodiosFetcherProvider
 > = (
-  options?: FetcherFactoryOptions & TypeOfFetcherOptions<FetcherProvider>
+  options?: ZodiosFetcherFactoryOptions<FetcherProvider>
 ) => ZodiosFetcher<FetcherProvider>;

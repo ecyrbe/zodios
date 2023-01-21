@@ -75,6 +75,7 @@ export type {
   TypeOfFetcherError,
   TypeOfFetcherOptions,
   TypeOfFetcherResponse,
+  ZodiosFetcherFactoryOptions,
   ZodiosFetcherFactory,
   ZodiosFetcher,
 } from "./fetcher-providers";
