@@ -41,6 +41,7 @@
     "test": "jest --coverage"
   },
   "peerDependencies": {
+    "@zodios/core": "11.x",
     "axios": "^0.x || ^1.0.0",
     "fp-ts": "2.x",
     "io-ts": "2.x",
@@ -64,7 +65,8 @@
     "@types/jest": "29.2.2",
     "@types/multer": "1.4.7",
     "@types/node": "18.11.9",
-    "axios": "1.2.0",
+    "@zodios/core": "workspace:*",
+    "axios": "1.2.3",
     "express": "4.18.2",
     "fp-ts": "2.13.1",
     "io-ts": "2.2.20",
@@ -76,8 +78,5 @@
     "tsup": "6.3.0",
     "typescript": "4.9.4",
     "zod": "3.20.1"
-  },
-  "dependencies": {
-    "@zodios/core": "workspace:*"
   }
 }
