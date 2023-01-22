@@ -1,3 +1,4 @@
+import type { AxiosResponse } from "axios";
 import { z } from "zod";
 import { apiBuilder } from "../api";
 import { ReadonlyDeep } from "../utils.types";
@@ -290,22 +291,19 @@ received:
     url,
   });
 
-  const createSampleResponse = () => ({
-    data: {
-      first: "123",
-      second: 111,
-    },
-    status: 200,
-    headers: {
-      "content-type": "application/json",
-    },
-    config: {
+  const createSampleResponse = () =>
+    ({
+      data: {
+        first: "123",
+        second: 111,
+      },
+      status: 200,
       headers: {
         "content-type": "application/json",
       },
-    },
-    statusText: "OK",
-  });
+      config: {},
+      statusText: "OK",
+    } as unknown as AxiosResponse);
 
   const api = apiBuilder({
     path: "/parse",
