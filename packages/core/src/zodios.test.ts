@@ -45,6 +45,7 @@ import type {
   ZodiosPlugin,
   ZodiosFetcherFactory,
 } from "./index";
+import type { Assert } from "./utils.types";
 
 interface MockProvider extends AnyZodiosFetcherProvider {
   options: {};
