@@ -3,7 +3,6 @@ import type {
   AnyZodiosRequestOptions,
   ZodiosFetcher,
   ZodiosFetcherFactory,
-  ZodiosFetcherFactoryOptions,
 } from "@zodios/core";
 import { Merge } from "@zodios/core/lib/utils.types";
 import { replacePathParams } from "../utils";

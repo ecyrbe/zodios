@@ -8,20 +8,28 @@ import type {
   ZodTypeProvider,
 } from "@zodios/core";
 import { ZodiosCore } from "@zodios/core";
-import { axiosProvider, AxiosProvider } from "./axios-provider";
+import { axiosFactory, AxiosProvider } from "./axios-provider";
 
-function ZodiosAxios(...args: any[]) {
-  if (args.length !== 0) {
-    let options: ZodiosOptions<AxiosProvider> = args[args.length - 1];
-    if (!Array.isArray(options) && typeof options === "object") {
-      args[args.length - 1] = { ...options, fetcherProvider: axiosProvider };
-    } else {
-      args.push({ fetcherProvider: axiosProvider });
-    }
-  }
-  // @ts-ignore
-  return new ZodiosCore(...args);
+function isZodiosOptions(
+  lastArg: unknown
+): lastArg is ZodiosOptions<AxiosProvider> {
+  return !Array.isArray(lastArg) && typeof lastArg === "object";
 }
+
+const ZodiosAxios = new Proxy(ZodiosCore, {
+  construct(target, args) {
+    if (args.length !== 0) {
+      let lastArg = args[args.length - 1];
+      if (isZodiosOptions(lastArg)) {
+        lastArg.fetcherFactory = axiosFactory;
+      } else {
+        args.push({ fetcherFactory: axiosFactory });
+      }
+    }
+    // @ts-ignore
+    return new target(...args);
+  },
+});
 
 export interface Zodios {
   new <
@@ -31,7 +39,7 @@ export interface Zodios {
     api: Narrow<Api>,
     options?: Omit<
       ZodiosOptions<AxiosProvider, TypeProvider>,
-      "fetcherProvider"
+      "fetcherFactory"
     > &
       TypeOfFetcherOptions<AxiosProvider>
   ): ZodiosInstance<Api, AxiosProvider, TypeProvider>;
@@ -43,12 +51,12 @@ export interface Zodios {
     api: Narrow<Api>,
     options?: Omit<
       ZodiosOptions<AxiosProvider, TypeProvider>,
-      "fetcherProvider"
+      "fetcherFactory"
     > &
       TypeOfFetcherOptions<AxiosProvider>
   ): ZodiosInstance<Api, AxiosProvider, TypeProvider>;
 }
 
-const Zodios = ZodiosAxios as unknown as Zodios;
+const Zodios = ZodiosAxios as Zodios;
 
 export { Zodios };

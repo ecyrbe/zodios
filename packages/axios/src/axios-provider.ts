@@ -1,13 +1,9 @@
-import axios, {
-  AxiosRequestConfig,
-  AxiosError,
-  AxiosInstance,
-  AxiosResponse,
-} from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import {
   AnyZodiosRequestOptions,
   AnyZodiosFetcherProvider,
-  ZodiosRuntimeFetcherProvider,
+  ZodiosFetcherFactory,
+  ZodiosFetcher,
 } from "@zodios/core";
 import { Merge } from "@zodios/core/lib/utils.types";
 import { omit, replacePathParams } from "./utils";
@@ -24,9 +20,12 @@ type AxiosErrorStatus<Response, Status> = Merge<
   }
 >;
 
+type AxiosRequestConfig = Parameters<typeof axios.request>[0];
+type AxiosCreateConfig = Parameters<typeof axios.create>[0];
+
 type AxiosProviderOptions = {
   axiosInstance?: AxiosInstance;
-  axiosConfig?: AxiosRequestConfig;
+  axiosConfig?: AxiosCreateConfig;
 };
 
 export interface AxiosProvider extends AnyZodiosFetcherProvider {
@@ -38,29 +37,31 @@ export interface AxiosProvider extends AnyZodiosFetcherProvider {
   error: AxiosErrorStatus<this["arg1"], this["arg2"]>;
 }
 
-export const axiosProvider: ZodiosRuntimeFetcherProvider<AxiosProvider> & {
+class Fetcher implements ZodiosFetcher<AxiosProvider> {
   instance: AxiosInstance;
-} = {
-  instance: undefined as any,
-  init(
-    options: {
-      baseURL?: string;
-    } & AxiosProviderOptions
+  constructor(
+    baseURL: string | undefined,
+    config: AxiosCreateConfig | undefined,
+    instance: AxiosInstance | undefined
   ) {
-    const { axiosInstance, axiosConfig, baseURL } = options;
-    this.instance = axiosInstance || axios.create(axiosConfig);
-    if (baseURL) {
-      this.instance.defaults.baseURL = baseURL;
-      this.baseURL = baseURL;
-    }
-  },
+    this.instance = instance || axios.create(config);
+    if (baseURL) this.instance.defaults.baseURL = baseURL;
+  }
+
   fetch(config: AnyZodiosRequestOptions<AxiosProvider>) {
-    const requestConfig: AxiosRequestConfig = {
+    return this.instance.request({
       ...omit(config, ["params", "queries", "body"]),
       url: replacePathParams(config),
       params: config.queries,
       data: config.body,
-    };
-    return this.instance.request(requestConfig);
-  },
+    });
+  }
+}
+
+export const axiosFactory: ZodiosFetcherFactory<AxiosProvider> = (options) => {
+  return new Fetcher(
+    options?.baseURL,
+    options?.axiosConfig,
+    options?.axiosInstance
+  );
 };
