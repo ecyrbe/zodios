@@ -328,10 +328,15 @@ describe("Zodios", () => {
       },
     ]);
     const response = await zodios.request({
+      //      ^?
       method: "get",
       url: "/:id",
       params: { id: 7 },
     });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 7, name: "test" });
   });
 
