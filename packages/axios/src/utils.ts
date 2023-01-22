@@ -17,25 +17,6 @@ export function omit<T, K extends keyof T>(
   return ret;
 }
 
-/**
- * pick properties from an object
- * @param obj - the object to pick properties from
- * @param keys - the keys to pick
- * @returns the object with the picked properties
- */
-export function pick<T, K extends keyof T>(
-  obj: T | undefined,
-  keys: K[]
-): Pick<T, K> {
-  const ret = {} as Pick<T, K>;
-  if (obj) {
-    for (const key of keys) {
-      ret[key] = obj[key];
-    }
-  }
-  return ret;
-}
-
 const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
 
 export function replacePathParams(
