@@ -1,5 +1,15 @@
 # @zodios/core
 
+## 11.0.0-beta.15
+
+### Major Changes
+
+- eaf8e45: feat(fetcher): change fetcher model to factory
+- faaec6f: chore(deps): update zod
+- f161353: chore(deps): update fp-ts
+- 5115eaa: chore(deps): update typescript
+- 4ac4921: feat(react): simplify exported instance
+
 ## 11.0.0-beta.14
 
 ### Major Changes
