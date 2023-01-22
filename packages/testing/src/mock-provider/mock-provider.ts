@@ -1,7 +1,8 @@
 import type {
   AnyZodiosFetcherProvider,
   AnyZodiosRequestOptions,
-  ZodiosRuntimeFetcherProvider,
+  ZodiosFetcher,
+  ZodiosFetcherFactory,
 } from "@zodios/core";
 import { setFetcherHook, clearFetcherHook } from "@zodios/core";
 
@@ -19,20 +20,16 @@ export interface MockProvider extends AnyZodiosFetcherProvider {
   error: unknown;
 }
 
-export const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
-  init() {},
+class Fetcher implements ZodiosFetcher<MockProvider> {
+  constructor(public baseURL: string | undefined) {}
   async fetch(config: AnyZodiosRequestOptions<MockProvider>) {
-    const requestConfig = {
-      ...config,
-      baseURL: this.baseURL,
-    };
     for (const [{ method, url }, callback] of registeredMocks) {
-      if (method === requestConfig.method && url === requestConfig.url) {
+      if (method === config.method && url === config.url) {
         const result = {
           headers: {},
           status: 200,
           statusText: "OK",
-          ...(await callback(requestConfig)),
+          ...(await callback(config)),
         };
         if (
           (config.validateStatus && !config.validateStatus(result.status)) ||
@@ -42,16 +39,19 @@ export const mockProvider: ZodiosRuntimeFetcherProvider<MockProvider> = {
             `Request failed with status code ${result.status}`
           ) as Error & { code: string; config: any; response: any };
           err.code = `ERR_STATUS_${result.status}`;
-          err.config = requestConfig;
+          err.config = config;
           err.response = result;
           throw err;
         }
         return result;
       }
     }
-    throw new Error(`No mocks found for ${requestConfig.url}`);
-  },
-};
+    throw new Error(`No mocks found for ${config.url}`);
+  }
+}
+
+export const mockFactory: ZodiosFetcherFactory<MockProvider> = (options) =>
+  new Fetcher(options?.baseURL);
 
 export type MockResponse<Data = unknown> = {
   readonly headers?: Record<string, string>;
@@ -83,7 +83,7 @@ const registeredMocks = new Map<
 
 export const zodiosMocks: ZodiosMockBase = {
   install() {
-    setFetcherHook(mockProvider);
+    setFetcherHook(mockFactory());
   },
   uninstall() {
     registeredMocks.clear();
