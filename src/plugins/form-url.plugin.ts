@@ -13,7 +13,7 @@ const plugin: ZodiosPlugin = {
 
     return {
       ...config,
-      data: new URLSearchParams(config.data).toString(),
+      data: new URLSearchParams(config.data as any).toString(),
       headers: {
         ...config.headers,
         "Content-Type": "application/x-www-form-urlencoded",
