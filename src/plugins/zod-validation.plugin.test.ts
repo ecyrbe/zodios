@@ -227,7 +227,6 @@ describe("zodValidationPlugin", () => {
 
     it("should throw on unsuccessful parse", async () => {
       const badResponse = createSampleResponse();
-      // @ts-expect-error Inject wrong data
       badResponse.data.first = 123;
 
       await expect(
