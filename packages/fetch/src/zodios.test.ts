@@ -1055,7 +1055,7 @@ received:
     });
   });
 
-  it("should trigger an axios error with error response", async () => {
+  it("should trigger an error with error response", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {
         method: "get",

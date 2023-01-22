@@ -1,10 +1,9 @@
-import type { AxiosResponse } from "axios";
 import { z } from "zod";
 import { apiBuilder } from "../api";
 import { ReadonlyDeep } from "../utils.types";
 import { AnyZodiosRequestOptions } from "../zodios.types";
 import { zodValidationPlugin } from "./zod-validation.plugin";
-import { AnyZodiosTypeProvider, zodTypeProvider } from "../type-providers";
+import { zodTypeProvider } from "../type-providers";
 import { AnyZodiosFetcherProvider } from "../fetcher-providers";
 
 describe("zodValidationPlugin", () => {
@@ -232,6 +231,7 @@ describe("zodValidationPlugin", () => {
 
     it("should throw on unsuccessful parse", async () => {
       const badResponse = createSampleResponse();
+      // @ts-expect-error
       badResponse.data.first = 123;
 
       await expect(
@@ -301,19 +301,18 @@ received:
     url,
   });
 
-  const createSampleResponse = () =>
-    ({
-      data: {
-        first: "123",
-        second: 111,
-      },
-      status: 200,
-      headers: {
-        "content-type": "application/json",
-      },
-      config: {},
-      statusText: "OK",
-    } as unknown as AxiosResponse);
+  const createSampleResponse = () => ({
+    data: {
+      first: "123",
+      second: 111,
+    },
+    status: 200,
+    headers: {
+      "content-type": "application/json",
+    },
+    config: {},
+    statusText: "OK",
+  });
 
   const api = apiBuilder({
     path: "/parse",
