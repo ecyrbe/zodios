@@ -299,7 +299,11 @@ received:
     headers: {
       "content-type": "application/json",
     },
-    config: {},
+    config: {
+      headers: {
+        "content-type": "application/json",
+      },
+    },
     statusText: "OK",
   });
 
