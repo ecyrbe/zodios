@@ -21,7 +21,7 @@ importers:
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
       '@zodios/core': workspace:*
-      axios: 1.2.0
+      axios: 1.2.3
       express: 4.18.2
       fp-ts: 2.13.1
       io-ts: 2.2.20
@@ -33,8 +33,6 @@ importers:
       tsup: 6.3.0
       typescript: 4.9.4
       zod: 3.20.1
-    dependencies:
-      '@zodios/core': link:../core
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
@@ -42,7 +40,8 @@ importers:
       '@types/jest': 29.2.2
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
-      axios: 1.2.0
+      '@zodios/core': link:../core
+      axios: 1.2.3
       express: 4.18.2
       fp-ts: 2.13.1
       io-ts: 2.2.20_fp-ts@2.13.1
@@ -108,8 +107,6 @@ importers:
       tsup: 6.3.0
       typescript: 4.9.4
       zod: 3.20.1
-    dependencies:
-      '@zodios/core': link:../core
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
@@ -117,6 +114,7 @@ importers:
       '@types/jest': 29.2.2
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
+      '@zodios/core': link:../core
       cross-fetch: 3.1.5
       express: 4.18.2
       fp-ts: 2.13.1
@@ -146,6 +144,7 @@ importers:
       '@types/node': 18.11.9
       '@types/react': 18.0.25
       '@zodios/axios': workspace:*
+      '@zodios/core': workspace:*
       '@zodios/fetch': workspace:*
       cors: 2.8.5
       cross-fetch: 3.1.5
@@ -178,6 +177,7 @@ importers:
       '@types/node': 18.11.9
       '@types/react': 18.0.25
       '@zodios/axios': link:../axios
+      '@zodios/core': link:../core
       '@zodios/fetch': link:../fetch
       cors: 2.8.5
       cross-fetch: 3.1.5
@@ -1594,8 +1594,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /axios/1.2.0:
-    resolution: {integrity: sha512-zT7wZyNYu3N5Bu0wuZ6QccIf93Qk1eV8LOewxgjOZFd2DenOs98cJ7+Y6703d0wkaXGY6/nZd4EweJaHz9uzQw==}
+  /axios/1.2.3:
+    resolution: {integrity: sha512-pdDkMYJeuXLZ6Xj/Q5J3Phpe+jbGdsSzlQaFVkMQzRUL05+6+tetX8TV3p4HrU4kzuO9bt+io/yGQxuyxA/xcw==}
     dependencies:
       follow-redirects: 1.15.2
       form-data: 4.0.0

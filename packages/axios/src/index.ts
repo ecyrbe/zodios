@@ -1,3 +1,3 @@
 export { Zodios } from "./zodios";
-export { AxiosProvider, axiosProvider } from "./axios-provider";
+export type { AxiosProvider } from "./axios-provider";
 export * from "@zodios/core";
