@@ -1,9 +1,4 @@
-import {
-  AxiosError,
-  AxiosInstance,
-  AxiosRequestConfig,
-  AxiosResponse,
-} from "axios";
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import type {
   FilterArrayByValue,
   MapSchemaParameters,
@@ -20,6 +15,8 @@ import type {
   UndefinedIfNever,
 } from "./utils.types";
 import z from "zod";
+
+type AxiosRequestConfig = Parameters<typeof axios.request>[0];
 
 export type MutationMethod = "post" | "put" | "patch" | "delete";
 

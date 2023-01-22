@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { AxiosInstance, AxiosRequestConfig } from "axios";
+import type { AxiosInstance } from "axios";
 import {
   AnyZodiosRequestOptions,
   ZodiosRequestOptions,
@@ -268,12 +268,11 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
     if (endpointPlugin) {
       conf = await endpointPlugin.interceptRequest(this.api, conf);
     }
-    const requestConfig: AxiosRequestConfig = {
+    let response = this.axiosInstance.request({
       ...omit(conf as AnyZodiosRequestOptions, ["params", "queries"]),
       url: replacePathParams(conf),
       params: conf.queries,
-    };
-    let response = this.axiosInstance.request(requestConfig);
+    });
     if (endpointPlugin) {
       response = endpointPlugin.interceptResponse(this.api, conf, response);
     }
