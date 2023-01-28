@@ -8,6 +8,7 @@ import { AddressInfo } from "net";
 import cors from "cors";
 import z from "zod";
 import { ZodiosHooks } from "./hooks";
+import { Assert } from "@zodios/core/lib/utils.types";
 
 const api = makeApi([
   {
@@ -408,11 +409,21 @@ describe("zodios hooks", () => {
             id: number;
             name: string;
           }>();
-          const apiMutations = apiHooks.usePost("/users", undefined, {
-            onSuccess: (data) => {
-              setUserCreated(data);
-            },
-          });
+          const apiMutations = apiHooks.useMutation(
+            "post",
+            "/users",
+            undefined,
+            {
+              onSuccess: (data) => {
+                //        ^?
+                setUserCreated(data);
+              },
+            }
+          );
+          const testMutation: Assert<
+            typeof apiMutations.data,
+            { id: number; name: string } | undefined
+          > = true;
           return { apiMutations, userCreated };
         },
         { wrapper }

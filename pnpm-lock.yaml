@@ -21,7 +21,7 @@ importers:
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
       '@zodios/core': workspace:*
-      axios: 1.2.3
+      axios: 1.2.5
       express: 4.18.2
       fp-ts: 2.13.1
       io-ts: 2.2.20
@@ -41,7 +41,7 @@ importers:
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
       '@zodios/core': link:../core
-      axios: 1.2.3
+      axios: 1.2.5
       express: 4.18.2
       fp-ts: 2.13.1
       io-ts: 2.2.20_fp-ts@2.13.1
@@ -1594,8 +1594,8 @@ packages:
     engines: {node: '>= 0.4'}
     dev: true
 
-  /axios/1.2.3:
-    resolution: {integrity: sha512-pdDkMYJeuXLZ6Xj/Q5J3Phpe+jbGdsSzlQaFVkMQzRUL05+6+tetX8TV3p4HrU4kzuO9bt+io/yGQxuyxA/xcw==}
+  /axios/1.2.5:
+    resolution: {integrity: sha512-9pU/8mmjSSOb4CXVsvGIevN+MlO/t9OWtKadTaLuN85Gge3HGorUckgp8A/2FH4V4hJ7JuQ3LIeI7KAV9ITZrQ==}
     dependencies:
       follow-redirects: 1.15.2
       form-data: 4.0.0
