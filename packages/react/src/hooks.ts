@@ -125,6 +125,7 @@ export class ZodiosHooksImpl<
               mutationOptions: any
             ) =>
               this.useMutation(
+                // @ts-expect-error
                 endpoint.method,
                 endpoint.path as any,
                 config,
@@ -147,6 +148,7 @@ export class ZodiosHooksImpl<
         path: any,
         config: any,
         mutationOptions: any
+        // @ts-expect-error
       ) => this.useMutation(method, path, config, mutationOptions);
     });
   }
@@ -548,6 +550,171 @@ export class ZodiosHooksImpl<
     };
   }
 
+  useMutation<
+    Path extends ZodiosPathsByMethod<Api, "get">,
+    TConfig extends Omit<
+      ZodiosRequestOptionsByPath<
+        Api,
+        "get",
+        Path,
+        FetcherProvider,
+        true,
+        TypeProvider
+      >,
+      "body"
+    >,
+    MutationVariables = UndefinedIfNever<
+      ZodiosBodyByPath<Api, "get", Path, true, TypeProvider>
+    >
+  >(
+    method: "get",
+    path: Path,
+    ...[config, mutationOptions]: RequiredKeys<TConfig> extends never
+      ? [
+          config?: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "get", Path, TypeProvider>
+        ]
+      : [
+          config: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "get", Path, TypeProvider>
+        ]
+  ): UseMutationResult<
+    ZodiosResponseByPath<Api, "get", Path, true, TypeProvider>,
+    Errors,
+    MutationVariables
+  >;
+  useMutation<
+    Path extends ZodiosPathsByMethod<Api, "post">,
+    TConfig extends Omit<
+      ZodiosRequestOptionsByPath<
+        Api,
+        "post",
+        Path,
+        FetcherProvider,
+        true,
+        TypeProvider
+      >,
+      "body"
+    >,
+    MutationVariables = UndefinedIfNever<
+      ZodiosBodyByPath<Api, "post", Path, true, TypeProvider>
+    >
+  >(
+    method: "post",
+    path: Path,
+    ...[config, mutationOptions]: RequiredKeys<TConfig> extends never
+      ? [
+          config?: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "post", Path, TypeProvider>
+        ]
+      : [
+          config: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "post", Path, TypeProvider>
+        ]
+  ): UseMutationResult<
+    ZodiosResponseByPath<Api, "post", Path, true, TypeProvider>,
+    Errors,
+    MutationVariables
+  >;
+  useMutation<
+    Path extends ZodiosPathsByMethod<Api, "put">,
+    TConfig extends Omit<
+      ZodiosRequestOptionsByPath<
+        Api,
+        "put",
+        Path,
+        FetcherProvider,
+        true,
+        TypeProvider
+      >,
+      "body"
+    >,
+    MutationVariables = UndefinedIfNever<
+      ZodiosBodyByPath<Api, "put", Path, true, TypeProvider>
+    >
+  >(
+    method: "put",
+    path: Path,
+    ...[config, mutationOptions]: RequiredKeys<TConfig> extends never
+      ? [
+          config?: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "put", Path, TypeProvider>
+        ]
+      : [
+          config: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "put", Path, TypeProvider>
+        ]
+  ): UseMutationResult<
+    ZodiosResponseByPath<Api, "put", Path, true, TypeProvider>,
+    Errors,
+    MutationVariables
+  >;
+  useMutation<
+    Path extends ZodiosPathsByMethod<Api, "patch">,
+    TConfig extends Omit<
+      ZodiosRequestOptionsByPath<
+        Api,
+        "patch",
+        Path,
+        FetcherProvider,
+        true,
+        TypeProvider
+      >,
+      "body"
+    >,
+    MutationVariables = UndefinedIfNever<
+      ZodiosBodyByPath<Api, "patch", Path, true, TypeProvider>
+    >
+  >(
+    method: "patch",
+    path: Path,
+    ...[config, mutationOptions]: RequiredKeys<TConfig> extends never
+      ? [
+          config?: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "patch", Path, TypeProvider>
+        ]
+      : [
+          config: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "patch", Path, TypeProvider>
+        ]
+  ): UseMutationResult<
+    ZodiosResponseByPath<Api, "patch", Path, true, TypeProvider>,
+    Errors,
+    MutationVariables
+  >;
+  useMutation<
+    Path extends ZodiosPathsByMethod<Api, "delete">,
+    TConfig extends Omit<
+      ZodiosRequestOptionsByPath<
+        Api,
+        "delete",
+        Path,
+        FetcherProvider,
+        true,
+        TypeProvider
+      >,
+      "body"
+    >,
+    MutationVariables = UndefinedIfNever<
+      ZodiosBodyByPath<Api, "delete", Path, true, TypeProvider>
+    >
+  >(
+    method: "delete",
+    path: Path,
+    ...[config, mutationOptions]: RequiredKeys<TConfig> extends never
+      ? [
+          config?: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "delete", Path, TypeProvider>
+        ]
+      : [
+          config: ReadonlyDeep<TConfig>,
+          mutationOptions?: MutationOptions<Api, "delete", Path, TypeProvider>
+        ]
+  ): UseMutationResult<
+    ZodiosResponseByPath<Api, "delete", Path, true, TypeProvider>,
+    Errors,
+    MutationVariables
+  >;
   useMutation<
     M extends Method,
     Path extends ZodiosPathsByMethod<Api, M>,
