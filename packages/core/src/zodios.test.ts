@@ -559,33 +559,51 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with one path params", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/:id",
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.get("/:id", { params: { id: 7 } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
+
     expect(response).toEqual({ id: 7, name: "test" });
   });
 
   it("should make an http alias request with one path params", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        alias: "getById",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/:id",
+          alias: "getById",
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.getById({ params: { id: 7 } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
+
     expect(response).toEqual({ id: 7, name: "test" });
   });
 
@@ -599,140 +617,177 @@ describe("Zodios", () => {
         name: z.string(),
       }),
     }).build();
-    const zodios = new ZodiosCore(`http://localhost`, api);
+    const zodios = new ZodiosCore(`http://localhost`, api, {
+      fetcherFactory: mockFetchFactory,
+    });
     const response = await zodios.getById({ params: { id: 7 } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
+
     expect(response).toEqual({ id: 7, name: "test" });
   });
 
   it("should make a get request with bad params and get back a zod error", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        parameters: [
-          {
-            name: "id",
-            type: "Path",
-            schema: z.number(),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/:id",
+          parameters: [
+            {
+              name: "id",
+              type: "Path",
+              schema: z.number(),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     try {
-      await zodios.get("/:id", { params: { id: "7" } });
+      await zodios.get("/:id", { params: { id: "7" as unknown as number } });
     } catch (e) {
       expect(e).toBeInstanceOf(ZodiosError);
     }
   });
 
   it("should make an http get with multiples path params", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id/address/:address",
-        response: z.object({
-          id: z.number(),
-          address: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/:id/address/:address",
+          response: z.object({
+            id: z.number(),
+            address: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.get("/:id/address/:address", {
       params: { id: 7, address: "address" },
     });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; address: string }
+    > = true;
+
     expect(response).toEqual({ id: 7, address: "address" });
   });
 
   it("should make an http post with body param", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/",
-        parameters: [
-          {
-            name: "name",
-            type: "Body",
-            schema: z.object({
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/",
+          parameters: [
+            {
+              name: "name",
+              type: "Body",
+              schema: z.object({
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.post("/", { body: { name: "post" } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 3, name: "post" });
   });
 
   it("should make an http post with transformed body param", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/",
-        parameters: [
-          {
-            name: "name",
-            type: "Body",
-            schema: z
-              .object({
-                firstname: z.string(),
-                lastname: z.string(),
-              })
-              .transform((data) => ({
-                name: `${data.firstname} ${data.lastname}`,
-              })),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/",
+          parameters: [
+            {
+              name: "name",
+              type: "Body",
+              schema: z
+                .object({
+                  firstname: z.string(),
+                  lastname: z.string(),
+                })
+                .transform((data) => ({
+                  name: `${data.firstname} ${data.lastname}`,
+                })),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const config = {
-      method: "post",
-      url: "/",
       body: { firstname: "post", lastname: "test" },
     } as const;
-    const response = await zodios.request(config);
+    const response = await zodios.post("/", config);
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
+
     expect(config).toEqual({
-      method: "post",
-      url: "/",
       body: { firstname: "post", lastname: "test" },
     });
     expect(response).toEqual({ id: 3, name: "post test" });
   });
 
   it("should throw a zodios error if params are not correct", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/",
-        parameters: [
-          {
-            name: "name",
-            type: "Body",
-            schema: z
-              .object({
-                email: z.string().email(),
-              })
-              .transform((data) => ({
-                name: `${data.email.split("@")[0]}`,
-              })),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/",
+          parameters: [
+            {
+              name: "name",
+              type: "Body",
+              schema: z
+                .object({
+                  email: z.string().email(),
+                })
+                .transform((data) => ({
+                  name: `${data.email.split("@")[0]}`,
+                })),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     let response;
     let error: ZodiosError | undefined;
     try {
@@ -751,209 +806,268 @@ describe("Zodios", () => {
   });
 
   it("should make an http mutation alias request with body param", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/",
-        alias: "create",
-        parameters: [
-          {
-            name: "name",
-            type: "Body",
-            schema: z.object({
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/",
+          alias: "create",
+          parameters: [
+            {
+              name: "name",
+              type: "Body",
+              schema: z.object({
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.create({ body: { name: "post" } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 3, name: "post" });
   });
 
   it("should make an http put", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "put",
-        path: "/",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.object({
-              id: z.number(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "put",
+          path: "/",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.object({
+                id: z.number(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.put("/", { body: { id: 5, name: "put" } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 5, name: "put" });
   });
 
   it("should make an http put alias", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "put",
-        path: "/",
-        alias: "update",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.object({
-              id: z.number(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "put",
+          path: "/",
+          alias: "update",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.object({
+                id: z.number(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.update({ body: { id: 5, name: "put" } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 5, name: "put" });
   });
 
   it("should make an http patch", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "patch",
-        path: "/",
-        parameters: [
-          {
-            name: "id",
-            type: "Body",
-            schema: z.object({
-              id: z.number(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "patch",
+          path: "/",
+          parameters: [
+            {
+              name: "id",
+              type: "Body",
+              schema: z.object({
+                id: z.number(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.patch("/", {
       body: { id: 4, name: "patch" },
     });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 4, name: "patch" });
   });
 
   it("should make an http patch alias", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "patch",
-        path: "/",
-        alias: "update",
-        parameters: [
-          {
-            name: "id",
-            type: "Body",
-            schema: z.object({
-              id: z.number(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "patch",
+          path: "/",
+          alias: "update",
+          parameters: [
+            {
+              name: "id",
+              type: "Body",
+              schema: z.object({
+                id: z.number(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.update({ body: { id: 4, name: "patch" } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string }
+    > = true;
     expect(response).toEqual({ id: 4, name: "patch" });
   });
 
   it("should make an http delete", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "delete",
-        path: "/:id",
-        response: z.object({
-          id: z.number(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "delete",
+          path: "/:id",
+          response: z.object({
+            id: z.number(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.delete("/:id", {
       params: { id: 6 },
     });
+    const testResonseType: Assert<typeof response, { id: number }> = true;
     expect(response).toEqual({ id: 6 });
   });
 
   it("should make an http delete alias", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "delete",
-        path: "/:id",
-        alias: "remove",
-        response: z.object({
-          id: z.number(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "delete",
+          path: "/:id",
+          alias: "remove",
+          response: z.object({
+            id: z.number(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.remove({
       params: { id: 6 },
     });
+    const testResonseType: Assert<typeof response, { id: number }> = true;
     expect(response).toEqual({ id: 6 });
   });
 
   it("should validate uuid in path params", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/path/:uuid",
-        parameters: [
-          {
-            name: "uuid",
-            type: "Path",
-            schema: z.string().uuid(),
-          },
-        ],
-        response: z.object({
-          uuid: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/path/:uuid",
+          parameters: [
+            {
+              name: "uuid",
+              type: "Path",
+              schema: z.string().uuid(),
+            },
+          ],
+          response: z.object({
+            uuid: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.get("/path/:uuid", {
       params: { uuid: "e9e09a1d-3967-4518-bc89-75a901aee128" },
     });
+    const testResonseType: Assert<typeof response, { uuid: string }> = true;
     expect(response).toEqual({
       uuid: "e9e09a1d-3967-4518-bc89-75a901aee128",
     });
   });
 
   it("should not validate bad path params", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/path/:uuid",
-        parameters: [
-          {
-            name: "uuid",
-            type: "Path",
-            schema: z.string().uuid(),
-          },
-        ],
-        response: z.object({
-          uuid: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/path/:uuid",
+          parameters: [
+            {
+              name: "uuid",
+              type: "Path",
+              schema: z.string().uuid(),
+            },
+          ],
+          response: z.object({
+            uuid: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     let error;
     try {
       await zodios.get("/path/:uuid", {
@@ -970,17 +1084,21 @@ describe("Zodios", () => {
   });
 
   it("should not validate bad formatted responses", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-          more: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/:id",
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+            more: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     try {
       await zodios.get("/:id", { params: { id: 1 } });
     } catch (e) {
@@ -1119,9 +1237,13 @@ received:
           }),
         },
       ],
-      { validate: false }
+      { validate: false, fetcherFactory: mockFetchFactory }
     );
     const response = await zodios.get("/:id", { params: { id: 1 } });
+    const testResonseType: Assert<
+      typeof response,
+      { id: number; name: string; more: string }
+    > = true;
     expect(response).toEqual({
       id: 1,
       name: "test",
@@ -1129,16 +1251,20 @@ received:
   });
 
   it("should trigger an error with error response", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/error502",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          path: "/error502",
+          response: z.object({
+            id: z.number(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     try {
       await zodios.get("/error502");
     } catch (e) {
@@ -1152,78 +1278,97 @@ received:
   });
 
   it("should send a form data request", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/form-data",
-        requestFormat: "form-data",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.object({
-              id: z.number(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.string(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/form-data",
+          requestFormat: "form-data",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.object({
+                id: z.number(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.post("/form-data", {
       body: { id: 4, name: "post" },
     });
+    const testResonseType: Assert<
+      typeof response,
+      { id: string; name: string }
+    > = true;
     expect(response).toEqual({ id: "4", name: "post" });
   });
 
   it("should send a form data request a second time under 100 ms", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/form-data",
-        requestFormat: "form-data",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.object({
-              id: z.string(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.string(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/form-data",
+          requestFormat: "form-data",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.object({
+                id: z.string(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.post("/form-data", {
-      // @ts-ignore
       body: { id: "4", name: "post" },
     });
+    const testResonseType: Assert<
+      typeof response,
+      { id: string; name: string }
+    > = true;
     expect(response).toEqual({ id: "4", name: "post" });
   }, 100);
 
   it("should not send an array as form data request", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/form-data",
-        requestFormat: "form-data",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.array(z.string()),
-          },
-        ],
-        response: z.string(),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/form-data",
+          requestFormat: "form-data",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.array(z.string()),
+            },
+          ],
+          response: z.string(),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     let error: Error | undefined;
     let response: string | undefined;
     try {
@@ -1239,49 +1384,61 @@ received:
   });
 
   it("should send a form url request", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/form-url",
-        requestFormat: "form-url",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.object({
-              id: z.number(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.string(),
-          name: z.string(),
-        }),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/form-url",
+          requestFormat: "form-url",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.object({
+                id: z.number(),
+                name: z.string(),
+              }),
+            },
+          ],
+          response: z.object({
+            id: z.string(),
+            name: z.string(),
+          }),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.post("/form-url", {
       body: { id: 4, name: "post" },
     });
+    const testResonseType: Assert<
+      typeof response,
+      { id: string; name: string }
+    > = true;
     expect(response).toEqual({ id: "4", name: "post" });
   });
 
   it("should not send an array as form url request", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/form-url",
-        requestFormat: "form-url",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.array(z.string()),
-          },
-        ],
-        response: z.string(),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/form-url",
+          requestFormat: "form-url",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.array(z.string()),
+            },
+          ],
+          response: z.string(),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     let error: Error | undefined;
     let response: string | undefined;
     try {
@@ -1297,22 +1454,27 @@ received:
   });
 
   it("should send a text request", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "post",
-        path: "/text",
-        requestFormat: "text",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.string(),
-          },
-        ],
-        response: z.string(),
-      },
-    ]);
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "post",
+          path: "/text",
+          requestFormat: "text",
+          parameters: [
+            {
+              name: "body",
+              type: "Body",
+              schema: z.string(),
+            },
+          ],
+          response: z.string(),
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     const response = await zodios.post("/text", { body: "test" });
+    const testResonseType: Assert<typeof response, string> = true;
     expect(response).toEqual("test");
   });
 });
