@@ -627,26 +627,38 @@ export type ZodiosAliases<
   >;
 };
 
+type OptionalRequestOptionsByPathParameters<
+  Api extends ZodiosEndpointDefinition[],
+  M extends Method,
+  Path extends ZodiosPathsByMethod<Api, M>,
+  FetcherProvider extends AnyZodiosFetcherProvider,
+  TypeProvider extends AnyZodiosTypeProvider,
+  Config = ZodiosRequestOptionsByPath<
+    Api,
+    M,
+    Path,
+    FetcherProvider,
+    true,
+    TypeProvider
+  >
+> = RequiredKeys<Config> extends never
+  ? [config?: ReadonlyDeep<Config>]
+  : [config: ReadonlyDeep<Config>];
+
 export type ZodiosVerbs<
   Api extends ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = {
-  [M in Method]: <
-    Path extends ZodiosPathsByMethod<Api, M>,
-    TConfig extends ZodiosRequestOptionsByPath<
+  [M in Method]: <Path extends ZodiosPathsByMethod<Api, M>>(
+    path: Path,
+    ...params: OptionalRequestOptionsByPathParameters<
       Api,
       M,
       Path,
       FetcherProvider,
-      true,
       TypeProvider
     >
-  >(
-    path: Path,
-    ...[config]: RequiredKeys<TConfig> extends never
-      ? [config?: ReadonlyDeep<TConfig>]
-      : [config: ReadonlyDeep<TConfig>]
   ) => Promise<ZodiosResponseByPath<Api, M, Path, true, TypeProvider>>;
 };
 
