@@ -300,11 +300,37 @@ export class ZodiosCoreImpl<
    * @param config - the config to setup zodios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async request<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
-    config: ReadonlyDeep<
-      ZodiosRequestOptions<Api, M, Path, FetcherProvider, true, TypeProvider>
+  async request<M extends Method, Path extends string>(
+    config: Path extends ZodiosPathsByMethod<Api, M>
+      ? ReadonlyDeep<
+          ZodiosRequestOptions<
+            Api,
+            M,
+            Path,
+            FetcherProvider,
+            true,
+            TypeProvider
+          >
+        >
+      : ReadonlyDeep<
+          ZodiosRequestOptions<
+            Api,
+            M,
+            ZodiosPathsByMethod<Api, M>,
+            FetcherProvider,
+            true,
+            TypeProvider
+          >
+        >
+  ): Promise<
+    ZodiosResponseByPath<
+      Api,
+      M,
+      Path extends ZodiosPathsByMethod<Api, M> ? Path : never,
+      true,
+      TypeProvider
     >
-  ): Promise<ZodiosResponseByPath<Api, M, Path, true, TypeProvider>> {
+  > {
     let conf = config as unknown as ReadonlyDeep<
       AnyZodiosRequestOptions<FetcherProvider>
     >;
