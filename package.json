@@ -11,6 +11,11 @@
       "require": "./lib/index.js",
       "types": "./lib/index.d.ts"
     },
+    "./lib/*.types": {
+      "import": "./lib/*.types.mjs",
+      "require": "./lib/*.types.js",
+      "types": "./lib/*.types.d.ts"
+    },
     "./package.json": "./package.json"
   },
   "files": [
