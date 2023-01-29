@@ -257,11 +257,11 @@ export class ZodiosHooksImpl<
       ["params", "queries", "body"]
     );
     const key = [{ api: this.apiName, path }, params] as QueryKey;
-    const query = ({ signal }: { signal?: AbortSignal }) =>
+    const query = (queryParams: QueryFunctionContext) =>
       this.zodios.get(path, {
         ...(config as any),
         signal: this.options.shouldAbortOnUnmount
-          ? combineSignals(signal, (config as any)?.signal)
+          ? combineSignals(queryParams.signal, (config as any)?.signal)
           : (config as any)?.signal,
       });
     const queryClient = useQueryClient();
@@ -306,11 +306,11 @@ export class ZodiosHooksImpl<
       ["params", "queries", "body"]
     );
     const key = [{ api: this.apiName, path }, params] as QueryKey;
-    const query = ({ signal }: { signal?: AbortSignal }) =>
+    const query = (queryParams: QueryFunctionContext) =>
       this.zodios.post(path, {
         ...(config as any),
         signal: this.options.shouldAbortOnUnmount
-          ? combineSignals(signal, (config as any)?.signal)
+          ? combineSignals(queryParams.signal, (config as any)?.signal)
           : (config as any)?.signal,
       });
     const queryClient = useQueryClient();
@@ -392,27 +392,27 @@ export class ZodiosHooksImpl<
       );
     }
     const key = [{ api: this.apiName, path }, params];
-    const query = ({ pageParam = undefined, signal }: QueryFunctionContext) =>
+    const query = (queryParams: QueryFunctionContext) =>
       this.zodios.get(path, {
         ...config,
         queries: {
           ...(config as any)?.queries,
-          ...pageParam?.queries,
+          ...queryParams.pageParam?.queries,
         },
         params: {
           ...(config as any)?.params,
-          ...pageParam?.params,
+          ...queryParams.pageParam?.params,
         },
         body:
           // istanbul ignore next
           hasObjectBody(config)
             ? {
                 ...(config as any)?.body,
-                ...pageParam?.body,
+                ...queryParams.pageParam?.body,
               }
             : (config as any)?.body,
         signal: this.options.shouldAbortOnUnmount
-          ? combineSignals(signal, (config as any)?.signal)
+          ? combineSignals(queryParams.signal, (config as any)?.signal)
           : (config as any)?.signal,
       } as unknown as ReadonlyDeep<TConfig>);
     const queryClient = useQueryClient();
@@ -507,27 +507,27 @@ export class ZodiosHooksImpl<
       );
     }
     const key = [{ api: this.apiName, path }, params];
-    const query = ({ pageParam = undefined, signal }: QueryFunctionContext) =>
+    const query = (queryParams: QueryFunctionContext) =>
       this.zodios.post(path, {
         ...config,
         queries: {
           ...(config as any)?.queries,
-          ...pageParam?.queries,
+          ...queryParams.pageParam?.queries,
         },
         params: {
           ...(config as any)?.params,
-          ...pageParam?.params,
+          ...queryParams.pageParam?.params,
         },
         body:
           // istanbul ignore next
           hasObjectBody(config)
             ? {
                 ...(config as any)?.body,
-                ...pageParam?.body,
+                ...queryParams.pageParam?.body,
               }
             : (config as any)?.body,
         signal: this.options.shouldAbortOnUnmount
-          ? combineSignals(signal, (config as any)?.signal)
+          ? combineSignals(queryParams.signal, (config as any)?.signal)
           : (config as any)?.signal,
       } as unknown as ReadonlyDeep<TConfig>);
     const queryClient = useQueryClient();
