@@ -368,14 +368,12 @@ export class ZodiosHooksImpl<
     );
     // istanbul ignore next
     if (params.params && queryOptions) {
-      // @ts-expect-error
       params.params = omit(
         params.params,
         queryOptions.getPageParamList() as string[]
       );
     }
     if (params.queries && queryOptions) {
-      // @ts-expect-error
       params.queries = omit(
         params.queries,
         queryOptions.getPageParamList() as string[]
@@ -388,9 +386,8 @@ export class ZodiosHooksImpl<
       !Array.isArray(params.body) &&
       queryOptions
     ) {
-      // @ts-expect-error
       params.body = omit(
-        params.body,
+        params.body as Record<string, unknown>,
         queryOptions.getPageParamList() as string[]
       );
     }
@@ -399,21 +396,21 @@ export class ZodiosHooksImpl<
       this.zodios.get(path, {
         ...config,
         queries: {
-          ...config?.queries,
+          ...(config as any)?.queries,
           ...pageParam?.queries,
         },
         params: {
-          ...config?.params,
+          ...(config as any)?.params,
           ...pageParam?.params,
         },
         body:
           // istanbul ignore next
           hasObjectBody(config)
             ? {
-                ...config?.body,
+                ...(config as any)?.body,
                 ...pageParam?.body,
               }
-            : config?.body,
+            : (config as any)?.body,
         signal: this.options.shouldAbortOnUnmount
           ? combineSignals(signal, (config as any)?.signal)
           : (config as any)?.signal,
@@ -485,7 +482,6 @@ export class ZodiosHooksImpl<
     );
     // istanbul ignore next
     if (params.params && queryOptions) {
-      // @ts-expect-error
       params.params = omit(
         params.params,
         queryOptions.getPageParamList() as string[]
@@ -493,7 +489,6 @@ export class ZodiosHooksImpl<
     }
     // istanbul ignore next
     if (params.queries && queryOptions) {
-      // @ts-expect-error
       params.queries = omit(
         params.queries,
         queryOptions.getPageParamList() as string[]
@@ -506,9 +501,8 @@ export class ZodiosHooksImpl<
       !Array.isArray(params.body) &&
       queryOptions
     ) {
-      // @ts-expect-error
       params.body = omit(
-        params.body,
+        params.body as Record<string, unknown>,
         queryOptions.getPageParamList() as string[]
       );
     }
@@ -517,21 +511,21 @@ export class ZodiosHooksImpl<
       this.zodios.post(path, {
         ...config,
         queries: {
-          ...config?.queries,
+          ...(config as any)?.queries,
           ...pageParam?.queries,
         },
         params: {
-          ...config?.params,
+          ...(config as any)?.params,
           ...pageParam?.params,
         },
         body:
           // istanbul ignore next
           hasObjectBody(config)
             ? {
-                ...config?.body,
+                ...(config as any)?.body,
                 ...pageParam?.body,
               }
-            : config?.body,
+            : (config as any)?.body,
         signal: this.options.shouldAbortOnUnmount
           ? combineSignals(signal, (config as any)?.signal)
           : (config as any)?.signal,

@@ -15,8 +15,8 @@ export interface AnyZodiosFetcherProvider {
   /**
    * config types to call fetcher
    */
-  options: any;
-  config: any;
+  options: unknown;
+  config: unknown;
   response: any;
   error: any;
 }
