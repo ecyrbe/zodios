@@ -16,7 +16,7 @@ importers:
     specifiers:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
       '@types/jest': 29.2.2
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
@@ -36,7 +36,7 @@ importers:
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
       '@types/jest': 29.2.2
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
@@ -90,7 +90,7 @@ importers:
     specifiers:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
       '@types/jest': 29.2.2
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
@@ -110,7 +110,7 @@ importers:
     devDependencies:
       '@jest/globals': 29.3.1
       '@jest/types': 29.3.1
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
       '@types/jest': 29.2.2
       '@types/multer': 1.4.7
       '@types/node': 18.11.9
@@ -139,7 +139,7 @@ importers:
       '@testing-library/react-hooks': 8.0.1
       '@testing-library/user-event': 14.4.3
       '@types/cors': 2.8.12
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
       '@types/jest': 29.2.3
       '@types/node': 18.11.9
       '@types/react': 18.0.25
@@ -172,7 +172,7 @@ importers:
       '@testing-library/react-hooks': 8.0.1_djah6xjkh3i2bchfafvsnwdbb4
       '@testing-library/user-event': 14.4.3_aaq3sbffpfe3jnxzm2zngsddei
       '@types/cors': 2.8.12
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
       '@types/jest': 29.2.3
       '@types/node': 18.11.9
       '@types/react': 18.0.25
@@ -1300,8 +1300,8 @@ packages:
       '@types/range-parser': 1.2.4
     dev: true
 
-  /@types/express/4.17.14:
-    resolution: {integrity: sha512-TEbt+vaPFQ+xpxFLFssxUDXj5cWCxZJjIcB7Yg0k0GMHGtgtQgpvx/MUQUeAkNbA9AAGrwkAsoeItdTgS7FMyg==}
+  /@types/express/4.17.16:
+    resolution: {integrity: sha512-LkKpqRZ7zqXJuvoELakaFYuETHjZkSol8EV6cNnyishutDBCCdv6+dsKPbKkCcIk57qRphOLY5sEgClw1bO3gA==}
     dependencies:
       '@types/body-parser': 1.19.2
       '@types/express-serve-static-core': 4.17.31
@@ -1370,7 +1370,7 @@ packages:
   /@types/multer/1.4.7:
     resolution: {integrity: sha512-/SNsDidUFCvqqcWDwxv2feww/yqhNeTRL5CVoL3jU4Goc4kKEL10T7Eye65ZqPNi4HRx8sAEX59pV1aEH7drNA==}
     dependencies:
-      '@types/express': 4.17.14
+      '@types/express': 4.17.16
     dev: true
 
   /@types/node/12.20.55:
