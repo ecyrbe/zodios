@@ -1,5 +1,12 @@
 # @zodios/core
 
+## 11.0.0-beta.16
+
+### Major Changes
+
+- f1b38f4: feat: improve typings
+- cb56d43: feat: improve typings
+
 ## 11.0.0-beta.15
 
 ### Major Changes
