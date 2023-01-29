@@ -256,9 +256,17 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    * @param config - the config to setup zodios options and parameters
    * @returns response validated with zod schema provided in the api description
    */
-  async request<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
-    config: ReadonlyDeep<ZodiosRequestOptions<Api, M, Path>>
-  ): Promise<ZodiosResponseByPath<Api, M, Path>> {
+  async request<M extends Method, Path extends string>(
+    config: Path extends ZodiosPathsByMethod<Api, M>
+      ? ReadonlyDeep<ZodiosRequestOptions<Api, M, Path>>
+      : ReadonlyDeep<ZodiosRequestOptions<Api, M, ZodiosPathsByMethod<Api, M>>>
+  ): Promise<
+    ZodiosResponseByPath<
+      Api,
+      M,
+      Path extends ZodiosPathsByMethod<Api, M> ? Path : never
+    >
+  > {
     let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
     const anyPlugin = this.getAnyEndpointPlugins()!;
     const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
@@ -297,7 +305,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       ...config,
       method: "get",
       url: path,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "get", Path>>);
+    } as any);
   }
 
   /**
@@ -325,7 +333,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       method: "post",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "post", Path>>);
+    } as any);
   }
 
   /**
@@ -353,7 +361,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       method: "put",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "put", Path>>);
+    } as any);
   }
 
   /**
@@ -381,7 +389,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       method: "patch",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "patch", Path>>);
+    } as any);
   }
 
   /**
@@ -408,7 +416,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       method: "delete",
       url: path,
       data,
-    } as unknown as ReadonlyDeep<ZodiosRequestOptions<Api, "delete", Path>>);
+    } as any);
   }
 }
 
