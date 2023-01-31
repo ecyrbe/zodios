@@ -1,138 +1,149 @@
-import {
+import type {
   AnyZodiosFetcherProvider,
   TypeOfFetcherResponse,
 } from "../fetcher-providers";
-import { ReadonlyDeep } from "../utils.types";
-import {
+import type { ReadonlyDeep } from "../utils.types";
+import type {
   AnyZodiosRequestOptions,
-  Method,
-  ZodiosEndpointDefinitions,
+  ZodiosEndpointDefinition,
   ZodiosPlugin,
 } from "../zodios.types";
+import {
+  PluginId,
+  ZodiosPluginRegistration,
+  RequiredZodiosPluginRegistration,
+  ZodiosPluginFilters,
+  PluginPriority,
+  PLUGIN_PRIORITIES_REQUEST,
+  PLUGIN_PRIORITIES_RESPONSE,
+  PluginPriorities,
+} from "./zodios-plugins.types";
 
-export type PluginId = {
-  key: string;
-  value: number;
+const matchPluginFilter = (
+  endpoint: ZodiosEndpointDefinition,
+  filters: ZodiosPluginFilters
+) => {
+  return (Object.keys(filters) as (keyof ZodiosPluginFilters)[]).every(
+    (key) => {
+      const filter = filters[key];
+      const endpointValue = endpoint[key];
+      if (typeof filter === "string" && endpointValue) {
+        return filter === endpointValue;
+      }
+      if (filter instanceof RegExp && endpointValue) {
+        return filter.test(endpointValue);
+      }
+      if (typeof filter === "function") {
+        return filter(endpointValue ?? "");
+      }
+      return filter === undefined;
+    }
+  );
 };
 
-/**
- * A list of plugins that can be used by the Zodios client.
- */
+const isPluginFor =
+  <FetcherProvider extends AnyZodiosFetcherProvider>(
+    endpoint: ZodiosEndpointDefinition,
+    priority: PluginPriority,
+    type: "request" | "response"
+  ) =>
+  (
+    plugin: ZodiosPluginRegistration<FetcherProvider>
+  ): plugin is RequiredZodiosPluginRegistration<FetcherProvider> => {
+    return (
+      plugin.priority === priority &&
+      Boolean(plugin.plugin) &&
+      Boolean(
+        type === "request"
+          ? plugin.plugin!.request
+          : plugin.plugin!.response || plugin.plugin!.error
+      ) &&
+      matchPluginFilter(endpoint, plugin.filter)
+    );
+  };
 export class ZodiosPlugins<FetcherProvider extends AnyZodiosFetcherProvider> {
-  public readonly key: string;
-  private plugins: Array<ZodiosPlugin<FetcherProvider> | undefined> = [];
+  private plugins: Array<ZodiosPluginRegistration<FetcherProvider>> = [];
 
-  /**
-   * Constructor
-   * @param method - http method of the endpoint where the plugins are registered
-   * @param path - path of the endpoint where the plugins are registered
-   */
-  constructor(method: Method | "any", path: string) {
-    this.key = `${method}-${path}`;
-  }
-
-  /**
-   * Get the index of a plugin by name
-   * @param name - name of the plugin
-   * @returns the index of the plugin if found, -1 otherwise
-   */
-  indexOf(name: string) {
-    return this.plugins.findIndex((p) => p?.name === name);
-  }
+  constructor() {}
 
   /**
    * register a plugin
-   * if the plugin has a name it will be replaced if it already exists
-   * @param plugin - plugin to register
-   * @returns unique id of the plugin
+   * @param filter - how to match the plugin
+   * @param plugin - plugin to be registered
+   * @param priority - low, normal, high, default: normal
+   * @returns - plugin id to be used for ejecting
    */
-  use(plugin: ZodiosPlugin<FetcherProvider>): PluginId {
-    if (plugin.name) {
-      const id = this.indexOf(plugin.name);
-      if (id !== -1) {
-        this.plugins[id] = plugin;
-        return { key: this.key, value: id };
-      }
-    }
-    this.plugins.push(plugin);
-    return { key: this.key, value: this.plugins.length - 1 };
+  use(
+    filter: ZodiosPluginFilters,
+    plugin: ZodiosPlugin<FetcherProvider>,
+    priority: PluginPriority = PluginPriorities.normal
+  ): PluginId {
+    this.plugins.push({
+      filter,
+      plugin,
+      priority,
+    });
+    return this.plugins.length - 1;
+  }
+  eject(id: PluginId) {
+    this.plugins[id].plugin = undefined;
   }
 
   /**
-   * unregister a plugin
-   * @param plugin - plugin to unregister
-   */
-  eject(plugin: PluginId | string) {
-    if (typeof plugin === "string") {
-      const id = this.indexOf(plugin);
-      if (id === -1) {
-        throw new Error(`Plugin with name '${plugin}' not found`);
-      }
-      this.plugins[id] = undefined;
-    } else {
-      if (plugin.key !== this.key) {
-        throw new Error(
-          `Plugin with key '${plugin.key}' is not registered for endpoint '${this.key}'`
-        );
-      }
-      this.plugins[plugin.value] = undefined;
-    }
-  }
-
-  /**
-   * Intercept the request config by applying all plugins
-   * before using it to send a request to the server
+   * intercept the request before it is sent to the server
+   * apply plugins in order of registration (internal plugins first)
+   * @param endpoint - endpoint definition
    * @param config - request config
-   * @returns the modified config
+   * @returns - modified request config
    */
   async interceptRequest(
-    api: ZodiosEndpointDefinitions,
+    endpoint: ZodiosEndpointDefinition,
     config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>
   ) {
     let pluginConfig = config;
-    for (const plugin of this.plugins) {
-      if (plugin?.request) {
-        pluginConfig = await plugin.request(api, pluginConfig);
+    for (const priority of PLUGIN_PRIORITIES_REQUEST) {
+      for (const plugin of this.plugins.filter(
+        isPluginFor(endpoint, priority, "request")
+      )) {
+        pluginConfig = await plugin.plugin.request(endpoint, pluginConfig);
       }
     }
     return pluginConfig;
   }
 
   /**
-   * Intercept the response from server by applying all plugins
-   * @param api - endpoint descriptions
+   * intercept the response before it is returned to the user
+   * apply plugins in reverse order of registration (user plugins first)
+   * @param endpoint - endpoint definition
    * @param config - request config
-   * @param response - response from the server
-   * @returns the modified response
+   * @param response - response promise from the server
+   * @returns - modified response promise
    */
   async interceptResponse(
-    api: ZodiosEndpointDefinitions,
+    endpoint: ZodiosEndpointDefinition,
     config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     response: Promise<TypeOfFetcherResponse<FetcherProvider>>
   ) {
     let pluginResponse = response;
-    for (let index = this.plugins.length - 1; index >= 0; index--) {
-      const plugin = this.plugins[index];
-      if (plugin) {
+    const plugins = [...this.plugins].reverse();
+
+    for (const priority of PLUGIN_PRIORITIES_RESPONSE) {
+      for (const plugin of plugins.filter(
+        isPluginFor(endpoint, priority, "response")
+      )) {
         pluginResponse = pluginResponse.then(
-          plugin?.response
-            ? (res) => plugin.response!(api, config, res)
+          Boolean(plugin.plugin.response)
+            ? (res) => plugin.plugin.response(endpoint, config, res)
             : undefined,
-          plugin?.error ? (err) => plugin.error!(api, config, err) : undefined
+          Boolean(plugin.plugin.error)
+            ? (err) => {
+                console.log("plugin error", err);
+                return plugin.plugin.error(endpoint, config, err);
+              }
+            : undefined
         );
       }
     }
     return pluginResponse;
-  }
-
-  /**
-   * Get the number of plugins registered
-   * @returns the number of plugins registered
-   */
-  count() {
-    return this.plugins.reduce(
-      (count, plugin) => (plugin ? count + 1 : count),
-      0
-    );
   }
 }

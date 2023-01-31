@@ -1,4 +1,3 @@
-import { findEndpoint } from "../utils";
 import { ZodiosError } from "../zodios-error";
 import type { AnyZodiosTypeProvider } from "../type-providers";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
@@ -23,11 +22,11 @@ function shouldRequest(option: string | boolean) {
 }
 
 /**
- * Zod validation plugin used internally by Zodios.
+ * alidation plugin used internally by Zodios.
  * By default zodios always validates the response.
- * @returns zod-validation plugin
+ * @returns schema-validation plugin
  */
-export function zodValidationPlugin<
+export function schemaValidationPlugin<
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 >({
@@ -37,15 +36,9 @@ export function zodValidationPlugin<
   typeProvider,
 }: Options<FetcherProvider, TypeProvider>): ZodiosPlugin<FetcherProvider> {
   return {
-    name: "zod-validation",
+    name: "schema-validation",
     request: shouldRequest(validate)
-      ? async (api, config) => {
-          const endpoint = findEndpoint(api, config.method, config.url);
-          if (!endpoint) {
-            throw new Error(
-              `No endpoint found for ${config.method} ${config.url}`
-            );
-          }
+      ? async (endpoint, config) => {
           const { parameters } = endpoint;
           if (!parameters) {
             return config;
@@ -98,14 +91,7 @@ export function zodValidationPlugin<
         }
       : undefined,
     response: shouldResponse(validate)
-      ? async (api, config, response) => {
-          const endpoint = findEndpoint(api, config.method, config.url);
-          /* istanbul ignore next */
-          if (!endpoint) {
-            throw new Error(
-              `No endpoint found for ${config.method} ${config.url}`
-            );
-          }
+      ? async (endpoint, config, response) => {
           if (
             typeof response.headers?.get === "function"
               ? (response.headers.get("content-type") as string)?.includes?.(

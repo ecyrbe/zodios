@@ -875,7 +875,7 @@ export interface ZodiosPlugin<
    * @returns possibly a new request config
    */
   request?: (
-    api: ZodiosEndpointDefinitions,
+    endpoint: ZodiosEndpointDefinition,
     config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>
   ) => Promise<ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>>;
   /**
@@ -886,7 +886,7 @@ export interface ZodiosPlugin<
    * @returns possibly a new response
    */
   response?: (
-    api: ZodiosEndpointDefinitions,
+    endpoint: ZodiosEndpointDefinition,
     config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     response: TypeOfFetcherResponse<FetcherProvider>
   ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;
@@ -899,7 +899,7 @@ export interface ZodiosPlugin<
    * @returns possibly a new response or a new error
    */
   error?: (
-    api: ZodiosEndpointDefinitions,
+    endpoint: ZodiosEndpointDefinition,
     config: ReadonlyDeep<AnyZodiosRequestOptions<FetcherProvider>>,
     error: Error
   ) => Promise<TypeOfFetcherResponse<FetcherProvider>>;

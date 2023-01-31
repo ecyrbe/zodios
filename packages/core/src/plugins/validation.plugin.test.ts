@@ -2,24 +2,24 @@ import { z } from "zod";
 import { apiBuilder } from "../api";
 import { ReadonlyDeep } from "../utils.types";
 import { AnyZodiosRequestOptions } from "../zodios.types";
-import { zodValidationPlugin } from "./zod-validation.plugin";
+import { schemaValidationPlugin } from "./validation.plugin";
 import { zodTypeProvider } from "../type-providers";
 import { AnyZodiosFetcherProvider } from "../fetcher-providers";
 
-describe("zodValidationPlugin", () => {
-  const plugin = zodValidationPlugin({
+describe("schemaValidationPlugin", () => {
+  const plugin = schemaValidationPlugin({
     validate: true,
     transform: true,
     sendDefaults: false,
     typeProvider: zodTypeProvider,
   });
-  const pluginWithDefaults = zodValidationPlugin({
+  const pluginWithDefaults = schemaValidationPlugin({
     validate: true,
     transform: true,
     sendDefaults: true,
     typeProvider: zodTypeProvider,
   });
-  const pluginWithoutTransform = zodValidationPlugin({
+  const pluginWithoutTransform = schemaValidationPlugin({
     validate: true,
     transform: false,
     sendDefaults: false,
@@ -31,15 +31,9 @@ describe("zodValidationPlugin", () => {
       expect(plugin.request).toBeDefined();
     });
 
-    it("should throw if endpoint is not found", async () => {
-      await expect(
-        plugin.request!(api, notExistingConfig)
-      ).rejects.toThrowError("No endpoint found for get /notExisting");
-    });
-
     it("should verify parameters", async () => {
       const transformed = await plugin.request!(
-        api,
+        api[0],
         createSampleConfig("/parse")
       );
 
@@ -54,7 +48,7 @@ describe("zodValidationPlugin", () => {
 
     it("should transform parameters", async () => {
       const transformed = await plugin.request!(
-        api,
+        api[2],
         createSampleConfig("/transform")
       );
 
@@ -69,7 +63,7 @@ describe("zodValidationPlugin", () => {
 
     it("should transform empty string parameters", async () => {
       const transformed = await plugin.request!(
-        api,
+        api[2],
         createEmptySampleConfig("/transform")
       );
 
@@ -84,7 +78,7 @@ describe("zodValidationPlugin", () => {
 
     it("should generate default parameter when generateDefaults is activated", async () => {
       const defaulted = await pluginWithDefaults.request!(
-        api,
+        api[1],
         createUndefinedSampleConfig("/defaults")
       );
 
@@ -98,7 +92,7 @@ describe("zodValidationPlugin", () => {
 
     it("should not transform parameters when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.request!(
-        api,
+        api[2],
         createSampleConfig("/transform")
       );
 
@@ -113,7 +107,7 @@ describe("zodValidationPlugin", () => {
 
     it("should transform parameters (async)", async () => {
       const transformed = await plugin.request!(
-        api,
+        api[3],
         createSampleConfig("/transformAsync")
       );
 
@@ -128,7 +122,7 @@ describe("zodValidationPlugin", () => {
 
     it("should not transform parameters (async) when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.request!(
-        api,
+        api[3],
         createSampleConfig("/transformAsync")
       );
 
@@ -147,7 +141,7 @@ describe("zodValidationPlugin", () => {
         sampleQueryParam: 123,
       };
 
-      await expect(plugin.request!(api, badConfig)).rejects.toThrowError(
+      await expect(plugin.request!(api[0], badConfig)).rejects.toThrowError(
         "Zodios: Invalid Query parameter 'sampleQueryParam'"
       );
     });
@@ -158,15 +152,9 @@ describe("zodValidationPlugin", () => {
       expect(plugin.response).toBeDefined();
     });
 
-    it("should throw if endpoint is not found", async () => {
-      await expect(
-        plugin.response!(api, notExistingConfig, createSampleResponse())
-      ).rejects.toThrowError("No endpoint found for get /notExisting");
-    });
-
     it("should verify body", async () => {
       const transformed = await plugin.response!(
-        api,
+        api[0],
         createSampleConfig("/parse"),
         createSampleResponse()
       );
@@ -179,7 +167,7 @@ describe("zodValidationPlugin", () => {
 
     it("should transform body", async () => {
       const transformed = await plugin.response!(
-        api,
+        api[2],
         createSampleConfig("/transform"),
         createSampleResponse()
       );
@@ -192,7 +180,7 @@ describe("zodValidationPlugin", () => {
 
     it("should not transform body when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.response!(
-        api,
+        api[2],
         createSampleConfig("/transform"),
         createSampleResponse()
       );
@@ -205,7 +193,7 @@ describe("zodValidationPlugin", () => {
 
     it("should transform body (async)", async () => {
       const transformed = await plugin.response!(
-        api,
+        api[3],
         createSampleConfig("/transformAsync"),
         createSampleResponse()
       );
@@ -218,7 +206,7 @@ describe("zodValidationPlugin", () => {
 
     it("should not transform body (async) when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.response!(
-        api,
+        api[3],
         createSampleConfig("/transformAsync"),
         createSampleResponse()
       );
@@ -235,7 +223,7 @@ describe("zodValidationPlugin", () => {
       badResponse.data.first = 123;
 
       await expect(
-        plugin.response!(api, createSampleConfig("/parse"), badResponse)
+        plugin.response!(api[0], createSampleConfig("/parse"), badResponse)
       ).rejects
         .toThrowError(`Zodios: Invalid response from endpoint 'post /parse'
 status: 200 OK
