@@ -69,9 +69,13 @@ const mockFetchFactory: ZodiosFetcherFactory<MockProvider> = (options) => ({
     };
     for (const [{ method, url }, callback] of registeredMocks) {
       if (method === requestConfig.method && url === requestConfig.url) {
-        const result = (await callback(
-          requestConfig
-        )) as Required<MockResponse>;
+        const result = {
+          status: 200,
+          statusText: "OK",
+          headers: {},
+          data: {},
+          ...(await callback(requestConfig)),
+        } as Required<MockResponse>;
         if (
           (config.validateStatus && !config.validateStatus(result.status)) ||
           result.status > 299
@@ -192,6 +196,9 @@ describe("Zodios", () => {
       data: {
         id: conf.params!.id,
         name: "test",
+      },
+      headers: {
+        "content-type": "application/json",
       },
     }));
     zodiosMocks.mockRequest("get", "/path/:uuid", async (config) => ({
@@ -349,8 +356,10 @@ describe("Zodios", () => {
 
   it("should register have validation plugin automatically installed", () => {
     const zodios = new ZodiosCore(`http://localhost`, []);
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
+    expect(
+      // @ts-expect-error
+      zodios.plugins.plugins.filter((plugin) => plugin.plugin).length
+    ).toBe(1);
   });
 
   it("should register a plugin", () => {
@@ -358,8 +367,10 @@ describe("Zodios", () => {
     zodios.use({
       request: async (_, config) => config,
     });
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
+    expect(
+      // @ts-expect-error
+      zodios.plugins.plugins.filter((plugin) => plugin.plugin).length
+    ).toBe(2);
   });
 
   it("should unregister a plugin", () => {
@@ -367,85 +378,21 @@ describe("Zodios", () => {
     const id = zodios.use({
       request: async (_, config) => config,
     });
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
+    expect(
+      // @ts-expect-error
+      zodios.plugins.plugins.filter((plugin) => plugin.plugin).length
+    ).toBe(2);
     zodios.eject(id);
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
-  });
-
-  it("should replace a named plugin", () => {
-    const zodios = new ZodiosCore(`http://localhost`, []);
-    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
-      name: "test",
-      request: async (_, config) => config,
-    };
-    zodios.use(plugin);
-    zodios.use(plugin);
-    zodios.use(plugin);
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("any-any").count()).toBe(2);
-  });
-
-  it("should unregister a named plugin", () => {
-    const zodios = new ZodiosCore(`http://localhost`, []);
-    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
-      name: "test",
-      request: async (_, config) => config,
-    };
-    zodios.use(plugin);
-    zodios.eject("test");
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
+    expect(
+      // @ts-expect-error
+      zodios.plugins.plugins.filter((plugin) => plugin.plugin).length
+    ).toBe(1);
   });
 
   it("should throw if invalide parameters when registering a plugin", () => {
     const zodios = new ZodiosCore(`http://localhost`, []);
     // @ts-expect-error
     expect(() => zodios.use(0)).toThrowError("Zodios: invalid plugin");
-  });
-
-  it("should throw if invalid alias when registering a plugin", () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        alias: "test",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
-    expect(() =>
-      // @ts-expect-error
-      zodios.use("tests", {
-        // @ts-expect-error
-        request: async (_, config) => config,
-      })
-    ).toThrowError("Zodios: no alias 'tests' found to register plugin");
-  });
-
-  it("should throw if invalid endpoint when registering a plugin", () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        path: "/:id",
-        response: z.object({
-          id: z.number(),
-          name: z.string(),
-        }),
-      },
-    ]);
-    expect(() =>
-      // @ts-expect-error
-      zodios.use("get", "/test/:id", {
-        // @ts-expect-error
-        request: async (_, config) => config,
-      })
-    ).toThrowError(
-      "Zodios: no endpoint 'get /test/:id' found to register plugin"
-    );
   });
 
   it("should register a plugin by endpoint", () => {
@@ -462,8 +409,10 @@ describe("Zodios", () => {
     zodios.use("get", "/:id", {
       request: async (_, config) => config,
     });
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("get-/:id").count()).toBe(1);
+    expect(
+      // @ts-expect-error
+      zodios.plugins.plugins.filter((plugin) => plugin.plugin).length
+    ).toBe(2);
   });
 
   it("should register a plugin by alias", () => {
@@ -481,8 +430,10 @@ describe("Zodios", () => {
     zodios.use("test", {
       request: async (_, config) => config,
     });
-    // @ts-expect-error
-    expect(zodios.endpointPlugins.get("get-/:id").count()).toBe(1);
+    expect(
+      // @ts-expect-error
+      zodios.plugins.plugins.filter((plugin) => plugin.plugin).length
+    ).toBe(2);
   });
 
   it("should make an http request", async () => {
@@ -1099,41 +1050,24 @@ describe("Zodios", () => {
       ],
       { fetcherFactory: mockFetchFactory }
     );
+    let error: Error | undefined = undefined;
     try {
       await zodios.get("/:id", { params: { id: 1 } });
     } catch (e) {
-      expect(e).toBeInstanceOf(ZodiosError);
-      expect((e as ZodiosError).cause).toBeInstanceOf(ZodError);
-      expect((e as ZodiosError).message)
-        .toBe(`Zodios: Invalid response from endpoint 'get /:id'
-status: 200 OK
-cause:
-[
-  {
-    "code": "invalid_type",
-    "expected": "string",
-    "received": "undefined",
-    "path": [
-      "more"
-    ],
-    "message": "Required"
-  }
-]
-received:
-{
-  "id": 1,
-  "name": "test"
-}`);
-      expect((e as ZodiosError).data).toEqual({
-        id: 1,
-        name: "test",
-      });
-      expect((e as ZodiosError).config).toEqual({
-        method: "get",
-        url: "/:id",
-        params: { id: 1 },
-      });
+      error = e as Error;
     }
+    expect(error).toBeInstanceOf(ZodiosError);
+    expect((error as ZodiosError).cause).toBeInstanceOf(ZodError);
+    expect((error as ZodiosError).message).toMatchSnapshot();
+    expect((error as ZodiosError).data).toEqual({
+      id: 1,
+      name: "test",
+    });
+    expect((error as ZodiosError).config).toEqual({
+      method: "get",
+      url: "/:id",
+      params: { id: 1 },
+    });
   });
 
   it("should match Expected error", async () => {

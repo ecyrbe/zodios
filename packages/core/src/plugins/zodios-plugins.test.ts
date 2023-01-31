@@ -1,6 +1,14 @@
 import { AnyZodiosFetcherProvider } from "../fetcher-providers";
-import { ZodiosPlugin } from "../zodios.types";
+import { tsSchema } from "../type-providers";
+import { ZodiosEndpointDefinition, ZodiosPlugin } from "../zodios.types";
 import { ZodiosPlugins } from "./zodios-plugins";
+
+const testEndpoint: ZodiosEndpointDefinition = {
+  method: "get",
+  path: "/test",
+  alias: "getTest",
+  response: tsSchema<{ test: string }>(),
+};
 
 describe("ZodiosPlugins", () => {
   it("should be defined", () => {
@@ -8,57 +16,29 @@ describe("ZodiosPlugins", () => {
   });
 
   it("should register one plugin", () => {
-    const plugins = new ZodiosPlugins("any", "any");
+    const plugins = new ZodiosPlugins();
     const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
-      request: async (api, config) => config,
-      response: async (api, config, response) => response,
+      request: async (endpoint, config) => config,
+      response: async (endpoint, config, response) => response,
     };
-    const id = plugins.use(plugin);
-    expect(id.key).toBe("any-any");
-    expect(id.value).toBe(0);
-    expect(plugins.count()).toBe(1);
+    const id = plugins.use({}, plugin);
+    expect(id).toBe(0);
   });
 
   it("should unregister one plugin", () => {
-    const plugins = new ZodiosPlugins("any", "any");
+    const plugins = new ZodiosPlugins();
     const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => response,
     };
-    const id = plugins.use(plugin);
+    const id = plugins.use({}, plugin);
     plugins.eject(id);
-    expect(plugins.count()).toBe(0);
-  });
-
-  it("should replace named plugins", () => {
-    const plugins = new ZodiosPlugins("any", "any");
-    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
-      name: "test",
-      request: async (api, config) => config,
-      response: async (api, config, response) => response,
-    };
-    plugins.use(plugin);
-    plugins.use(plugin);
-    expect(plugins.count()).toBe(1);
-  });
-
-  it("should throw if plugin is not registered", () => {
-    const plugins = new ZodiosPlugins("any", "any");
-    const id = { key: "test-any", value: 5 };
-    expect(() => plugins.eject(id)).toThrowError(
-      `Plugin with key 'test-any' is not registered for endpoint 'any-any'`
-    );
-  });
-
-  it("should throw if named plugin is not registered", () => {
-    const plugins = new ZodiosPlugins("any", "any");
-    expect(() => plugins.eject("test")).toThrowError(
-      `Plugin with name 'test' not found`
-    );
+    // @ts-ignore
+    expect(plugins.plugins.filter((filter) => filter.plugin).length).toBe(0);
   });
 
   it("should execute response plugins consistently", async () => {
-    const plugins = new ZodiosPlugins("any", "any");
+    const plugins = new ZodiosPlugins();
     const plugin1: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => {
@@ -66,7 +46,7 @@ describe("ZodiosPlugins", () => {
         return response;
       },
     };
-    plugins.use(plugin1);
+    plugins.use({}, plugin1);
     const plugin2: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
       response: async (api, config, response) => {
@@ -74,16 +54,16 @@ describe("ZodiosPlugins", () => {
         return response;
       },
     };
-    plugins.use(plugin2);
+    plugins.use({}, plugin2);
     const response1 = await plugins.interceptResponse(
-      [],
+      testEndpoint,
       // @ts-ignore
       {},
       Promise.resolve({ data: "test1:" })
     );
     expect(response1.data).toBe("test1:21");
     const response2 = await plugins.interceptResponse(
-      [],
+      testEndpoint,
       // @ts-ignore
       {},
       Promise.resolve({ data: "test2:" })
@@ -92,38 +72,18 @@ describe("ZodiosPlugins", () => {
   });
 
   it('should catch error if plugin "error" is defined', async () => {
-    const plugins = new ZodiosPlugins("any", "any");
+    const plugins = new ZodiosPlugins();
     const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
       request: async (api, config) => config,
-      // @ts-ignore
       error: async (api, config, error) => ({ test: true }),
     };
-    plugins.use(plugin);
+    plugins.use({}, plugin);
     const response = await plugins.interceptResponse(
-      [],
+      testEndpoint,
       // @ts-ignore
       { method: "any", url: "any" },
       Promise.reject(new Error("test"))
     );
     expect(response).toEqual({ test: true });
-  });
-
-  it("should count plugins", () => {
-    const plugins = new ZodiosPlugins("any", "any");
-    const namedPlugin: (n: number) => ZodiosPlugin<AnyZodiosFetcherProvider> = (
-      n
-    ) => ({
-      name: `test${n}`,
-      request: async (api, config) => config,
-      response: async (api, config, response) => response,
-    });
-    const plugin: ZodiosPlugin<AnyZodiosFetcherProvider> = {
-      request: async (api, config) => config,
-      response: async (api, config, response) => response,
-    };
-    plugins.use(namedPlugin(1));
-    plugins.use(plugin);
-    plugins.use(namedPlugin(2));
-    expect(plugins.count()).toBe(3);
   });
 });

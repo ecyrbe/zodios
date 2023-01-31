@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Zodios should not validate bad formatted responses 1`] = `
+"Zodios: Invalid response from endpoint 'get /:id'
+status: 200 OK
+cause:
+[
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "undefined",
+    "path": [
+      "more"
+    ],
+    "message": "Required"
+  }
+]
+received:
+{
+  "id": 1,
+  "name": "test"
+}"
+`;

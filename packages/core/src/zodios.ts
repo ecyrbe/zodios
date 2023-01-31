@@ -16,9 +16,8 @@ import type {
 } from "./zodios.types";
 import { HTTP_METHODS } from "./zodios.types";
 import {
-  PluginId,
   ZodiosPlugins,
-  zodValidationPlugin,
+  schemaValidationPlugin,
   formDataPlugin,
   formURLPlugin,
   headerPlugin,
@@ -37,8 +36,18 @@ import {
   TypeOfFetcherOptions,
   ZodiosFetcher,
 } from "./fetcher-providers";
-import { findEndpointErrorsByAlias, findEndpointErrorsByPath } from "./utils";
+import {
+  findEndpoint,
+  findEndpointErrorsByAlias,
+  findEndpointErrorsByPath,
+} from "./utils";
 import { hooks } from "./hooks";
+import {
+  PluginPriority,
+  ZodiosPluginFilters,
+  PluginId,
+  PluginPriorities,
+} from "./plugins/zodios-plugins.types";
 
 export interface ZodiosBase<
   Api extends ZodiosEndpointDefinitions,
@@ -67,8 +76,7 @@ export class ZodiosCoreImpl<
   public readonly fetcher: ZodiosFetcher<FetcherProvider> | undefined;
   public readonly _typeProvider: TypeProvider;
   public readonly _fetcherProvider: FetcherProvider;
-  private endpointPlugins: Map<string, ZodiosPlugins<FetcherProvider>> =
-    new Map();
+  private plugins = new ZodiosPlugins<FetcherProvider>();
 
   /**
    * constructor
@@ -158,7 +166,7 @@ export class ZodiosCoreImpl<
     this.injectHttpVerbEndpoints();
     this.initPlugins();
     if ([true, "all", "request", "response"].includes(this.options.validate)) {
-      this.use(zodValidationPlugin(this.options));
+      this.use(schemaValidationPlugin(this.options), PluginPriorities.high);
     }
   }
 
@@ -167,16 +175,15 @@ export class ZodiosCoreImpl<
   }
 
   private initPlugins() {
-    this.endpointPlugins.set("any-any", new ZodiosPlugins("any", "any"));
-
     this.api.forEach((endpoint) => {
-      const plugins = new ZodiosPlugins<FetcherProvider>(
-        endpoint.method,
-        endpoint.path
-      );
       switch (endpoint.requestFormat) {
         case "binary":
-          plugins.use(
+          this.plugins.use(
+            {
+              method: endpoint.method,
+              path: endpoint.path,
+              alias: endpoint.alias,
+            },
             headerPlugin<FetcherProvider>(
               "Content-Type",
               "application/octet-stream"
@@ -184,35 +191,37 @@ export class ZodiosCoreImpl<
           );
           break;
         case "form-data":
-          plugins.use(formDataPlugin<FetcherProvider>());
+          this.plugins.use(
+            {
+              method: endpoint.method,
+              path: endpoint.path,
+              alias: endpoint.alias,
+            },
+            formDataPlugin<FetcherProvider>()
+          );
           break;
         case "form-url":
-          plugins.use(formURLPlugin<FetcherProvider>());
+          this.plugins.use(
+            {
+              method: endpoint.method,
+              path: endpoint.path,
+              alias: endpoint.alias,
+            },
+            formURLPlugin<FetcherProvider>()
+          );
           break;
         case "text":
-          plugins.use(
+          this.plugins.use(
+            {
+              method: endpoint.method,
+              path: endpoint.path,
+              alias: endpoint.alias,
+            },
             headerPlugin<FetcherProvider>("Content-Type", "text/plain")
           );
           break;
       }
-      this.endpointPlugins.set(`${endpoint.method}-${endpoint.path}`, plugins);
     });
-  }
-
-  private getAnyEndpointPlugins() {
-    return this.endpointPlugins.get("any-any");
-  }
-
-  private findAliasEndpointPlugins(alias: string) {
-    const endpoint = this.api.find((endpoint) => endpoint.alias === alias);
-    if (endpoint) {
-      return this.endpointPlugins.get(`${endpoint.method}-${endpoint.path}`);
-    }
-    return undefined;
-  }
-
-  private findEnpointPlugins(method: Method, path: string) {
-    return this.endpointPlugins.get(`${method}-${path}`);
   }
 
   /**
@@ -220,39 +229,65 @@ export class ZodiosCoreImpl<
    * @param plugin - the plugin to use
    * @returns an id to allow you to unregister the plugin
    */
-  use(plugin: ZodiosPlugin<FetcherProvider>): PluginId;
+  use(
+    plugin: ZodiosPlugin<FetcherProvider>,
+    priority?: PluginPriority
+  ): PluginId;
   use<Alias extends Aliases<Api>>(
     alias: Alias,
-    plugin: ZodiosPlugin<FetcherProvider>
+    plugin: ZodiosPlugin<FetcherProvider>,
+    priority?: PluginPriority
   ): PluginId;
   use<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
     method: M,
     path: Path,
-    plugin: ZodiosPlugin<FetcherProvider>
+    plugin: ZodiosPlugin<FetcherProvider>,
+    priority?: PluginPriority
   ): PluginId;
-  use(...args: unknown[]) {
-    if (typeof args[0] === "object") {
-      const plugins = this.getAnyEndpointPlugins()!;
-      return plugins.use(args[0] as ZodiosPlugin<FetcherProvider>);
-    } else if (typeof args[0] === "string" && typeof args[1] === "object") {
-      const plugins = this.findAliasEndpointPlugins(args[0]);
-      if (!plugins)
-        throw new Error(
-          `Zodios: no alias '${args[0]}' found to register plugin`
+  use(
+    filter: ZodiosPluginFilters,
+    plugin: ZodiosPlugin<FetcherProvider>,
+    priority?: PluginPriority
+  ): PluginId;
+  use(
+    arg0: ZodiosPlugin<FetcherProvider> | ZodiosPluginFilters | string,
+    arg1?: ZodiosPlugin<FetcherProvider> | string,
+    arg2?: ZodiosPlugin<FetcherProvider> | PluginPriority,
+    arg3?: PluginPriority
+  ) {
+    if (typeof arg0 === "object") {
+      if ("method" in arg0 || "path" in arg0 || "alias" in arg0) {
+        return this.plugins.use(
+          arg0,
+          arg1 as ZodiosPlugin<FetcherProvider>,
+          arg2 as PluginPriority
         );
-      return plugins.use(args[1] as ZodiosPlugin<FetcherProvider>);
-    } else if (
-      typeof args[0] === "string" &&
-      typeof args[1] === "string" &&
-      typeof args[2] === "object"
-    ) {
-      const plugins = this.findEnpointPlugins(args[0] as Method, args[1]);
-      if (!plugins)
-        throw new Error(
-          `Zodios: no endpoint '${args[0]} ${args[1]}' found to register plugin`
-        );
-      return plugins.use(args[2] as ZodiosPlugin<FetcherProvider>);
+      }
+      return this.plugins.use(
+        {},
+        arg0 as ZodiosPlugin<FetcherProvider>,
+        arg1 as PluginPriority
+      );
     }
+    if (typeof arg0 === "string" && typeof arg1 === "object") {
+      return this.plugins.use(
+        { alias: arg0 },
+        arg1 as ZodiosPlugin<FetcherProvider>,
+        arg2 as PluginPriority
+      );
+    }
+    if (
+      typeof arg0 === "string" &&
+      typeof arg1 === "string" &&
+      typeof arg2 === "object"
+    ) {
+      return this.plugins.use(
+        { method: arg0, path: arg1 },
+        arg2 as ZodiosPlugin<FetcherProvider>,
+        arg3 as PluginPriority
+      );
+    }
+
     throw new Error("Zodios: invalid plugin registration");
   }
 
@@ -262,13 +297,8 @@ export class ZodiosCoreImpl<
    * it will unregister the plugin with that name only for non endpoint plugins
    * @param plugin - id of the plugin to remove
    */
-  eject(plugin: PluginId | string): void {
-    if (typeof plugin === "string") {
-      const plugins = this.getAnyEndpointPlugins()!;
-      plugins.eject(plugin);
-      return;
-    }
-    this.endpointPlugins.get(plugin.key)?.eject(plugin);
+  eject(plugin: PluginId): void {
+    this.plugins.eject(plugin);
   }
 
   private injectAliasEndpoints() {
@@ -334,12 +364,13 @@ export class ZodiosCoreImpl<
     let conf = config as unknown as ReadonlyDeep<
       AnyZodiosRequestOptions<FetcherProvider>
     >;
-    const anyPlugin = this.getAnyEndpointPlugins()!;
-    const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
-    conf = await anyPlugin.interceptRequest(this.api, conf);
-    if (endpointPlugin) {
-      conf = await endpointPlugin.interceptRequest(this.api, conf);
+    const endpoint = findEndpoint(this.api, conf.method, conf.url);
+    if (!endpoint) {
+      throw new Error(
+        `Zodios: no endpoint found for ${conf.method} ${conf.url}`
+      );
     }
+    conf = await this.plugins.interceptRequest(endpoint, conf);
     let response: Promise<any>;
     if (hooks.fetcher) {
       response = hooks.fetcher.fetch(conf);
@@ -348,10 +379,7 @@ export class ZodiosCoreImpl<
     } else {
       throw new Error("Zodios: no fetcher provider found");
     }
-    if (endpointPlugin) {
-      response = endpointPlugin.interceptResponse(this.api, conf, response);
-    }
-    response = anyPlugin.interceptResponse(this.api, conf, response);
+    response = this.plugins.interceptResponse(endpoint, conf, response);
     return (await response).data;
   }
 
