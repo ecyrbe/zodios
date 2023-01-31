@@ -82,7 +82,7 @@ export type {
 export { setFetcherHook, clearFetcherHook } from "./hooks";
 export {
   PluginId,
-  zodValidationPlugin,
+  schemaValidationPlugin,
   formDataPlugin,
   formURLPlugin,
   headerPlugin,
