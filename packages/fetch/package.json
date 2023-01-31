@@ -1,7 +1,7 @@
 {
   "name": "@zodios/fetch",
   "description": "Typescript API client with fetch",
-  "version": "11.0.0-beta.16",
+  "version": "11.0.0-beta.17",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
@@ -41,7 +41,7 @@
     "test": "NODE_OPTIONS=--experimental-abortcontroller jest --coverage"
   },
   "peerDependencies": {
-    "@zodios/core": "11.0.0-beta.16",
+    "@zodios/core": "11.0.0-beta.17",
     "fp-ts": "2.x",
     "io-ts": "2.x",
     "zod": "^3.x"

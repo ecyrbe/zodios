@@ -1,5 +1,12 @@
 # @zodios/core
 
+## 11.0.0-beta.17
+
+### Major Changes
+
+- 48a20cc: fix(react): do not double fetch if react-query signal is not used
+- 8303e57: feat(plugin): add new zodios plugin system
+
 ## 11.0.0-beta.16
 
 ### Major Changes
