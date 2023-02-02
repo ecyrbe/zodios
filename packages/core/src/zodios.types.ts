@@ -36,7 +36,6 @@ export const HTTP_MUTATION_METHODS = [
 export const HTTP_METHODS = [
   ...HTTP_QUERY_METHODS,
   ...HTTP_MUTATION_METHODS,
-  "options",
 ] as const;
 
 export type QueryMethod = typeof HTTP_QUERY_METHODS[number];

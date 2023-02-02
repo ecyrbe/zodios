@@ -39,13 +39,11 @@ function validateEndpointMiddleware(
   ) => {
     for (let parameter of endpoint.parameters!) {
       let schema = parameter.schema;
-      if (!transform) {
-        schema = withoutTransform(schema);
-      }
 
       switch (parameter.type) {
         case "Body":
           {
+            // @ts-ignore
             const result = await schema.safeParseAsync(req.body);
             if (!result.success) {
               return res.status(400).json({
@@ -59,6 +57,7 @@ function validateEndpointMiddleware(
         case "Path":
           {
             const result = await validateParam(
+              // @ts-ignore
               schema,
               req.params[parameter.name]
             );
@@ -74,6 +73,7 @@ function validateEndpointMiddleware(
         case "Query":
           {
             const result = await validateParam(
+              // @ts-ignore
               schema,
               req.query[parameter.name]
             );
@@ -88,6 +88,7 @@ function validateEndpointMiddleware(
           break;
         case "Header":
           {
+            // @ts-ignore
             const result = await parameter.schema.safeParseAsync(
               req.get(parameter.name)
             );
