@@ -40,6 +40,11 @@ function validateEndpointMiddleware(
     for (let parameter of endpoint.parameters!) {
       let schema = parameter.schema;
 
+      if (!transform) {
+        // @ts-ignore
+        schema = withoutTransform(schema);
+      }
+
       switch (parameter.type) {
         case "Body":
           {

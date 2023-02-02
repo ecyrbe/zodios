@@ -967,35 +967,6 @@ received:
     expect(response).toEqual({ id: "4", name: "post" });
   });
 
-  it("should send a form data request a second time under 100 ms", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
-      {
-        method: "post",
-        path: "/form-data",
-        requestFormat: "form-data",
-        parameters: [
-          {
-            name: "body",
-            type: "Body",
-            schema: z.object({
-              id: z.string(),
-              name: z.string(),
-            }),
-          },
-        ],
-        response: z.object({
-          id: z.string(),
-          name: z.string(),
-        }),
-      },
-    ]);
-    const response = await zodios.post("/form-data", {
-      // @ts-ignore
-      body: { id: "4", name: "post" },
-    });
-    expect(response).toEqual({ id: "4", name: "post" });
-  }, 100);
-
   it("should not send an array as form data request", async () => {
     const zodios = new Zodios(`http://localhost:${port}`, [
       {

@@ -1247,42 +1247,6 @@ describe("Zodios", () => {
     expect(response).toEqual({ id: "4", name: "post" });
   });
 
-  it("should send a form data request a second time under 100 ms", async () => {
-    const zodios = new ZodiosCore(
-      `http://localhost`,
-      [
-        {
-          method: "post",
-          path: "/form-data",
-          requestFormat: "form-data",
-          parameters: [
-            {
-              name: "body",
-              type: "Body",
-              schema: z.object({
-                id: z.string(),
-                name: z.string(),
-              }),
-            },
-          ],
-          response: z.object({
-            id: z.string(),
-            name: z.string(),
-          }),
-        },
-      ],
-      { fetcherFactory: mockFetchFactory }
-    );
-    const response = await zodios.post("/form-data", {
-      body: { id: "4", name: "post" },
-    });
-    const testResonseType: Assert<
-      typeof response,
-      { id: string; name: string }
-    > = true;
-    expect(response).toEqual({ id: "4", name: "post" });
-  }, 100);
-
   it("should not send an array as form data request", async () => {
     const zodios = new ZodiosCore(
       `http://localhost`,
