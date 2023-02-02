@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request } from "express";
 import {
   ZodiosEndpointDefinitions,
   ZodiosEndpointDefinition,
@@ -10,7 +10,7 @@ import {
   ZodiosPathParamsByPath,
   Method,
 } from "@zodios/core";
-import { IfEquals } from "@zodios/core/lib/utils.types";
+import { IfEquals, Merge } from "@zodios/core/lib/utils.types";
 import { z, ZodAny, ZodObject } from "zod";
 
 export type ZodiosSucessCodes =
@@ -25,14 +25,13 @@ export type ZodiosSucessCodes =
   | 208
   | 226;
 
-export type WithZodiosContext<
-  T,
-  Context extends ZodObject<any>
-> = Context extends ZodAny ? T : T & z.infer<Context>;
+export type WithZodiosContext<T, Context> = T & Context;
+
+type Test = WithZodiosContext<Request, unknown>;
 
 export interface ZodiosRequestHandler<
   Api extends ZodiosEndpointDefinitions,
-  Context extends ZodObject<any>,
+  Context,
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   ReqPath = ZodiosPathParamsByPath<Api, M, Path, false>,
@@ -64,9 +63,7 @@ export interface ZodiosRequestHandler<
   ): void;
 }
 
-export interface ZodiosRouterContextRequestHandler<
-  Context extends ZodObject<any>
-> {
+export interface ZodiosRouterContextRequestHandler<Context> {
   (
     req: WithZodiosContext<express.Request, Context>,
     res: express.Response,
@@ -76,7 +73,7 @@ export interface ZodiosRouterContextRequestHandler<
 
 export type ZodiosHandler<
   Router,
-  Context extends ZodObject<any>,
+  Context,
   Api extends ZodiosEndpointDefinitions,
   M extends Method
 > = <Path extends ZodiosPathsByMethod<Api, M>>(
@@ -84,7 +81,7 @@ export type ZodiosHandler<
   ...handlers: Array<ZodiosRequestHandler<Api, Context, M, Path>>
 ) => Router;
 
-export interface ZodiosUse<Context extends ZodObject<any>> {
+export interface ZodiosUse<Context> {
   use(...handlers: Array<ZodiosRouterContextRequestHandler<Context>>): this;
   use(handlers: Array<ZodiosRouterContextRequestHandler<Context>>): this;
   use(
@@ -97,16 +94,13 @@ export interface ZodiosUse<Context extends ZodObject<any>> {
   ): this;
 }
 
-export interface ZodiosHandlers<
-  Api extends ZodiosEndpointDefinitions,
-  Context extends ZodObject<any>
-> extends ZodiosUse<Context> {
+export interface ZodiosHandlers<Api extends ZodiosEndpointDefinitions, Context>
+  extends ZodiosUse<Context> {
   get: ZodiosHandler<this, Context, Api, "get">;
   post: ZodiosHandler<this, Context, Api, "post">;
   put: ZodiosHandler<this, Context, Api, "put">;
   patch: ZodiosHandler<this, Context, Api, "patch">;
   delete: ZodiosHandler<this, Context, Api, "delete">;
-  options: ZodiosHandler<this, Context, Api, "options">;
   head: ZodiosHandler<this, Context, Api, "head">;
 }
 
@@ -121,7 +115,7 @@ export interface ZodiosValidationOptions {
   transform?: boolean;
 }
 
-export interface ZodiosAppOptions<Context extends ZodObject<any>>
+export interface ZodiosAppOptions<ContextSchema>
   extends ZodiosValidationOptions {
   /**
    * express app intance - default is express()
@@ -131,21 +125,21 @@ export interface ZodiosAppOptions<Context extends ZodObject<any>>
    * enable express json body parser - default is true
    */
   enableJsonBodyParser?: boolean;
-  context?: Context;
+  context?: ContextSchema;
 }
 
-export interface ZodiosRouterOptions<Context extends ZodObject<any>>
+export interface ZodiosRouterOptions<ContextSchema>
   extends ZodiosValidationOptions {
   /**
    * express router instance - default is express.Router
    */
   router?: ReturnType<typeof express.Router>;
-  context?: Context;
+  context?: ContextSchema;
 }
 
 export type ZodiosApp<
   Api extends ZodiosEndpointDefinitions,
-  Context extends ZodObject<any>
+  Context
 > = IfEquals<
   Api,
   any,
@@ -156,7 +150,7 @@ export type ZodiosApp<
 
 export type ZodiosRouter<
   Api extends ZodiosEndpointDefinitions,
-  Context extends ZodObject<any>
+  Context
 > = IfEquals<
   Api,
   any,
