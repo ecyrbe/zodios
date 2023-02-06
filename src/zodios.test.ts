@@ -30,6 +30,9 @@ describe("Zodios", () => {
     app.get("/error401", (req, res) => {
       res.status(401).json({});
     });
+    app.get("/error/:id/error401", (req, res) => {
+      res.status(401).json({});
+    });
     app.get("/error502", (req, res) => {
       res.status(502).json({ error: { message: "bad gateway" } });
     });
@@ -893,6 +896,40 @@ received:
         error: { message: "bad gateway" },
       });
     }
+  });
+
+  it("should match error with params", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        alias: "getError401",
+        path: "/error/:id/error401",
+        response: z.void(),
+        errors: [
+          {
+            status: 401,
+            schema: z.object({}),
+          },
+        ],
+      },
+    ]);
+
+    const params = {
+      id: "test",
+    };
+
+    let error;
+    try {
+      await zodios.getError401({ params });
+    } catch (e) {
+      error = e;
+    }
+    expect(isErrorFromAlias(zodios.api, "getError401", error, params)).toBe(
+      true
+    );
+    expect(
+      isErrorFromPath(zodios.api, "get", "/error/:id/error401", error, params)
+    ).toBe(true);
   });
 
   it("should match Unexpected error", async () => {
