@@ -50,30 +50,29 @@ export type RequestFormat =
   | "text"; // for text data
 
 type EndpointDefinitionsByMethod<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method
 > = FilterArrayByValue<Api, { method: M }>;
 
 export type ZodiosEndpointDefinitionByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>
 > = FilterArrayByValue<Api, { method: M; path: Path }>;
 
 export type ZodiosEndpointDefinitionByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string
 > = FilterArrayByValue<Api, { alias: Alias }>;
 
 export type ZodiosPathsByMethod<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method
 > = EndpointDefinitionsByMethod<Api, M>[number]["path"];
 
-export type Aliases<Api extends ZodiosEndpointDefinition[]> = FilterArrayByKey<
-  Api,
-  "alias"
->[number]["alias"];
+export type Aliases<
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[]
+> = FilterArrayByKey<Api, "alias">[number]["alias"];
 
 export type ZodiosResponseForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
@@ -84,7 +83,7 @@ export type ZodiosResponseForEndpoint<
   : InferInputTypeFromSchema<TypeProvider, Endpoint["response"]>;
 
 export type ZodiosResponseByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -100,7 +99,7 @@ export type ZodiosResponseByPath<
     >;
 
 export type ZodiosResponseByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -124,7 +123,7 @@ export type ZodiosDefaultErrorForEndpoint<
 >[number]["schema"];
 
 type ZodiosDefaultErrorByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>
 > = FilterArrayByValue<
@@ -135,7 +134,7 @@ type ZodiosDefaultErrorByPath<
 >[number]["schema"];
 
 type ZodiosDefaultErrorByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string
 > = FilterArrayByValue<
   ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
@@ -178,7 +177,7 @@ export type ZodiosErrorForEndpoint<
     >;
 
 export type ZodiosErrorByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Status extends number,
@@ -211,7 +210,7 @@ export type ZodiosErrorByPath<
     >;
 
 export type ZodiosErrorsByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -235,7 +234,7 @@ export type ZodiosErrorsByPath<
     >;
 
 export type ZodiosErrorsByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -251,11 +250,30 @@ export type ZodiosErrorsByAlias<
     >;
 
 export type InferFetcherErrors<
-  T,
+  T extends readonly unknown[] | unknown[],
   TypeProvider extends AnyZodiosTypeProvider,
   FetcherProvider extends AnyZodiosFetcherProvider,
   Acc extends unknown[] = []
-> = T extends [infer Head, ...infer Tail]
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends {
+      status: infer Status;
+      schema: infer Schema;
+    }
+    ? InferFetcherErrors<
+        Tail,
+        TypeProvider,
+        FetcherProvider,
+        [
+          ...Acc,
+          TypeOfFetcherError<
+            FetcherProvider,
+            InferOutputTypeFromSchema<TypeProvider, Schema>,
+            Status
+          >
+        ]
+      >
+    : Acc
+  : T extends [infer Head, ...infer Tail]
   ? Head extends {
       status: infer Status;
       schema: infer Schema;
@@ -277,7 +295,7 @@ export type InferFetcherErrors<
   : Acc;
 
 export type ZodiosMatchingErrorsByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   FetcherProvider extends AnyZodiosFetcherProvider,
@@ -289,7 +307,7 @@ export type ZodiosMatchingErrorsByPath<
 >[number];
 
 export type ZodiosMatchingErrorsByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -300,7 +318,7 @@ export type ZodiosMatchingErrorsByAlias<
 >[number];
 
 export type ZodiosErrorByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   Status extends number,
   Frontend extends boolean = true,
@@ -338,7 +356,7 @@ export type BodySchemaForEndpoint<Endpoint extends ZodiosEndpointDefinition> =
   >[number]["schema"];
 
 export type BodySchema<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>
 > = FilterArrayByValue<
@@ -355,7 +373,7 @@ export type ZodiosBodyForEndpoint<
   : InferOutputTypeFromSchema<TypeProvider, BodySchemaForEndpoint<Endpoint>>;
 
 export type ZodiosBodyByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -365,7 +383,7 @@ export type ZodiosBodyByPath<
   : InferOutputTypeFromSchema<TypeProvider, BodySchema<Api, M, Path>>;
 
 export type BodySchemaByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string
 > = FilterArrayByValue<
   ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["parameters"],
@@ -373,7 +391,7 @@ export type BodySchemaByAlias<
 >[number]["schema"];
 
 export type ZodiosBodyByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -429,7 +447,7 @@ export type ZodiosQueryParamsForEndpoint<
 >;
 
 export type ZodiosQueryParamsByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -448,7 +466,7 @@ export type ZodiosQueryParamsByPath<
 >;
 
 export type ZodiosQueryParamsByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -493,7 +511,7 @@ export type ZodiosPathParamsForEndpoint<
  * Get path params for a given endpoint by path
  */
 export type ZodiosPathParamsByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -516,7 +534,7 @@ export type ZodiosPathParamsByPath<
  * Get path params for a given endpoint by alias
  */
 export type ZodiosPathParamByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
@@ -551,7 +569,7 @@ export type ZodiosHeaderParamsForEndpoint<
 >;
 
 export type ZodiosHeaderParamsByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
@@ -570,7 +588,7 @@ export type ZodiosHeaderParamsByPath<
 >;
 
 export type ZodiosHeaderParamsByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
@@ -588,7 +606,7 @@ export type ZodiosHeaderParamsByAlias<
 >;
 
 export type ZodiosRequestOptionsByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   FetcherProvider extends AnyZodiosFetcherProvider,
   Frontend extends boolean = true,
@@ -611,7 +629,7 @@ export type ZodiosAliasRequest<Config, Response> =
     : (configOptions: ReadonlyDeep<Config>) => Promise<Response>;
 
 export type ZodiosAliases<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = {
@@ -628,7 +646,7 @@ export type ZodiosAliases<
 };
 
 type OptionalRequestOptionsByPathParameters<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   FetcherProvider extends AnyZodiosFetcherProvider,
@@ -646,7 +664,7 @@ type OptionalRequestOptionsByPathParameters<
   : [config: ReadonlyDeep<Config>];
 
 export type ZodiosVerbs<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = {
@@ -685,7 +703,7 @@ export type AnyZodiosRequestOptions<
  * Get the request options for a given endpoint
  */
 export type ZodiosRequestOptionsByPath<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   FetcherProvider extends AnyZodiosFetcherProvider,
@@ -704,7 +722,7 @@ export type ZodiosRequestOptionsByPath<
 >;
 
 export type ZodiosRequestOptions<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   FetcherProvider extends AnyZodiosFetcherProvider,
@@ -834,7 +852,7 @@ export interface ZodiosEndpointDefinition {
   /**
    * optional parameters of the endpoint
    */
-  parameters?: Array<ZodiosEndpointParameter>;
+  parameters?: readonly ZodiosEndpointParameter[] | ZodiosEndpointParameter[];
   /**
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
@@ -852,10 +870,8 @@ export interface ZodiosEndpointDefinition {
   /**
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
-  errors?: Array<ZodiosEndpointError>;
+  errors?: readonly ZodiosEndpointError[] | ZodiosEndpointError[];
 }
-
-export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses

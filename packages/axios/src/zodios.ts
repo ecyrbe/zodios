@@ -1,6 +1,5 @@
-import { Narrow } from "@zodios/core/lib/utils.types";
 import type {
-  ZodiosEndpointDefinitions,
+  ZodiosEndpointDefinition,
   ZodiosOptions,
   AnyZodiosTypeProvider,
   TypeOfFetcherOptions,
@@ -33,10 +32,10 @@ const ZodiosAxios = new Proxy(ZodiosCore, {
 
 export interface Zodios {
   new <
-    Api extends ZodiosEndpointDefinitions,
+    const Api extends ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
-    api: Narrow<Api>,
+    api: Api,
     options?: Omit<
       ZodiosOptions<AxiosProvider, TypeProvider>,
       "fetcherFactory"
@@ -44,11 +43,11 @@ export interface Zodios {
       TypeOfFetcherOptions<AxiosProvider>
   ): ZodiosInstance<Api, AxiosProvider, TypeProvider>;
   new <
-    Api extends ZodiosEndpointDefinitions,
+    const Api extends ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     baseUrl: string,
-    api: Narrow<Api>,
+    api: Api,
     options?: Omit<
       ZodiosOptions<AxiosProvider, TypeProvider>,
       "fetcherFactory"

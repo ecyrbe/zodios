@@ -5,7 +5,7 @@ import type {
   ZodiosPathsByMethod,
   ZodiosResponseByPath,
   ZodiosOptions,
-  ZodiosEndpointDefinitions,
+  ZodiosEndpointDefinition,
   ZodiosAliases,
   ZodiosPlugin,
   Aliases,
@@ -22,12 +22,7 @@ import {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
-import type {
-  Narrow,
-  PickRequired,
-  ReadonlyDeep,
-  RequiredKeys,
-} from "./utils.types";
+import type { PickRequired, ReadonlyDeep } from "./utils.types";
 import { checkApi } from "./api";
 import type { AnyZodiosTypeProvider, ZodTypeProvider } from "./type-providers";
 import { zodTypeProvider } from "./type-providers";
@@ -50,7 +45,7 @@ import {
 } from "./plugins/zodios-plugins.types";
 
 export interface ZodiosBase<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > {
@@ -63,7 +58,7 @@ export interface ZodiosBase<
  * zodios api client
  */
 export class ZodiosCoreImpl<
-  Api extends ZodiosEndpointDefinitions,
+  const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > implements ZodiosBase<Api, FetcherProvider, TypeProvider>
@@ -106,13 +101,13 @@ export class ZodiosCoreImpl<
    *   ]);
    */
   constructor(
-    api: Narrow<Api>,
+    api: Api,
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
   );
   constructor(
     baseUrl: string,
-    api: Narrow<Api>,
+    api: Api,
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
   );
@@ -136,10 +131,10 @@ export class ZodiosCoreImpl<
     let baseURL: string | undefined;
     if (typeof arg1 === "string" && Array.isArray(arg2)) {
       baseURL = arg1;
-      this.api = arg2;
+      this.api = arg2 as any;
       options = arg3 || {};
     } else if (Array.isArray(arg1) && !Array.isArray(arg2)) {
-      this.api = arg1;
+      this.api = arg1 as any;
       options = arg2 || {};
     } else {
       throw new Error("Zodios: api must be an array");
@@ -452,7 +447,7 @@ export class ZodiosCoreImpl<
 }
 
 export type ZodiosInstance<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = ZodiosCoreImpl<Api, FetcherProvider, TypeProvider> &
@@ -461,21 +456,21 @@ export type ZodiosInstance<
 
 export interface ZodiosCore {
   new <
-    Api extends ZodiosEndpointDefinitions,
+    const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
     FetcherProvider extends AnyZodiosFetcherProvider,
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
-    api: Narrow<Api>,
+    api: Api,
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
   ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
   new <
-    Api extends ZodiosEndpointDefinitions,
+    const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
     FetcherProvider extends AnyZodiosFetcherProvider,
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     baseUrl: string,
-    api: Narrow<Api>,
+    api: Api,
     options?: ZodiosOptions<FetcherProvider, TypeProvider> &
       TypeOfFetcherOptions<FetcherProvider>
   ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;

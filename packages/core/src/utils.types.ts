@@ -5,14 +5,23 @@
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type FilterArrayByValue<
-  T extends unknown[] | undefined,
+  T extends readonly unknown[] | unknown[] | undefined,
   C,
   Acc extends unknown[] = []
-> = T extends [infer Head, ...infer Tail]
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends C
+    ? FilterArrayByValue<Tail, C, [...Acc, Head]>
+    : FilterArrayByValue<Tail, C, Acc>
+  : T extends [infer Head, ...infer Tail]
   ? Head extends C
     ? FilterArrayByValue<Tail, C, [...Acc, Head]>
     : FilterArrayByValue<Tail, C, Acc>
   : Acc;
+
+type Test = FilterArrayByValue<
+  readonly [{ hello: "world"; world: "hello" }, { hello: "world" }],
+  { hello: "world" }
+>;
 
 /**
  * filter an array type by key
@@ -21,10 +30,14 @@ export type FilterArrayByValue<
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type FilterArrayByKey<
-  T extends unknown[],
+  T extends readonly unknown[] | unknown[],
   K extends string,
   Acc extends unknown[] = []
-> = T extends [infer Head, ...infer Tail]
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends { [Key in K]: unknown }
+    ? FilterArrayByKey<Tail, K, [...Acc, Head]>
+    : FilterArrayByKey<Tail, K, Acc>
+  : T extends [infer Head, ...infer Tail]
   ? Head extends { [Key in K]: unknown }
     ? FilterArrayByKey<Tail, K, [...Acc, Head]>
     : FilterArrayByKey<Tail, K, Acc>
@@ -36,37 +49,17 @@ export type FilterArrayByKey<
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type DefinedArray<
-  T extends unknown[],
+  T extends readonly unknown[] | unknown[],
   Acc extends unknown[] = []
-> = T extends [infer Head, ...infer Tail]
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends undefined
+    ? DefinedArray<Tail, Acc>
+    : DefinedArray<Tail, [Head, ...Acc]>
+  : T extends [infer Head, ...infer Tail]
   ? Head extends undefined
     ? DefinedArray<Tail, Acc>
     : DefinedArray<Tail, [Head, ...Acc]>
   : Acc;
-
-type Try<A, B, C> = A extends B ? A : C;
-
-type NarrowRaw<T> =
-  | (T extends Function ? T : never)
-  | (T extends string | number | bigint | boolean ? T : never)
-  | (T extends [] ? [] : never)
-  | {
-      [K in keyof T]: K extends "description" ? T[K] : NarrowNotSchema<T[K]>;
-    };
-
-type NarrowNotSchema<T> = Try<
-  T,
-  { parse: (...args: any[]) => any } | { validate: (...args: any[]) => any },
-  NarrowRaw<T>
->;
-
-/**
- * Utility to infer the embedded primitive type of any type
- * Same as `as const` but without setting the object as readonly and without needing the user to use it
- * @param T - type to infer the embedded type of
- * @see - thank you tannerlinsley for this idea
- */
-export type Narrow<T> = Try<T, [], NarrowNotSchema<T>>;
 
 /**
  * merge all union types into a single type
