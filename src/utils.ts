@@ -96,13 +96,18 @@ export function findEndpointErrorsByPath(
   api: ZodiosEndpointDefinitions,
   method: string,
   path: string,
-  err: AxiosError
+  err: AxiosError,
+  params: Record<string, unknown>
 ) {
   const endpoint = findEndpoint(api, method, path);
   return endpoint &&
     err.config &&
     endpoint.method === err.config.method &&
-    endpoint.path === err.config.url
+    replacePathParams({
+      method: endpoint.method,
+      url: endpoint.path,
+      params,
+    }) === err.config.url
     ? findEndpointErrors(endpoint, err)
     : undefined;
 }
@@ -110,13 +115,18 @@ export function findEndpointErrorsByPath(
 export function findEndpointErrorsByAlias(
   api: ZodiosEndpointDefinitions,
   alias: string,
-  err: AxiosError
+  err: AxiosError,
+  params: Record<string, unknown>
 ) {
   const endpoint = findEndpointByAlias(api, alias);
   return endpoint &&
     err.config &&
     endpoint.method === err.config.method &&
-    endpoint.path === err.config.url
+    replacePathParams({
+      method: endpoint.method,
+      url: endpoint.path,
+      params,
+    }) === err.config.url
     ? findEndpointErrors(endpoint, err)
     : undefined;
 }
