@@ -37,6 +37,12 @@ import {
   apiBuilder,
   setFetcherHook,
   clearFetcherHook,
+  makeApi,
+  makeParameters,
+  ApiOf,
+  ZodTypeProvider,
+  TypeOfFetcherError,
+  InferOutputTypeFromSchema,
 } from "./index";
 
 import type {
@@ -46,6 +52,19 @@ import type {
   ZodiosFetcherFactory,
 } from "./index";
 import type { Assert } from "./utils.types";
+import {
+  InferFetcherErrors,
+  ZodiosEndpointDefinitionByPath,
+  ZodiosMatchingErrorsByPath,
+} from "./zodios.types";
+
+interface MockError<T, S> {
+  status: S;
+  response: {
+    status: S;
+    data: T;
+  };
+}
 
 interface MockProvider extends AnyZodiosFetcherProvider {
   options: {};
@@ -58,7 +77,7 @@ interface MockProvider extends AnyZodiosFetcherProvider {
     responseType?: "arraybuffer" | "blob" | "json" | "text" | "stream";
   };
   response: unknown;
-  error: unknown;
+  error: MockError<this["arg1"], this["arg2"]>;
 }
 
 const mockFetchFactory: ZodiosFetcherFactory<MockProvider> = (options) => ({
@@ -396,6 +415,17 @@ describe("Zodios", () => {
   });
 
   it("should register a plugin by endpoint", () => {
+    const api = makeApi([
+      {
+        method: "get",
+        path: "/:id",
+        response: z.object({
+          id: z.number(),
+          name: z.string(),
+        }),
+      },
+    ]);
+
     const zodios = new ZodiosCore(`http://localhost`, [
       {
         method: "get",
@@ -475,6 +505,32 @@ describe("Zodios", () => {
   });
 
   it("should make an http get with standard query arrays", async () => {
+    const api = makeApi([
+      {
+        method: "get",
+        path: "/queries",
+        parameters: makeParameters([
+          {
+            name: "id",
+            type: "Query",
+            schema: z.array(z.number()),
+          },
+        ]),
+        response: z.object({
+          queries: z.array(z.string()),
+        }),
+      },
+      {
+        method: "get",
+        path: "/users",
+        response: z.array(
+          z.object({
+            id: z.number(),
+            name: z.string(),
+          })
+        ),
+      },
+    ]);
     const zodios = new ZodiosCore(
       `http://localhost`,
       [
@@ -1071,48 +1127,65 @@ describe("Zodios", () => {
   });
 
   it("should match Expected error", async () => {
-    const zodios = new ZodiosCore(`http://localhost`, [
-      {
-        method: "get",
-        alias: "getError502",
-        path: "/error502",
-        response: z.void(),
-        errors: [
-          {
-            status: 502,
-            schema: z.object({
-              error: z.object({
-                message: z.string(),
+    const zodios = new ZodiosCore(
+      `http://localhost`,
+      [
+        {
+          method: "get",
+          alias: "getError502",
+          path: "/error502",
+          response: z.void(),
+          errors: [
+            {
+              status: 502,
+              schema: z.object({
+                error: z.object({
+                  message: z.string(),
+                }),
               }),
-            }),
-          },
-          {
-            status: 401,
-            schema: z.object({
-              error: z.object({
-                message: z.string(),
-                _401: z.literal(true),
+            },
+            {
+              status: 401,
+              schema: z.object({
+                error: z.object({
+                  message: z.string(),
+                  _401: z.literal(true),
+                }),
               }),
-            }),
-          },
-          {
-            status: "default",
-            schema: z.object({
-              error: z.object({
-                message: z.string(),
-                _default: z.literal(true),
+            },
+            {
+              status: "default",
+              schema: z.object({
+                error: z.object({
+                  message: z.string(),
+                  _default: z.literal(true),
+                }),
               }),
-            }),
-          },
-        ],
-      },
-    ]);
+            },
+          ],
+        },
+      ],
+      { fetcherFactory: mockFetchFactory }
+    );
     let error;
     try {
       await zodios.get("/error502");
     } catch (e) {
       error = e;
     }
+    type Test = ZodiosMatchingErrorsByPath<
+      ApiOf<typeof zodios>,
+      "get",
+      "/error502",
+      MockProvider,
+      ZodTypeProvider
+    >;
+    type Test2 = ZodiosEndpointDefinitionByPath<
+      ApiOf<typeof zodios>,
+      "get",
+      "/error502"
+    >[number]["errors"];
+
     expect(error).toBeInstanceOf(Error);
     // @ts-ignore
     expect(error.response?.status).toBe(502);
