@@ -47,11 +47,10 @@ export function isErrorFromPath<
   api: Api,
   method: M,
   path: Path,
-  error: unknown,
-  params: Record<string, unknown> = {}
+  error: unknown
 ): error is ZodiosMatchingErrorsByPath<Api, M, Path> {
   return isDefinedError(error, (err) =>
-    findEndpointErrorsByPath(api, method, path, err, params)
+    findEndpointErrorsByPath(api, method, path, err)
   );
 }
 
@@ -68,10 +67,9 @@ export function isErrorFromAlias<
 >(
   api: Api,
   alias: Alias,
-  error: unknown,
-  params: Record<string, unknown> = {}
+  error: unknown
 ): error is ZodiosMatchingErrorsByAlias<Api, Alias> {
   return isDefinedError(error, (err) =>
-    findEndpointErrorsByAlias(api, alias, err, params)
+    findEndpointErrorsByAlias(api, alias, err)
   );
 }
