@@ -912,6 +912,18 @@ received:
           },
         ],
       },
+      {
+        method: "get",
+        alias: "getError404",
+        path: "/error/:id/error404",
+        response: z.void(),
+        errors: [
+          {
+            status: 404,
+            schema: z.object({}),
+          },
+        ],
+      },
     ]);
 
     const params = {
@@ -924,12 +936,16 @@ received:
     } catch (e) {
       error = e;
     }
-    expect(isErrorFromAlias(zodios.api, "getError401", error, params)).toBe(
-      true
-    );
+
+    expect(isErrorFromAlias(zodios.api, "getError401", error)).toBe(true);
+    expect(isErrorFromAlias(zodios.api, "getError404", error)).toBe(false);
+
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error401", error, params)
+      isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
     ).toBe(true);
+    expect(
+      isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
+    ).toBe(false);
   });
 
   it("should match Unexpected error", async () => {

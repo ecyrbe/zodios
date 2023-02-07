@@ -96,18 +96,14 @@ export function findEndpointErrorsByPath(
   api: ZodiosEndpointDefinitions,
   method: string,
   path: string,
-  err: AxiosError,
-  params: Record<string, unknown>
+  err: AxiosError
 ) {
   const endpoint = findEndpoint(api, method, path);
   return endpoint &&
     err.config &&
+    err.config.url &&
     endpoint.method === err.config.method &&
-    replacePathParams({
-      method: endpoint.method,
-      url: endpoint.path,
-      params,
-    }) === err.config.url
+    pathMatchesUrl(endpoint.path, err.config.url)
     ? findEndpointErrors(endpoint, err)
     : undefined;
 }
@@ -115,18 +111,21 @@ export function findEndpointErrorsByPath(
 export function findEndpointErrorsByAlias(
   api: ZodiosEndpointDefinitions,
   alias: string,
-  err: AxiosError,
-  params: Record<string, unknown>
+  err: AxiosError
 ) {
   const endpoint = findEndpointByAlias(api, alias);
+
   return endpoint &&
     err.config &&
+    err.config.url &&
     endpoint.method === err.config.method &&
-    replacePathParams({
-      method: endpoint.method,
-      url: endpoint.path,
-      params,
-    }) === err.config.url
+    pathMatchesUrl(endpoint.path, err.config.url)
     ? findEndpointErrors(endpoint, err)
     : undefined;
+}
+
+export function pathMatchesUrl(path: string, url: string) {
+  return new RegExp(`^${path.replace(paramsRegExp, () => "([^/]+)")}$`).test(
+    url
+  );
 }
