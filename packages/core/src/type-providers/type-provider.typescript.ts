@@ -46,13 +46,10 @@ export const tsFnSchema = <Schema>(
   },
 });
 
-export interface TsTypeProvider extends AnyZodiosTypeProvider {
-  input: this["schema"] extends { _schema: unknown }
-    ? this["schema"]["_schema"]
-    : never;
-  output: this["schema"] extends { _schema: unknown }
-    ? this["schema"]["_schema"]
-    : never;
+export interface TsTypeProvider
+  extends AnyZodiosTypeProvider<{ _schema: unknown }> {
+  input: this["schema"]["_schema"];
+  output: this["schema"]["_schema"];
 }
 
 /**

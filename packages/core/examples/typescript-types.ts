@@ -1,5 +1,5 @@
 import {
-  Zodios,
+  ZodiosCore,
   makeApi,
   tsFnSchema,
   ApiOf,
@@ -55,7 +55,7 @@ const jsonplaceholderApi = makeApi([
 ]);
 
 async function bootstrap() {
-  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi, {
+  const apiClient = new ZodiosCore(jsonplaceholderUrl, jsonplaceholderApi, {
     typeProvider: tsTypeProvider,
   });
 

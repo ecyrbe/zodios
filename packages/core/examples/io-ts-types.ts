@@ -6,8 +6,8 @@ import {
   ioTsTypeProvider,
 } from "../src/index";
 import * as t from "io-ts";
-import { fetchProvider } from "../src/fetcher-providers";
 import { FetcherProviderOf } from "../src/zodios";
+import { mockFetchFactory } from "../src/fetcher-providers/mock-provider";
 
 // you can define schema before declaring the API to get back the type
 
@@ -58,7 +58,7 @@ const jsonplaceholderApi = makeApi([
 async function bootstrap() {
   const apiClient = new ZodiosCore(jsonplaceholderUrl, jsonplaceholderApi, {
     typeProvider: ioTsTypeProvider,
-    fetcherProvider: fetchProvider,
+    fetcherFactory: mockFetchFactory,
   });
 
   type Api = ApiOf<typeof apiClient>;

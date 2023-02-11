@@ -1,5 +1,5 @@
-export interface AnyZodiosTypeProvider {
-  schema: unknown;
+export interface AnyZodiosTypeProvider<Schema = unknown> {
+  schema: Schema;
   input: unknown;
   output: unknown;
 }
