@@ -1,4 +1,4 @@
-import { Zodios, makeApi } from "../src/index";
+import { ZodiosCore, makeApi } from "../src/index";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type
@@ -48,7 +48,7 @@ const jsonplaceholderApi = makeApi([
 
 // and then use them in your API
 async function bootstrap() {
-  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi);
+  const apiClient = new ZodiosCore(jsonplaceholderUrl, jsonplaceholderApi);
 
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
   console.log(users);

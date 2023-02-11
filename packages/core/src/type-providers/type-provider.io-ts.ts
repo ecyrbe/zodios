@@ -3,9 +3,10 @@ import {
   ZodiosRuntimeTypeProvider,
 } from "./type-provider.types";
 
-export interface IoTsTypeProvider extends AnyZodiosTypeProvider {
-  input: this["schema"] extends { _I: unknown } ? this["schema"]["_I"] : never;
-  output: this["schema"] extends { _O: unknown } ? this["schema"]["_O"] : never;
+export interface IoTsTypeProvider
+  extends AnyZodiosTypeProvider<{ _A: unknown; _O: unknown }> {
+  input: this["schema"]["_A"];
+  output: this["schema"]["_O"];
 }
 
 export const ioTsTypeProvider: ZodiosRuntimeTypeProvider<IoTsTypeProvider> = {
