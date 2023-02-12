@@ -43,7 +43,7 @@ const api = makeApi([
 
 ## makeEndpoint
 
-`makeEndpoint` is a helper to narrow a signle endpoint definition and make some runtime checks.
+`makeEndpoint` is a helper to narrow a single endpoint definition and make some runtime checks.
 
 ```ts
 function makeEndpoint(endpoint: ZodiosEndpointDescription): ZodiosEndpointDescription;
