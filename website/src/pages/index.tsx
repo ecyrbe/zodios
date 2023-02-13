@@ -31,10 +31,10 @@ function HomepageHeader() {
             <li>
               Standalone typesafe API client based on{" "}
               <a
-                href="https://axios-http.com/"
+                href="https://tanstack.com/query"
                 style={{ color: "white", textDecoration: "underline" }}
               >
-                Axios
+                TanStack Query
               </a>{" "}
               with parameters and response validation
             </li>
