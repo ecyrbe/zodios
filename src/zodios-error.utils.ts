@@ -42,13 +42,19 @@ function isDefinedError(
 export function isErrorFromPath<
   Api extends ZodiosEndpointDefinitions,
   M extends Method,
-  Path extends ZodiosPathsByMethod<Api, M>
+  Path extends string
 >(
   api: Api,
   method: M,
-  path: Path,
+  path: Path extends ZodiosPathsByMethod<Api, M>
+    ? Path
+    : ZodiosPathsByMethod<Api, M>,
   error: unknown
-): error is ZodiosMatchingErrorsByPath<Api, M, Path> {
+): error is ZodiosMatchingErrorsByPath<
+  Api,
+  M,
+  Path extends ZodiosPathsByMethod<Api, M> ? Path : never
+> {
   return isDefinedError(error, (err) =>
     findEndpointErrorsByPath(api, method, path, err)
   );
@@ -63,10 +69,10 @@ export function isErrorFromPath<
  */
 export function isErrorFromAlias<
   Api extends ZodiosEndpointDefinitions,
-  Alias extends Aliases<Api>
+  Alias extends string
 >(
   api: Api,
-  alias: Alias,
+  alias: Alias extends Aliases<Api> ? Alias : Aliases<Api>,
   error: unknown
 ): error is ZodiosMatchingErrorsByAlias<Api, Alias> {
   return isDefinedError(error, (err) =>

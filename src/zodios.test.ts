@@ -827,6 +827,7 @@ received:
             schema: z.object({
               error: z.object({
                 message: z.string(),
+                _502: z.literal(true),
               }),
             }),
           },
@@ -850,6 +851,31 @@ received:
           },
         ],
       },
+      {
+        method: "get",
+        alias: "getErrorById",
+        path: "/error502/:id",
+        response: z.void(),
+        errors: [
+          {
+            status: 502,
+            schema: z.object({
+              error: z.object({
+                message: z.string(),
+              }),
+            }),
+          },
+          {
+            status: 401,
+            schema: z.object({
+              error: z.object({
+                message: z.string(),
+                _401: z.literal(true),
+              }),
+            }),
+          },
+        ],
+      },
     ]);
     let error;
     try {
@@ -863,7 +889,10 @@ received:
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
-        const test: Assert<typeof data, { error: { message: string } }> = true;
+        const test: Assert<
+          typeof data,
+          { error: { message: string; _502: true } }
+        > = true;
       }
       expect(error.response?.data).toEqual({
         error: { message: "bad gateway" },
@@ -874,7 +903,10 @@ received:
       if (error.response.status === 502) {
         const data = error.response.data;
         //     ^?
-        const test: Assert<typeof data, { error: { message: string } }> = true;
+        const test: Assert<
+          typeof data,
+          { error: { message: string; _502: true } }
+        > = true;
       } else if (error.response.status === 401) {
         const data = error.response.data;
         //     ^?
