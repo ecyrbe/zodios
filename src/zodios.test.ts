@@ -64,7 +64,7 @@ describe("Zodios", () => {
     app.delete("/:id", (req, res) => {
       res.status(200).json({ id: Number(req.params.id) });
     });
-    app.post("/form-data", multipart.none(), (req, res) => {
+    app.post("/form-data", multipart.none() as any, (req, res) => {
       res.status(200).json(req.body);
     });
     app.post(
