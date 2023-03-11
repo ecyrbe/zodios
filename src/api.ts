@@ -9,7 +9,7 @@ import {
 } from "./zodios.types";
 import z from "zod";
 import { capitalize } from "./utils";
-import { Narrow } from "./utils.types";
+import { Narrow, TupleFlat, UnionToTuple } from "./utils.types";
 
 /**
  * check api for non unique paths
@@ -201,4 +201,77 @@ export function makeCrudApi<T extends string, S extends z.ZodObject<any>>(
       response: schema,
     },
   ]);
+}
+
+type CleanPath<Path extends string> = Path extends `${infer PClean}/`
+  ? PClean
+  : Path;
+
+type MapApiPath<
+  Path extends string,
+  Api,
+  Acc extends unknown[] = []
+> = Api extends readonly [infer Head, ...infer Tail]
+  ? MapApiPath<
+      Path,
+      Tail,
+      [
+        ...Acc,
+        {
+          [K in keyof Head]: K extends "path"
+            ? Head[K] extends string
+              ? CleanPath<`${Path}${Head[K]}`>
+              : Head[K]
+            : Head[K];
+        }
+      ]
+    >
+  : Acc;
+
+type MergeApis<
+  Apis extends Record<string, ZodiosEndpointDefinition[]>,
+  MergedPathApis = UnionToTuple<
+    {
+      [K in keyof Apis]: K extends string ? MapApiPath<K, Apis[K]> : never;
+    }[keyof Apis]
+  >
+> = TupleFlat<MergedPathApis>;
+
+function cleanPath(path: string) {
+  return path.endsWith("/") ? path.slice(0, -1) : path;
+}
+
+/**
+ * prefix all paths of an api with a given prefix
+ * @param prefix - the prefix to add
+ * @param api - the api to prefix
+ * @returns the prefixed api
+ */
+export function prefixApi<
+  Prefix extends string,
+  Api extends ZodiosEndpointDefinition[]
+>(prefix: Prefix, api: Api) {
+  return api.map((endpoint) => ({
+    ...endpoint,
+    path: cleanPath(`${prefix}${endpoint.path}`),
+  })) as MapApiPath<Prefix, Api>;
+}
+
+/**
+ * Merge multiple apis into one in a route friendly way
+ * @param apis - the apis to merge
+ * @returns the merged api
+ *
+ * @example
+ * ```ts
+ * const api = mergeApis({
+ *   "/users": usersApi,
+ *   "/posts": postsApi,
+ * });
+ * ```
+ */
+export function mergeApis<
+  Apis extends Record<string, ZodiosEndpointDefinition[]>
+>(apis: Apis): MergeApis<Apis> {
+  return Object.keys(apis).flatMap((key) => prefixApi(key, apis[key])) as any;
 }

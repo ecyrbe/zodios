@@ -49,6 +49,7 @@ export {
   formURLPlugin,
   headerPlugin,
 } from "./plugins";
+
 export {
   makeApi,
   makeCrudApi,
@@ -57,4 +58,6 @@ export {
   makeEndpoint,
   makeErrors,
   checkApi,
+  prefixApi,
+  mergeApis,
 } from "./api";

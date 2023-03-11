@@ -1,7 +1,7 @@
 import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";
-import { makeCrudApi, Zodios } from "./index";
+import { makeApi, makeCrudApi, mergeApis, Zodios } from "./index";
 import { Assert } from "./utils.types";
 
 const userSchema = z.object({
@@ -177,5 +177,71 @@ describe("makeCrudApi", () => {
     const client = new Zodios(`http://localhost:${port}`, api);
     const user = await client.deleteUser(undefined, { params: { id: 2 } });
     expect(user).toEqual({ id: 2, name: "test" });
+  });
+});
+
+describe("mergeApis", () => {
+  it("should merge two apis", () => {
+    const usersSchema = z.array(userSchema);
+    const api1 = makeApi([
+      {
+        method: "get",
+        path: "/",
+        alias: "getUsers",
+        description: "Get all users",
+        response: usersSchema,
+      },
+      {
+        method: "get",
+        path: "/:id",
+        alias: "getUser",
+        description: "Get a user",
+        response: userSchema,
+      },
+    ]);
+
+    const api2 = makeApi([
+      {
+        method: "get",
+        path: "/",
+        alias: "getAdmins",
+        description: "Get all admins",
+        response: usersSchema,
+      },
+    ]);
+    const merged = mergeApis({
+      "/users": api1,
+      "/admins": api2,
+    });
+    expect(merged).toHaveLength(3);
+    expect(merged[0].path).toEqual("/users");
+    expect(merged[1].path).toEqual("/users/:id");
+    expect(merged[2].path).toEqual("/admins");
+    const test1: Assert<
+      typeof merged,
+      [
+        {
+          method: "get";
+          path: "/users";
+          alias: "getUsers";
+          description: "Get all users";
+          response: typeof usersSchema;
+        },
+        {
+          method: "get";
+          path: "/users/:id";
+          alias: "getUser";
+          description: "Get a user";
+          response: typeof userSchema;
+        },
+        {
+          method: "get";
+          path: "/admins";
+          alias: "getAdmins";
+          description: "Get all admins";
+          response: typeof usersSchema;
+        }
+      ]
+    > = true;
   });
 });

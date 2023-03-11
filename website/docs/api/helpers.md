@@ -171,3 +171,23 @@ const api = apiBuilder({
   })
   .build();
 ```
+
+## mergeApis
+
+`mergeApis` is a helper to merge multiple API definitions in a router friendly way.
+
+```ts
+function mergeApis(apis: Record<string,ZodiosEndpointDescriptions>): ZodiosEndpointDescriptions;
+```
+
+**Example**
+```ts
+import { mergeApis } from "@zodios/core";
+import { usersApi } from "./users";
+import { postsApi } from "./posts";
+
+const api = mergeApis({
+  '/users': usersApi,
+  '/posts': postsApi,
+});
+```
