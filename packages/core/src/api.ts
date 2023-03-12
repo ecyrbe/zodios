@@ -1,3 +1,4 @@
+import { TupleFlat, UnionToTuple } from "./utils.types";
 import type {
   ZodiosEndpointDefinition,
   ZodiosEndpointParameter,
@@ -231,106 +232,6 @@ export function apiBuilder<const T extends ZodiosEndpointDefinition>(
   return new Builder([endpoint] as [T]);
 }
 
-/**
- * Helper to generate a basic CRUD api for a given resource
- * @param resource - the resource to generate the api for
- * @param schema - the schema of the resource
- * @returns - the api definitions
- */
-export function makeCrudApi<
-  T extends string,
-  S extends z.ZodObject<z.ZodRawShape>
->(resource: T, schema: S) {
-  type Schema = z.input<S>;
-  const capitalizedResource = capitalize(resource);
-  return makeApi([
-    {
-      method: "get",
-      // @ts-expect-error
-      path: `/${resource}s`,
-      // @ts-expect-error
-      alias: `get${capitalizedResource}s`,
-      description: `Get all ${resource}s`,
-      response: z.array(schema),
-    },
-    {
-      method: "get",
-      // @ts-expect-error
-      path: `/${resource}s/:id`,
-      // @ts-expect-error
-      alias: `get${capitalizedResource}`,
-      description: `Get a ${resource}`,
-      // @ts-expect-error
-      response: schema,
-    },
-    {
-      method: "post",
-      // @ts-expect-error
-      path: `/${resource}s`,
-      // @ts-expect-error
-      alias: `create${capitalizedResource}`,
-      description: `Create a ${resource}`,
-      parameters: [
-        {
-          name: "body",
-          type: "Body",
-          description: "The object to create",
-          schema: schema.partial() as z.Schema<Partial<Schema>>,
-        },
-      ],
-      // @ts-expect-error
-      response: schema,
-    },
-    {
-      method: "put",
-      // @ts-expect-error
-      path: `/${resource}s/:id`,
-      // @ts-expect-error
-      alias: `update${capitalizedResource}`,
-      description: `Update a ${resource}`,
-      parameters: [
-        {
-          name: "body",
-          type: "Body",
-          description: "The object to update",
-          // @ts-expect-error
-          schema: schema,
-        },
-      ],
-      // @ts-expect-error
-      response: schema,
-    },
-    {
-      method: "patch",
-      // @ts-expect-error
-      path: `/${resource}s/:id`,
-      // @ts-expect-error
-      alias: `patch${capitalizedResource}`,
-      description: `Patch a ${resource}`,
-      parameters: [
-        {
-          name: "body",
-          type: "Body",
-          description: "The object to patch",
-          schema: schema.partial() as z.Schema<Partial<Schema>>,
-        },
-      ],
-      // @ts-expect-error
-      response: schema,
-    },
-    {
-      method: "delete",
-      // @ts-expect-error
-      path: `/${resource}s/:id`,
-      // @ts-expect-error
-      alias: `delete${capitalizedResource}`,
-      description: `Delete a ${resource}`,
-      // @ts-expect-error
-      response: schema,
-    },
-  ]);
-}
-
 type CleanPath<Path extends string> = Path extends `${infer PClean}/`
   ? PClean
   : Path;
@@ -357,7 +258,7 @@ type MapApiPath<
   : Acc;
 
 type MergeApis<
-  Apis extends Record<string, ZodiosEndpointDefinition[]>,
+  Apis extends Record<string, readonly ZodiosEndpointDefinition[]>,
   MergedPathApis = UnionToTuple<
     {
       [K in keyof Apis]: K extends string ? MapApiPath<K, Apis[K]> : never;
@@ -377,7 +278,7 @@ function cleanPath(path: string) {
  */
 export function prefixApi<
   Prefix extends string,
-  Api extends ZodiosEndpointDefinition[]
+  const Api extends readonly ZodiosEndpointDefinition[]
 >(prefix: Prefix, api: Api) {
   return api.map((endpoint) => ({
     ...endpoint,
@@ -399,7 +300,7 @@ export function prefixApi<
  * ```
  */
 export function mergeApis<
-  Apis extends Record<string, ZodiosEndpointDefinition[]>
+  const Apis extends Record<string, readonly ZodiosEndpointDefinition[]>
 >(apis: Apis): MergeApis<Apis> {
   return Object.keys(apis).flatMap((key) => prefixApi(key, apis[key])) as any;
 }

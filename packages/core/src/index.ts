@@ -36,7 +36,6 @@ export type {
   ZodiosErrorsByPath,
   ZodiosErrorsByAlias,
   ZodiosEndpointDefinition,
-  ZodiosEndpointDefinitions,
   ZodiosEndpointParameter,
   ZodiosEndpointParameters,
   ZodiosEndpointError,
