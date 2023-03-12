@@ -48,7 +48,9 @@ const jsonplaceholderApi = makeApi([
 
 // and then use them in your API
 async function bootstrap() {
-  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi);
+  const apiClient = new Zodios(jsonplaceholderUrl, jsonplaceholderApi, {
+    fetchConfig: { credentials: "include" },
+  });
 
   const users = await apiClient.get("/users", { queries: { q: "Nicholas" } });
   console.log(users);

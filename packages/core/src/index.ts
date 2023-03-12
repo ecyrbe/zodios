@@ -36,7 +36,6 @@ export type {
   ZodiosErrorsByPath,
   ZodiosErrorsByAlias,
   ZodiosEndpointDefinition,
-  ZodiosEndpointDefinitions,
   ZodiosEndpointParameter,
   ZodiosEndpointParameters,
   ZodiosEndpointError,
@@ -94,4 +93,6 @@ export {
   makeEndpoint,
   makeErrors,
   checkApi,
+  prefixApi,
+  mergeApis,
 } from "./api";

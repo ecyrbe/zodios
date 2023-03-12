@@ -228,3 +228,58 @@ export type Assert<T, U> = IfEquals<
 >;
 
 export type PickRequired<T, K extends keyof T> = Merge<T, { [P in K]-?: T[P] }>;
+
+/**
+ * Flatten a tuple type one level
+ * @param T - tuple type
+ * @returns flattened tuple type
+ *
+ * @example
+ * ```ts
+ * type T0 = TupleFlat<[1, 2, [3, 4], 5]>; // T0 = [1, 2, 3, 4, 5]
+ * ```
+ */
+export type TupleFlat<T, Acc extends unknown[] = []> = T extends [
+  infer Head,
+  ...infer Tail
+]
+  ? Head extends unknown[]
+    ? TupleFlat<Tail, [...Acc, ...Head]>
+    : TupleFlat<Tail, [...Acc, Head]>
+  : Acc;
+
+/**
+ * trick to combine multiple unions of objects into a single object
+ * only works with objects not primitives
+ * @param union - Union of objects
+ * @returns Intersection of objects
+ */
+export type UnionToIntersection<union> = (
+  union extends any ? (k: union) => void : never
+) extends (k: infer intersection) => void
+  ? intersection
+  : never;
+/**
+ * get last element of union
+ * @param Union - Union of any types
+ * @returns Last element of union
+ */
+type GetUnionLast<Union> = UnionToIntersection<
+  Union extends any ? () => Union : never
+> extends () => infer Last
+  ? Last
+  : never;
+
+/**
+ * Convert union to tuple
+ * @param Union - Union of any types, can be union of complex, composed or primitive types
+ * @returns Tuple of each elements in the union
+ */
+export type UnionToTuple<Union, Tuple extends unknown[] = []> = [
+  Union
+] extends [never]
+  ? Tuple
+  : UnionToTuple<
+      Exclude<Union, GetUnionLast<Union>>,
+      [GetUnionLast<Union>, ...Tuple]
+    >;
