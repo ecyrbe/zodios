@@ -371,7 +371,7 @@ See examples below.
 
 **Example**:
 ```ts
-const user = await api.delete("/users/:id", {params: {id: 1}});
+const user = await api.delete("/users/:id", undefined, {params: {id: 1}});
 ```
 
 will send the following HTTP request:

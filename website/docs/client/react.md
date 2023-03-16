@@ -15,7 +15,7 @@ Zodios query hook also returns an invalidation helper to allow you to reset reac
 When creating an instance or zodios hooks, you need to provide a name that will be used as `react-query` key prefix and your instance of Zodios Api Client.  
 
 ```ts
-new ZodiosHook(name: string, client: Zodios)
+new ZodiosHooks(name: string, client: Zodios)
 ```
 
 **Example**
