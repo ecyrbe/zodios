@@ -25,14 +25,14 @@ import { makeApi } from "@zodios/core";
 
 const api = makeApi([
   {
-    method: "GET",
+    method: "get",
     path: "/users/:id",
     response: user,
     alias: "getUser",
     description: "Get user",
   },
   {
-    method: "GET",
+    method: "get",
     path: "/users",
     response: z.array(user),
     alias: "getUsers",
@@ -54,7 +54,7 @@ function makeEndpoint(endpoint: ZodiosEndpointDescription): ZodiosEndpointDescri
 import { makeEndpoint } from "@zodios/core";
 
 const getUser = makeEndpoint({
-  method: "GET",
+  method: "get",
   path: "/users/:id",
   response: user,
   alias: "getUser",
@@ -156,14 +156,14 @@ ApiBuilder is a helper to build API definitions with better type autocompletion.
 import { apiBuilder } from "@zodios/core";
 
 const api = apiBuilder({
-  method: "GET",
+  method: "get",
   path: "/users",
   response: z.array(user),
   alias: "getUsers",
   description: "Get users",
 })
   .addEndpoint({
-    method: "GET",
+    method: "get",
     path: "/users/:id",
     response: user,
     alias: "getUser",
