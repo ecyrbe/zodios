@@ -123,7 +123,7 @@ export interface ZodiosValidationOptions {
    */
   validate?: boolean;
   /**
-   * transform request parameters - default is false
+   * transform request parameters - default is true
    */
   transform?: boolean;
 }

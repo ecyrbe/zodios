@@ -1,32 +1,36 @@
 import express from "express";
-import { ZodiosEndpointDefinition } from "@zodios/core";
-import { isZodType, withoutTransform } from "./zodios.utils";
-import { z } from "zod";
+import { AnyZodiosTypeProvider, ZodiosEndpointDefinition } from "@zodios/core";
+import { ZodiosExpressTypeProviderFactory } from "./type-providers";
 
 const METHODS = ["get", "post", "put", "patch", "delete"] as const;
 
-async function validateParam(schema: z.ZodType<any>, parameter: unknown) {
+function safeJsonParse(str: string) {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return str;
+  }
+}
+
+async function validateParam(
+  schema: unknown,
+  parameter: unknown,
+  typeFactory: ZodiosExpressTypeProviderFactory<AnyZodiosTypeProvider>
+) {
   if (
-    !isZodType(schema, z.ZodFirstPartyTypeKind.ZodString) &&
+    !typeFactory.isSchemaString(schema) &&
     parameter &&
     typeof parameter === "string"
   ) {
-    return z
-      .preprocess((x) => {
-        try {
-          return JSON.parse(x as string);
-        } catch {
-          return x;
-        }
-      }, schema)
-      .safeParseAsync(parameter);
+    return typeFactory.validateAsync(schema, safeJsonParse(parameter));
   }
-  return schema.safeParseAsync(parameter);
+  return typeFactory.validateAsync(schema, parameter);
 }
 
 function validateEndpointMiddleware(
   endpoint: ZodiosEndpointDefinition,
-  transform: boolean
+  transform: boolean,
+  typeFactory: ZodiosExpressTypeProviderFactory<AnyZodiosTypeProvider>
 ) {
   return async (
     req: express.Request,
@@ -36,31 +40,26 @@ function validateEndpointMiddleware(
     for (let parameter of endpoint.parameters!) {
       let schema = parameter.schema;
 
-      if (!transform) {
-        // @ts-ignore
-        schema = withoutTransform(schema);
-      }
-
       switch (parameter.type) {
         case "Body":
           {
             // @ts-ignore
-            const result = await schema.safeParseAsync(req.body);
+            const result = await typeFactory.validateAsync(schema, req.body);
             if (!result.success) {
               return res.status(400).json({
                 context: "body",
                 error: result.error.issues,
               });
             }
-            req.body = result.data;
+            if (transform) req.body = result.data;
           }
           break;
         case "Path":
           {
             const result = await validateParam(
-              // @ts-ignore
               schema,
-              req.params[parameter.name]
+              req.params[parameter.name],
+              typeFactory
             );
             if (!result.success) {
               return res.status(400).json({
@@ -68,15 +67,15 @@ function validateEndpointMiddleware(
                 error: result.error.issues,
               });
             }
-            req.params[parameter.name] = result.data as any;
+            if (transform) req.params[parameter.name] = result.data as any;
           }
           break;
         case "Query":
           {
             const result = await validateParam(
-              // @ts-ignore
               schema,
-              req.query[parameter.name]
+              req.query[parameter.name],
+              typeFactory
             );
             if (!result.success) {
               return res.status(400).json({
@@ -84,7 +83,7 @@ function validateEndpointMiddleware(
                 error: result.error.issues,
               });
             }
-            req.query[parameter.name] = result.data as any;
+            if (transform) req.query[parameter.name] = result.data as any;
           }
           break;
         case "Header":
@@ -99,7 +98,7 @@ function validateEndpointMiddleware(
                 error: result.error.issues,
               });
             }
-            req.headers[parameter.name] = result.data as any;
+            if (transform) req.headers[parameter.name] = result.data as any;
           }
           break;
       }
@@ -117,7 +116,8 @@ function validateEndpointMiddleware(
 export function injectParametersValidators(
   api: readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   router: express.Router,
-  transform: boolean
+  transform: boolean,
+  typeFactory: ZodiosExpressTypeProviderFactory<AnyZodiosTypeProvider>
 ) {
   for (let method of METHODS) {
     const savedMethod = router[method].bind(router);
@@ -128,7 +128,7 @@ export function injectParametersValidators(
       );
       if (endpoint && endpoint.parameters) {
         handlers = [
-          validateEndpointMiddleware(endpoint, transform),
+          validateEndpointMiddleware(endpoint, transform, typeFactory),
           ...handlers,
         ];
       }
