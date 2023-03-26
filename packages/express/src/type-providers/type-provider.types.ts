@@ -6,5 +6,5 @@ export interface ZodiosExpressTypeProviderFactory<
   readonly _provider?: TypeProvider;
   validate: (schema: any, input: unknown) => ZodiosValidateResult;
   validateAsync: (schema: any, input: unknown) => Promise<ZodiosValidateResult>;
-  isSchemaBooleanOrNumber: (schema: any) => boolean;
+  isSchemaString: (schema: any) => boolean;
 }
