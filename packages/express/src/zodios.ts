@@ -1,19 +1,21 @@
 import express, { RouterOptions } from "express";
-import { z } from "zod";
 import {
-  ZodiosEndpointDefinitions,
   AnyZodiosTypeProvider,
   ZodTypeProvider,
   InferInputTypeFromSchema,
+  InferOutputTypeFromSchema,
+  ZodiosEndpointDefinition,
 } from "@zodios/core";
-import { Narrow } from "@zodios/core/lib/utils.types";
 import {
   ZodiosApp,
   ZodiosRouter,
   ZodiosAppOptions,
   ZodiosRouterOptions,
+  ZodiosMiddleware,
 } from "./zodios.types";
 import { injectParametersValidators } from "./zodios-validator";
+import { ZodiosExpressTypeProviderFactory } from "./type-providers";
+import { zodTypeFactory } from "./type-providers/zod.type-provider";
 
 /**
  * create a zodios app based on the given api and express
@@ -23,16 +25,17 @@ import { injectParametersValidators } from "./zodios-validator";
  */
 export function zodiosApp<
   ContextSchema,
-  Api extends ZodiosEndpointDefinitions = any,
+  const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
-  api?: Narrow<Api>,
-  options: ZodiosAppOptions<ContextSchema> = {}
+  api?: Api,
+  options: ZodiosAppOptions<ContextSchema, TypeProvider> = {}
 ): ZodiosApp<
   Api,
   [unknown] extends [ContextSchema]
     ? unknown
-    : InferInputTypeFromSchema<TypeProvider, ContextSchema>
+    : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
+  TypeProvider
 > {
   const {
     express: app = express(),
@@ -56,17 +59,18 @@ export function zodiosApp<
  * @returns
  */
 export function zodiosRouter<
-  Api extends ZodiosEndpointDefinitions,
+  const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[],
   ContextSchema,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
-  api: Narrow<Api>,
-  options: RouterOptions & ZodiosRouterOptions<ContextSchema> = {}
+  api: Api,
+  options: RouterOptions & ZodiosRouterOptions<ContextSchema, TypeProvider> = {}
 ): ZodiosRouter<
   Api,
   [unknown] extends [ContextSchema]
     ? unknown
-    : InferInputTypeFromSchema<TypeProvider, ContextSchema>
+    : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
+  TypeProvider
 > {
   const { validate = true, transform = false, ...routerOptions } = options;
   const router = options?.router ?? express.Router(routerOptions);
@@ -83,16 +87,17 @@ export function zodiosRouter<
  */
 export function zodiosNextApp<
   ContextSchema,
-  Api extends ZodiosEndpointDefinitions = any,
+  const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
-  api?: Narrow<Api>,
-  options: ZodiosAppOptions<ContextSchema> = {}
+  api?: Api,
+  options: ZodiosAppOptions<ContextSchema, TypeProvider> = {}
 ): ZodiosApp<
   Api,
   [unknown] extends [ContextSchema]
     ? unknown
-    : InferInputTypeFromSchema<TypeProvider, ContextSchema>
+    : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
+  TypeProvider
 > {
   return zodiosApp(api, {
     ...options,
@@ -104,57 +109,63 @@ export class ZodiosContext<
   ContextSchema,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > {
+  typeFactory: ZodiosExpressTypeProviderFactory<TypeProvider>;
   constructor(
     public context?: ContextSchema,
     options?: {
-      typeProvider: TypeProvider;
+      typeFactory: ZodiosExpressTypeProviderFactory<TypeProvider>;
     }
-  ) {}
+  ) {
+    this.typeFactory = options?.typeFactory ?? (zodTypeFactory as any);
+  }
 
-  app<Api extends ZodiosEndpointDefinitions = any>(
-    api?: Narrow<Api>,
-    options?: ZodiosAppOptions<ContextSchema>
+  app<const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any>(
+    api?: Api,
+    options?: ZodiosAppOptions<ContextSchema, TypeProvider>
   ): ZodiosApp<
     Api,
     [unknown] extends [ContextSchema]
       ? unknown
-      : InferInputTypeFromSchema<TypeProvider, ContextSchema>
+      : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
+    TypeProvider
   > {
     return zodiosApp(api, options);
   }
 
-  nextApp<Api extends ZodiosEndpointDefinitions = any>(
-    api?: Narrow<Api>,
-    options?: ZodiosAppOptions<ContextSchema>
+  nextApp<const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any>(
+    api?: Api,
+    options?: ZodiosAppOptions<ContextSchema, TypeProvider>
   ): ZodiosApp<
     Api,
     [unknown] extends [ContextSchema]
       ? unknown
-      : InferInputTypeFromSchema<TypeProvider, ContextSchema>
+      : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
+    TypeProvider
   > {
     return zodiosNextApp(api, options);
   }
 
-  router<Api extends ZodiosEndpointDefinitions>(
-    api: Narrow<Api>,
-    options?: RouterOptions & ZodiosRouterOptions<ContextSchema>
+  router<const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[]>(
+    api: Api,
+    options?: RouterOptions & ZodiosRouterOptions<ContextSchema, TypeProvider>
   ): ZodiosRouter<
     Api,
     [unknown] extends [ContextSchema]
       ? unknown
-      : InferInputTypeFromSchema<TypeProvider, ContextSchema>
+      : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
+    TypeProvider
   > {
     return zodiosRouter(api, options);
   }
 }
 
 export function zodiosContext<
-  ContextSchema,
+  ContextSchema = unknown,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   context?: ContextSchema,
   options?: {
-    typeProvider: TypeProvider;
+    typeFactory: ZodiosExpressTypeProviderFactory<TypeProvider>;
   }
 ): ZodiosContext<ContextSchema, TypeProvider> {
   return new ZodiosContext(context, options);

@@ -12,6 +12,11 @@
   "devDependencies": {
     "@changesets/cli": "2.25.2",
     "turbo": "1.6.3",
-    "typescript": "5.0.0-dev.20230205"
+    "typescript": "5.0.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "0.17.14"
+    }
   }
 }

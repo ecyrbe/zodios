@@ -1,5 +1,5 @@
 import { AnyZodiosFetcherProvider } from "./fetcher-providers";
-import type { ReadonlyDeep } from "./utils.types";
+import type { ReadonlyDeep, DeepReadonlyObject } from "./utils.types";
 import type { AnyZodiosRequestOptions } from "./zodios.types";
 
 /**

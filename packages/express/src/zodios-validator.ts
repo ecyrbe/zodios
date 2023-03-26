@@ -1,8 +1,5 @@
 import express from "express";
-import {
-  ZodiosEndpointDefinition,
-  ZodiosEndpointDefinitions,
-} from "@zodios/core";
+import { ZodiosEndpointDefinition } from "@zodios/core";
 import { isZodType, withoutTransform } from "./zodios.utils";
 import { z } from "zod";
 
@@ -10,8 +7,7 @@ const METHODS = ["get", "post", "put", "patch", "delete"] as const;
 
 async function validateParam(schema: z.ZodType<any>, parameter: unknown) {
   if (
-    (isZodType(schema, z.ZodFirstPartyTypeKind.ZodNumber) ||
-      isZodType(schema, z.ZodFirstPartyTypeKind.ZodBoolean)) &&
+    !isZodType(schema, z.ZodFirstPartyTypeKind.ZodString) &&
     parameter &&
     typeof parameter === "string"
   ) {
@@ -119,7 +115,7 @@ function validateEndpointMiddleware(
  * @param transform - whether to transform the data or not
  */
 export function injectParametersValidators(
-  api: ZodiosEndpointDefinitions,
+  api: readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   router: express.Router,
   transform: boolean
 ) {

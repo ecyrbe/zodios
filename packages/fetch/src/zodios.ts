@@ -32,7 +32,7 @@ const ZodiosFetch = new Proxy(ZodiosCore, {
 
 export interface Zodios {
   new <
-    const Api extends ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
+    const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     api: Api,
@@ -43,7 +43,7 @@ export interface Zodios {
       TypeOfFetcherOptions<FetchProvider>
   ): ZodiosInstance<Api, FetchProvider, TypeProvider>;
   new <
-    const Api extends ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
+    const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
     baseUrl: string,

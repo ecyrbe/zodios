@@ -1,7 +1,7 @@
 import type {
   ZodiosPathsByMethod,
   ZodiosResponseByPath,
-  ZodiosEndpointDefinitions,
+  ZodiosEndpointDefinition,
   ZodiosRequestOptionsByPath,
   AnyZodiosTypeProvider,
   ZodTypeProvider,
@@ -15,7 +15,7 @@ import { zodiosMocks, MockResponse, MaybePromise } from "./mock-provider";
  * zodios mock service
  */
 export class ZodiosMocks<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > {
