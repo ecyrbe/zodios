@@ -79,8 +79,8 @@ export type {
   ZodiosFetcher,
 } from "./fetcher-providers";
 export { setFetcherHook, clearFetcherHook } from "./hooks";
+export type { PluginId } from "./plugins";
 export {
-  PluginId,
   schemaValidationPlugin,
   formDataPlugin,
   formURLPlugin,

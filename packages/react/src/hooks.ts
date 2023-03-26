@@ -22,7 +22,6 @@ import type {
   ZodiosPathsByMethod,
   ZodiosResponseByPath,
   ZodiosResponseByAlias,
-  ZodiosEndpointDefinitions,
   ZodiosEndpointDefinition,
   ZodiosEndpointDefinitionByAlias,
   ZodiosRequestOptionsByPath,
@@ -45,7 +44,7 @@ type UndefinedIfNever<T> = IfEquals<T, never, undefined, T>;
 type Errors = Error | ZodiosError;
 
 type MutationOptions<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   TypeProvider extends AnyZodiosTypeProvider
@@ -59,7 +58,7 @@ type MutationOptions<
 >;
 
 type MutationOptionsByAlias<
-  Api extends ZodiosEndpointDefinition[],
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
   TypeProvider extends AnyZodiosTypeProvider
 > = Omit<
@@ -92,7 +91,7 @@ export type ImmutableInfiniteQueryOptions<TQueryFnData, TData> = Omit<
 >;
 
 export class ZodiosHooksImpl<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > {
@@ -798,7 +797,7 @@ export type ZodiosMutationAliasHook<Body, Config, MutationOptions, Response> =
       ) => UseMutationResult<Response, Errors, UndefinedIfNever<Body>, unknown>;
 
 export type ZodiosHooksAliases<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = {
@@ -889,7 +888,7 @@ export type ZodiosHooksAliases<
 };
 
 export type ZodiosHooksMutations<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = {
@@ -928,7 +927,7 @@ export type ZodiosHooksMutations<
 };
 
 export type ZodiosHooksInstance<
-  Api extends ZodiosEndpointDefinitions,
+  Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = ZodiosHooksImpl<Api, FetcherProvider, TypeProvider> &
@@ -937,7 +936,9 @@ export type ZodiosHooksInstance<
 
 export type ZodiosHooks = {
   new <
-    Api extends ZodiosEndpointDefinitions,
+    Api extends
+      | readonly ZodiosEndpointDefinition[]
+      | ZodiosEndpointDefinition[],
     FetcherProvider extends AnyZodiosFetcherProvider,
     TypeProvider extends AnyZodiosTypeProvider
   >(

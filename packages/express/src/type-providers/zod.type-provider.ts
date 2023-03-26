@@ -6,5 +6,5 @@ export const zodTypeFactory: ZodiosExpressTypeProviderFactory<ZodTypeProvider> =
   {
     validate: (schema, input) => schema.safeParse(input),
     validateAsync: (schema, input) => schema.safeParseAsync(input),
-    isSchemaBooleanOrNumber: (schema: any) => true,
+    isSchemaBooleanOrNumber: (schema) => true,
   };

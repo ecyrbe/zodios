@@ -1,6 +1,6 @@
 import type {
   ZodiosEndpointDefinition,
-  ZodiosEndpointDefinitions,
+  ZodiosEndpointError,
 } from "./zodios.types";
 
 /**
@@ -40,7 +40,7 @@ export function pick<T, K extends keyof T>(
 }
 
 export function findEndpoint(
-  api: ZodiosEndpointDefinitions,
+  api: ZodiosEndpointDefinition[] | readonly ZodiosEndpointDefinition[],
   method: string,
   path: string
 ) {
@@ -48,7 +48,7 @@ export function findEndpoint(
 }
 
 export function findEndpointByAlias(
-  api: ZodiosEndpointDefinitions,
+  api: ZodiosEndpointDefinition[] | readonly ZodiosEndpointDefinition[],
   alias: string
 ) {
   return api.find((e) => e.alias === alias);
@@ -66,7 +66,7 @@ export function findEndpointErrors(
 }
 
 export function findEndpointErrorsByPath(
-  api: ZodiosEndpointDefinitions,
+  api: ZodiosEndpointDefinition[] | readonly ZodiosEndpointDefinition[],
   method: string,
   path: string,
   err: any
@@ -82,7 +82,7 @@ export function findEndpointErrorsByPath(
 }
 
 export function findEndpointErrorsByAlias(
-  api: ZodiosEndpointDefinitions,
+  api: ZodiosEndpointDefinition[] | readonly ZodiosEndpointDefinition[],
   alias: string,
   err: any
 ) {

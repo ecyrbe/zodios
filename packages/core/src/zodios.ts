@@ -24,7 +24,7 @@ import {
 } from "./plugins";
 import type { PickRequired, ReadonlyDeep } from "./utils.types";
 import { checkApi } from "./api";
-import type { AnyZodiosTypeProvider, ZodTypeProvider } from "./type-providers";
+import type { AnyZodiosTypeProvider, ZodTypeProvider,ZodiosRuntimeTypeProvider } from "./type-providers";
 import { zodTypeProvider } from "./type-providers";
 import {
   AnyZodiosFetcherProvider,
