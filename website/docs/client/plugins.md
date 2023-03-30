@@ -134,7 +134,7 @@ export type ZodiosPlugin = {
    * @param api - the api description
    * @param config - the config for the request
    * @param error - the error that occured
-   * @returns possibly a new response or a new error
+   * @returns possibly a new response or throw a new error
    */
   error?: (
     api: ZodiosEnpointDescriptions,
