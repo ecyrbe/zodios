@@ -9,6 +9,78 @@ const userSchema = z.object({
   name: z.string(),
 });
 
+describe("makeApi", () => {
+  it("should throw on duplicate path", () => {
+    expect(() =>
+      makeApi([
+        {
+          method: "get",
+          path: "/users",
+          alias: "getUsers",
+          description: "Get all users",
+          response: z.array(userSchema),
+        },
+        {
+          method: "get",
+          path: "/users",
+          alias: "getUsers2",
+          description: "Get all users",
+          response: z.array(userSchema),
+        },
+      ])
+    ).toThrowError("Zodios: Duplicate path 'get /users'");
+  });
+
+  it("should throw on duplicate alias", () => {
+    expect(() =>
+      makeApi([
+        {
+          method: "get",
+          path: "/users",
+          alias: "getUsers",
+          description: "Get all users",
+          response: z.array(userSchema),
+        },
+        {
+          method: "get",
+          path: "/users2",
+          alias: "getUsers",
+          description: "Get all users",
+          response: z.array(userSchema),
+        },
+      ])
+    ).toThrowError("Zodios: Duplicate alias 'getUsers'");
+  });
+
+  it("should throw on duplicate Body", () => {
+    expect(() =>
+      makeApi([
+        {
+          method: "post",
+          path: "/users",
+          alias: "createUser",
+          description: "Create a user",
+          parameters: [
+            {
+              name: "first",
+              type: "Body",
+              description: "The object to create",
+              schema: userSchema.partial(),
+            },
+            {
+              name: "second",
+              type: "Body",
+              description: "The object to create",
+              schema: userSchema.partial(),
+            },
+          ],
+          response: userSchema,
+        },
+      ])
+    ).toThrowError("Zodios: Multiple body parameters in endpoint '/users'");
+  });
+});
+
 describe("makeCrudApi", () => {
   let app: express.Express;
   let server: ReturnType<typeof app.listen>;

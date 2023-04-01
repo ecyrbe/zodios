@@ -18,6 +18,7 @@ import { Narrow, TupleFlat, UnionToTuple } from "./utils.types";
  * @throws - error if api has non unique paths
  */
 export function checkApi<T extends ZodiosEndpointDefinitions>(api: T) {
+  // check if no duplicate path
   const paths = new Set<string>();
   for (let endpoint of api) {
     const fullpath = `${endpoint.method} ${endpoint.path}`;
@@ -25,6 +26,28 @@ export function checkApi<T extends ZodiosEndpointDefinitions>(api: T) {
       throw new Error(`Zodios: Duplicate path '${fullpath}'`);
     }
     paths.add(fullpath);
+  }
+  // check if no duplicate alias
+  const aliases = new Set<string>();
+  for (let endpoint of api) {
+    if (endpoint.alias) {
+      if (aliases.has(endpoint.alias)) {
+        throw new Error(`Zodios: Duplicate alias '${endpoint.alias}'`);
+      }
+      aliases.add(endpoint.alias);
+    }
+  }
+
+  // check if no duplicate body in parameters
+  for (let endpoint of api) {
+    if (endpoint.parameters) {
+      const bodyParams = endpoint.parameters.filter((p) => p.type === "Body");
+      if (bodyParams.length > 1) {
+        throw new Error(
+          `Zodios: Multiple body parameters in endpoint '${endpoint.path}'`
+        );
+      }
+    }
   }
 }
 
