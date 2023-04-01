@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
+    "noErrorTruncation": true,
     "jsx": "react-jsx"
   },
   "exclude": ["node_modules", "lib"]

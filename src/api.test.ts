@@ -79,6 +79,111 @@ describe("makeApi", () => {
       ])
     ).toThrowError("Zodios: Multiple body parameters in endpoint '/users'");
   });
+
+  it("should build with parameters (Path,Query,Body,Header)", () => {
+    // get users api with query filter for user name, and path parameter for user id and header parameter for user token
+    const optionalTrueSchema = z.boolean().default(true).optional();
+    const partialUserSchema = userSchema.partial();
+    const bearerSchema = z.string().transform((s) => `Bearer ${s}`);
+    const api = makeApi([
+      {
+        method: "post",
+        path: "/users/:id",
+        alias: "createtUser",
+        description: "Create a user",
+        parameters: [
+          {
+            name: "id",
+            type: "Path",
+            description: "The user id",
+            schema: z.number(),
+          },
+          {
+            name: "homonyms",
+            type: "Query",
+            description: "Allow homonyms",
+            schema: optionalTrueSchema,
+          },
+          {
+            name: "email",
+            type: "Query",
+            description: "create an email account for the user",
+            schema: optionalTrueSchema,
+          },
+          {
+            name: "body",
+            type: "Body",
+            description: "The object to create",
+            schema: partialUserSchema,
+          },
+          {
+            name: "Authorization",
+            type: "Header",
+            description: "The user token",
+            schema: bearerSchema,
+          },
+          {
+            name: "x-custom-header",
+            type: "Header",
+            description: "A custom header",
+            schema: z.string(),
+          },
+        ],
+        response: userSchema,
+      },
+    ]);
+    // check narrowing works
+    const test: Assert<
+      typeof api,
+      [
+        {
+          method: "post";
+          path: "/users/:id";
+          alias: "createtUser";
+          description: "Create a user";
+          parameters: [
+            {
+              name: "id";
+              type: "Path";
+              description: string;
+              schema: z.ZodNumber;
+            },
+            {
+              name: "homonyms";
+              type: "Query";
+              description: string;
+              schema: typeof optionalTrueSchema;
+            },
+            {
+              name: "email";
+              type: "Query";
+              description: string;
+              schema: typeof optionalTrueSchema;
+            },
+            {
+              name: "body";
+              type: "Body";
+              description: string;
+              schema: typeof partialUserSchema;
+            },
+            {
+              name: "Authorization";
+              type: "Header";
+              description: string;
+              schema: typeof bearerSchema;
+            },
+            {
+              name: "x-custom-header";
+              type: "Header";
+              description: string;
+              schema: z.ZodString;
+            }
+          ];
+          response: typeof userSchema;
+        }
+      ]
+    > = true;
+  });
 });
 
 describe("makeCrudApi", () => {
