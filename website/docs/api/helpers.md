@@ -273,7 +273,7 @@ const params = parametersBuilder()
 
 is equivalent to
 ```ts
-import { makeParameters } from "@zodios/core";
+import { parametersBuilder } from "@zodios/core";
 
 const params = parametersBuilder()
   .addQueries({
