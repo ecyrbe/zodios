@@ -125,7 +125,7 @@ export function findEndpointErrorsByAlias(
 }
 
 export function pathMatchesUrl(path: string, url: string) {
-  return new RegExp(`^${path.replace(paramsRegExp, () => "([^/]+)")}$`).test(
+  return new RegExp(`^${path.replace(paramsRegExp, () => "([^/]*?)")}$`).test(
     url
   );
 }
