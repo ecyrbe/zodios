@@ -241,6 +241,7 @@ ParametersBuilder is a helper to build parameter definitions with better type au
 | ------------- | ------------------------------------------- | ------------------------ | ---------------------------------- |
 | addParameter  | name: Name, type: Type, schema: Schema      | ParametersBuilder        | Add a parameter to the API         |
 | addParameters | type: Type, schemas: Record<string, Schema> | ParametersBuilder        | Add multiple parameters to the API |
+| addBody       | schema: Schema                              | ParametersBuilder        | Add a body to the API              |
 | addHeader     | name: Name, schema: Schema                  | ParametersBuilder        | Add a header to the API            |
 | addHeaders    | schemas: Record<string, Schema>             | ParametersBuilder        | Add multiple headers to the API    |
 | addQuery      | name: Name, schema: Schema                  | ParametersBuilder        | Add a query to the API             |
