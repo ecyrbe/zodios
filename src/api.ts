@@ -7,7 +7,7 @@ import {
   ZodiosEndpointDefinitions,
   ZodiosEndpointError,
 } from "./zodios.types";
-import z from "zod";
+import z, { ZodRawShape } from "zod";
 import { capitalize } from "./utils";
 import { Narrow, TupleFlat, UnionToTuple } from "./utils.types";
 
@@ -78,6 +78,108 @@ export function makeParameters<
   return params as ParameterDescriptions;
 }
 
+export function parametersBuilder() {
+  return new ParametersBuilder<[]>([]);
+}
+
+type ObjectToQueryParameters<
+  Type extends "Query" | "Path" | "Header",
+  T extends Record<string, z.ZodType<any, any, any>>,
+  Keys = UnionToTuple<keyof T>
+> = {
+  [Index in keyof Keys]: {
+    name: Keys[Index];
+    type: Type;
+    description?: string;
+    schema: T[Extract<Keys[Index], keyof T>];
+  };
+};
+
+class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
+  constructor(private params: T) {}
+
+  addParameter<
+    Name extends string,
+    Type extends "Path" | "Query" | "Body" | "Header",
+    Schema extends z.ZodType<any, any, any>
+  >(name: Name, type: Type, schema: Schema) {
+    return new ParametersBuilder<
+      [...T, { name: Name; type: Type; description?: string; schema: Schema }]
+    >([
+      ...this.params,
+      { name, type, description: schema.description, schema },
+    ]);
+  }
+
+  addParameters<
+    Type extends "Query" | "Path" | "Header",
+    Schemas extends Record<string, z.ZodType<any, any, any>>
+  >(type: Type, schemas: Schemas) {
+    const parameters = Object.keys(schemas).map((key) => ({
+      name: key,
+      type,
+      description: schemas[key].description,
+      schema: schemas[key],
+    }));
+    return new ParametersBuilder<
+      [
+        ...T,
+        ...Extract<
+          ObjectToQueryParameters<Type, Schemas>,
+          ZodiosEndpointParameter[]
+        >
+      ]
+    >([...this.params, ...parameters] as any);
+  }
+
+  addBody<Schema extends z.ZodType<any, any, any>>(schema: Schema) {
+    return this.addParameter("body", "Body", schema);
+  }
+
+  addQuery<Name extends string, Schema extends z.ZodType<any, any, any>>(
+    name: Name,
+    schema: Schema
+  ) {
+    return this.addParameter(name, "Query", schema);
+  }
+
+  addPath<Name extends string, Schema extends z.ZodType<any, any, any>>(
+    name: Name,
+    schema: Schema
+  ) {
+    return this.addParameter(name, "Path", schema);
+  }
+
+  addHeader<Name extends string, Schema extends z.ZodType<any, any, any>>(
+    name: Name,
+    schema: Schema
+  ) {
+    return this.addParameter(name, "Header", schema);
+  }
+
+  addQueries<Schemas extends Record<string, z.ZodType<any, any, any>>>(
+    schemas: Schemas
+  ) {
+    return this.addParameters("Query", schemas);
+  }
+
+  addPaths<Schemas extends Record<string, z.ZodType<any, any, any>>>(
+    schemas: Schemas
+  ) {
+    return this.addParameters("Path", schemas);
+  }
+
+  addHeaders<Schemas extends Record<string, z.ZodType<any, any, any>>>(
+    schemas: Schemas
+  ) {
+    return this.addParameters("Header", schemas);
+  }
+
+  build() {
+    return this.params;
+  }
+}
+
 /**
  * Simple helper to split your error definitions into multiple files
  * Mandatory to be used when declaring errors appart from your endpoint definitions
@@ -132,10 +234,10 @@ export function apiBuilder<T extends ZodiosEndpointDefinition<any>>(
  * @param schema - the schema of the resource
  * @returns - the api definitions
  */
-export function makeCrudApi<T extends string, S extends z.ZodObject<any>>(
-  resource: T,
-  schema: S
-) {
+export function makeCrudApi<
+  T extends string,
+  S extends z.ZodObject<z.ZodRawShape>
+>(resource: T, schema: S) {
   type Schema = z.input<S>;
   const capitalizedResource = capitalize(resource);
   return makeApi([

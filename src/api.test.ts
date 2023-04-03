@@ -1,7 +1,13 @@
 import express from "express";
 import { AddressInfo } from "net";
 import z from "zod";
-import { makeApi, makeCrudApi, mergeApis, Zodios } from "./index";
+import {
+  makeApi,
+  makeCrudApi,
+  mergeApis,
+  Zodios,
+  parametersBuilder,
+} from "./index";
 import { Assert } from "./utils.types";
 
 const userSchema = z.object({
@@ -180,6 +186,72 @@ describe("makeApi", () => {
             }
           ];
           response: typeof userSchema;
+        }
+      ]
+    > = true;
+  });
+});
+
+describe("parametersBuilder", () => {
+  it("should build parameters (Path,Query,Body,Header)", () => {
+    // get users api with query filter for user name, and path parameter for user id and header parameter for user token
+    const optionalTrueSchema = z.boolean().default(true).optional();
+    const partialUserSchema = userSchema.partial();
+    const bearerSchema = z.string().transform((s) => `Bearer ${s}`);
+
+    const parameters = parametersBuilder()
+      .addParameters("Path", {
+        id: z.number(),
+      })
+      .addQueries({
+        homonyms: optionalTrueSchema,
+        email: optionalTrueSchema,
+      })
+      .addBody(partialUserSchema)
+      .addHeaders({
+        Authorization: bearerSchema,
+        "x-custom-header": z.string(),
+      })
+      .build();
+
+    const test: Assert<
+      typeof parameters,
+      [
+        {
+          name: "id";
+          type: "Path";
+          description?: string;
+          schema: z.ZodNumber;
+        },
+        {
+          name: "homonyms";
+          type: "Query";
+          description?: string;
+          schema: typeof optionalTrueSchema;
+        },
+        {
+          name: "email";
+          type: "Query";
+          description?: string;
+          schema: typeof optionalTrueSchema;
+        },
+        {
+          name: "body";
+          type: "Body";
+          description?: string;
+          schema: typeof partialUserSchema;
+        },
+        {
+          name: "Authorization";
+          type: "Header";
+          description?: string;
+          schema: typeof bearerSchema;
+        },
+        {
+          name: "x-custom-header";
+          type: "Header";
+          description?: string;
+          schema: z.ZodString;
         }
       ]
     > = true;

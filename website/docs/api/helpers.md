@@ -62,7 +62,7 @@ const getUser = makeEndpoint({
 });
 ```
 
-it can then be combined with `makeApi` to compose a full api description.
+It can then be combined with `makeApi` to compose a full api description.
 
 ```ts
 import { makeApi } from "@zodios/core";
@@ -93,6 +93,46 @@ const params = makeParameters([
     name: "offset",
     description: "Offset",
     schema: z.number().positive(),
+  },
+]);
+```
+
+It can then be combined with `makeApi` to compose a full api description.
+```ts
+const api = makeApi([
+  {
+    method: "get",
+    path: "/users",
+    response: z.array(user),
+    alias: "getUsers",
+    description: "Get users",
+    parameters: params,
+  },
+]);
+```
+is equivalent to
+```ts
+import { makeApi } from "@zodios/core";
+
+const api = makeApi([
+  {
+    method: "get",
+    path: "/users",
+    response: z.array(user),
+    alias: "getUsers",
+    description: "Get users",
+    parameters: [
+      {
+        name: "limit",
+        description: "Limit",
+        schema: z.number().positive(),
+      },
+      {
+        name: "offset",
+        description: "Offset",
+        schema: z.number().positive(),
+      },
+    ],
   },
 ]);
 ```
@@ -134,6 +174,182 @@ const errors = makeErrors([
 ]);
 ```
 
+It can then be combined with `makeApi` to compose a full api description.
+```ts
+const api = makeApi([
+  {
+    method: "get",
+    path: "/users/:id",
+    response: user,
+    alias: "getUser",
+    description: "Get user",
+    errors,
+  },
+]);
+```
+is equivalent to
+```ts
+import { makeApi } from "@zodios/core";
+
+const api = makeApi([
+  {
+    method: "get",
+    path: "/users/:id",
+    response: user,
+    alias: "getUser",
+    description: "Get user",
+    errors: [
+      {
+        status: 404,
+        description: "User not found",
+        schema: z.object({
+          error: z.object({
+            userId: z.number(),
+            code: z.string(),
+            message: z.string(),
+          }),
+        }),
+      },
+      {
+        status: "default",
+        description: "Default error",
+        schema: z.object({
+          error: z.object({
+            code: z.string(),
+            message: z.string(),
+          }),
+        }),
+      },
+    ],
+  },
+]);
+```
+
+## parametersBuilder
+
+`parametersBuilder` is a helper to build parameter definitions with better type autocompletion.
+
+```ts
+function parametersBuilder(): ParametersBuilder;
+```
+
+### ParametersBuilder methods
+
+ParametersBuilder is a helper to build parameter definitions with better type autocompletion.
+
+| methods       | parameters                                  | return                   | Description                        |
+| ------------- | ------------------------------------------- | ------------------------ | ---------------------------------- |
+| addParameter  | name: Name, type: Type, schema: Schema      | ParametersBuilder        | Add a parameter to the API         |
+| addParameters | type: Type, schemas: Record<string, Schema> | ParametersBuilder        | Add multiple parameters to the API |
+| addHeader     | name: Name, schema: Schema                  | ParametersBuilder        | Add a header to the API            |
+| addHeaders    | schemas: Record<string, Schema>             | ParametersBuilder        | Add multiple headers to the API    |
+| addQuery      | name: Name, schema: Schema                  | ParametersBuilder        | Add a query to the API             |
+| addQueries    | schemas: Record<string, Schema>             | ParametersBuilder        | Add multiple queries to the API    |
+| addPath       | name: Name, schema: Schema                  | ParametersBuilder        | Add a path to the API              |
+| addPaths      | schemas: Record<string, Schema>             | ParametersBuilder        | Add multiple paths to the API      |
+| build         | none                                        | ZodiosEndpointParameters | Build the parameters               |
+
+**Example**
+```ts
+import { parametersBuilder } from "@zodios/core";
+
+const params = parametersBuilder()
+  .addParameters("Query", {
+    limit: z.number().positive(),
+    offset: z.number().positive(),
+  })
+  .build();
+```
+is equivalent to
+```ts
+import { parametersBuilder } from "@zodios/core";
+
+const params = parametersBuilder()
+  .addQuery("limit", z.number().positive())
+  .addQuery("offset", z.number().positive())
+  .build();
+```
+
+is equivalent to
+```ts
+import { makeParameters } from "@zodios/core";
+
+const params = parametersBuilder()
+  .addQueries({
+    limit: z.number().positive(),
+    offset: z.number().positive(),
+  })
+  .build();
+```
+
+is equivalent to
+```ts
+import { parametersBuilder } from "@zodios/core";
+
+const params = parametersBuilder()
+  .addParameter("limit", "Query", z.number().positive())
+  .addParameter("offset", "Query", z.number().positive())
+  .build();
+```
+is equivalent to
+```ts
+import { makeParameters } from "@zodios/core";
+
+const params = makeParameters([
+  {
+    name: "limit",
+    type: "Query",
+    schema: z.number().positive(),
+  },
+  {
+    name: "offset",
+    type: "Query",
+    schema: z.number().positive(),
+  },
+]);
+```
+
+It can then be combined with `makeApi` to compose a full api description.
+```ts
+const api = makeApi([
+  {
+    method: "get",
+    path: "/users",
+    response: z.array(user),
+    alias: "getUsers",
+    description: "Get users",
+    parameters: params,
+  },
+]);
+```
+
+is equivalent to
+```ts
+import { makeApi } from "@zodios/core";
+
+const api = makeApi([
+  {
+    method: "get",
+    path: "/users",
+    response: z.array(user),
+    alias: "getUsers",
+    description: "Get users",
+    parameters: [
+      {
+        name: "limit",
+        type: "Query",
+        schema: z.number().positive(),
+      },
+      {
+        name: "offset",
+        type: "Query",
+        schema: z.number().positive(),
+      },
+    ],
+  },
+]);
+```
+
 ## apiBuilder
 
 `apiBuilder` is a helper to build API definitions with better type autocompletion.
@@ -147,7 +363,7 @@ function apiBuilder(endpoint: ZodiosEndpointDescription): ApiBuilder;
 ApiBuilder is a helper to build API definitions with better type autocompletion.
 
 | methods     | parameters                | return                     | Description                |
-| ----------- | ------------------------- | -------------------------- |
+| ----------- | ------------------------- | -------------------------- | -------------------------- |
 | addEndpoint | ZodiosEndpointDescription | ApiBuilder                 | Add an endpoint to the API |
 | build       | none                      | ZodiosEndpointDescriptions | Build the API              |
 

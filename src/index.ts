@@ -54,6 +54,7 @@ export {
   makeApi,
   makeCrudApi,
   apiBuilder,
+  parametersBuilder,
   makeParameters,
   makeEndpoint,
   makeErrors,
