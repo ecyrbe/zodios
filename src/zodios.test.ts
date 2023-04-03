@@ -30,6 +30,9 @@ describe("Zodios", () => {
     app.get("/error401", (req, res) => {
       res.status(401).json({});
     });
+    app.get("/error//error401", (req, res) => {
+      res.status(401).json({});
+    });
     app.get("/error/:id/error401", (req, res) => {
       res.status(401).json({});
     });
@@ -977,6 +980,107 @@ received:
     ).toBe(true);
     expect(
       isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
+    ).toBe(false);
+  });
+
+  it("should match error with empty params", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        alias: "getError401",
+        path: "/error/:id/error401",
+        response: z.void(),
+        errors: [
+          {
+            status: 401,
+            schema: z.object({}),
+          },
+        ],
+      },
+      {
+        method: "get",
+        alias: "getError404",
+        path: "/error/:id/error404",
+        response: z.void(),
+        errors: [
+          {
+            status: 404,
+            schema: z.object({}),
+          },
+        ],
+      },
+    ]);
+
+    const params = {
+      id: "",
+    };
+
+    let error;
+    try {
+      await zodios.getError401({ params });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(isErrorFromAlias(zodios.api, "getError401", error)).toBe(true);
+    expect(isErrorFromAlias(zodios.api, "getError404", error)).toBe(false);
+
+    expect(
+      isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
+    ).toBe(true);
+    expect(
+      isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
+    ).toBe(false);
+  });
+
+  it("should match error with optional params at the end", async () => {
+    const zodios = new Zodios(`http://localhost:${port}`, [
+      {
+        method: "get",
+        alias: "getError401",
+        path: "/error/:id/error401/:message",
+        response: z.void(),
+        errors: [
+          {
+            status: 401,
+            schema: z.object({}),
+          },
+        ],
+      },
+      {
+        method: "get",
+        alias: "getError404",
+        path: "/error/:id/error404/:message",
+        response: z.void(),
+        errors: [
+          {
+            status: 404,
+            schema: z.object({}),
+          },
+        ],
+      },
+    ]);
+
+    const params = {
+      id: "test",
+      message : ""
+    }
+
+    let error;
+    try {
+      await zodios.getError401({ params });
+    } catch (e) {
+      error = e;
+    }
+
+    expect(isErrorFromAlias(zodios.api, "getError401", error)).toBe(true);
+    expect(isErrorFromAlias(zodios.api, "getError404", error)).toBe(false);
+
+    expect(
+      isErrorFromPath(zodios.api, "get", "/error/:id/error401/:message", error)
+    ).toBe(true);
+    expect(
+      isErrorFromPath(zodios.api, "get", "/error/:id/error404/:message", error)
     ).toBe(false);
   });
 
