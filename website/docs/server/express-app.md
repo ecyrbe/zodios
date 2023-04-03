@@ -27,12 +27,25 @@ Context.app(api?: ZodiosEndpointDescriptions, options?: ZodiosAppOptions): Zodio
 
 ## Options
 
-| Property             | Type     | Description                                        |
-| -------------------- | -------- | -------------------------------------------------- |
-| express              | Express> | optional express instance - default to express()   |
-| enableJsonBodyParser | boolean  | enable json body parser - default to true          |
-| validate             | boolean  | enable zod input validation - default to true      |
-| transform            | boolean  | enable zod input transformation - default to false |
+| Property               | Type                         | Description                                                           |
+| ---------------------- | ---------------------------- | --------------------------------------------------------------------- |
+| express                | Express                      | optional express instance - default to express()                      |
+| enableJsonBodyParser   | boolean                      | enable json body parser - default to true                             |
+| validate               | boolean                      | enable zod input validation - default to true                         |
+| transform              | boolean                      | enable zod input transformation - default to false                    |
+| validationErrorHandler | RouterValidationErrorHandler | error handler for validation errors - default to `defaulErrorHandler` |
+
+```ts
+type RouterValidationErrorHandler = (
+  err: {
+      context: string;
+      error: z.ZodIssue[];
+  },
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void;
+```
 
 ## Examples
 

@@ -28,15 +28,27 @@ Context.router(api?: ZodiosEndpointDescriptions, options?: ZodiosRouterOptions):
 
 ## Options
 
-| Property             | Type           | Description                                            |
-| -------------------- | -------------- | ------------------------------------------------------ |
-| router               | express.Router | optional express router - default to express.Router()  |
-| enableJsonBodyParser | boolean        | enable json body parser - default to true              |
-| validate             | boolean        | enable zod input validation - default to true          |
-| transform            | boolean        | enable zod input transformation - default to false     |
-| caseSensitive        | boolean        | enable case sensitive path matching - default to false |
-| strict               | boolean        | enable strict path matching - default to false         |
+| Property               | Type                         | Description                                                           |
+| ---------------------- | ---------------------------- | --------------------------------------------------------------------- |
+| router                 | express.Router               | optional express router - default to express.Router()                 |
+| enableJsonBodyParser   | boolean                      | enable json body parser - default to true                             |
+| validate               | boolean                      | enable zod input validation - default to true                         |
+| transform              | boolean                      | enable zod input transformation - default to false                    |
+| validationErrorHandler | RouterValidationErrorHandler | error handler for validation errors - default to `defaulErrorHandler` |
+| caseSensitive          | boolean                      | enable case sensitive path matching - default to false                |
+| strict                 | boolean                      | enable strict path matching - default to false                        |
 
+```ts
+type RouterValidationErrorHandler = (
+  err: {
+      context: string;
+      error: z.ZodIssue[];
+  },
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void;
+```
 
 ## Examples
 
