@@ -215,45 +215,43 @@ describe("parametersBuilder", () => {
       .build();
 
     const test: Assert<
-      typeof parameters,
-      [
-        {
+      typeof parameters[number],
+      | {
           name: "id";
           type: "Path";
           description?: string;
           schema: z.ZodNumber;
-        },
-        {
+        }
+      | {
           name: "homonyms";
           type: "Query";
           description?: string;
           schema: typeof optionalTrueSchema;
-        },
-        {
+        }
+      | {
           name: "email";
           type: "Query";
           description?: string;
           schema: typeof optionalTrueSchema;
-        },
-        {
+        }
+      | {
           name: "body";
           type: "Body";
           description?: string;
           schema: typeof partialUserSchema;
-        },
-        {
+        }
+      | {
           name: "Authorization";
           type: "Header";
           description?: string;
           schema: typeof bearerSchema;
-        },
-        {
+        }
+      | {
           name: "x-custom-header";
           type: "Header";
           description?: string;
           schema: z.ZodString;
         }
-      ]
     > = true;
   });
 });
