@@ -226,7 +226,7 @@ describe("Zodios", () => {
     expect(zodios.endpointPlugins.get("any-any").count()).toBe(1);
   });
 
-  it("should throw if invalide parameters when registering a plugin", () => {
+  it("should throw if invalid parameters when registering a plugin", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     // @ts-ignore
     expect(() => zodios.use(0)).toThrowError("Zodios: invalid plugin");
@@ -1063,8 +1063,8 @@ received:
 
     const params = {
       id: "test",
-      message : ""
-    }
+      message: "",
+    };
 
     let error;
     try {
