@@ -1,5 +1,11 @@
 # @zodios/core
 
+## 11.0.0-beta.18
+
+### Major Changes
+
+- 58016f5: migrate to typescript v11
+
 ## 11.0.0-beta.17
 
 ### Major Changes

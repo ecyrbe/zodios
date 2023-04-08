@@ -1,7 +1,7 @@
 {
   "name": "@zodios/react",
   "description": "React hooks for zodios",
-  "version": "11.0.0-beta.17",
+  "version": "11.0.0-beta.18",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
@@ -40,9 +40,9 @@
   },
   "peerDependencies": {
     "@tanstack/react-query": "4.x",
-    "@zodios/axios": "11.0.0-beta.17",
-    "@zodios/core": "11.0.0-beta.17",
-    "@zodios/fetch": "11.0.0-beta.17",
+    "@zodios/axios": "11.0.0-beta.18",
+    "@zodios/core": "11.0.0-beta.18",
+    "@zodios/fetch": "11.0.0-beta.18",
     "react": ">=16.8.0"
   },
   "peerDependenciesMeta": {

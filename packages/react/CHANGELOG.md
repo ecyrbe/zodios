@@ -1,5 +1,18 @@
 # @zodios/react
 
+## 11.0.0-beta.18
+
+### Major Changes
+
+- 58016f5: migrate to typescript v11
+
+### Patch Changes
+
+- Updated dependencies [58016f5]
+  - @zodios/axios@11.0.0-beta.18
+  - @zodios/fetch@11.0.0-beta.18
+  - @zodios/core@11.0.0-beta.18
+
 ## 11.0.0-beta.17
 
 ### Major Changes

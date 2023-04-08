@@ -1,7 +1,7 @@
 {
   "name": "@zodios/express",
   "description": "Typescript express server",
-  "version": "11.0.0-beta.17",
+  "version": "11.0.0-beta.18",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
@@ -38,7 +38,7 @@
     "test": "jest --coverage"
   },
   "peerDependencies": {
-    "@zodios/core": "11.0.0-beta.17",
+    "@zodios/core": "11.0.0-beta.18",
     "express": "4.x",
     "zod": "^3.x"
   },
