@@ -6,7 +6,8 @@
     "@zodios/axios": "11.0.0-beta.0",
     "@zodios/fetch": "11.0.0-beta.5",
     "@zodios/testing": "11.0.0-beta.8",
-    "@zodios/react": "11.0.0-beta.12"
+    "@zodios/react": "11.0.0-beta.12",
+    "@zodios/express": "11.0.0-beta.17"
   },
   "changesets": [
     "blue-hounds-sort",
