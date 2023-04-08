@@ -180,7 +180,7 @@ export type ZodiosErrorByPath<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
-  Status extends number,
+  Status extends number | "default",
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = Frontend extends true
@@ -320,7 +320,7 @@ export type ZodiosMatchingErrorsByAlias<
 export type ZodiosErrorByAlias<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string,
-  Status extends number,
+  Status extends number | "default",
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = Frontend extends true

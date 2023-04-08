@@ -1,4 +1,4 @@
-import { ZodiosCore, makeApi } from "../src/index";
+import { ZodiosCore, ZodiosErrorByAlias, makeApi } from "../src/index";
 import { z } from "zod";
 
 // you can define schema before declaring the API to get back the type
@@ -42,9 +42,25 @@ const jsonplaceholderApi = makeApi([
     method: "get",
     path: "/users/:id",
     description: "Get a user",
+    alias: "getUser",
     response: userSchema,
+    errors: [
+      {
+        status: "default",
+        schema: z.object({ error: z.string(), message: z.string() }),
+      },
+      {
+        status: 400,
+        schema: z.object({
+          error: z.string(),
+          message: z.literal("Bad Request"),
+        }),
+      },
+    ],
   },
 ]);
+
+type Error400 = ZodiosErrorByAlias<typeof jsonplaceholderApi, "getUser", 400>;
 
 // and then use them in your API
 async function bootstrap() {
