@@ -1,5 +1,0 @@
-{
-  "extends": ["config:base"],
-  "ignorePaths": ["examples/**"],
-  "ignoreDeps": ["tsup"]
-}
