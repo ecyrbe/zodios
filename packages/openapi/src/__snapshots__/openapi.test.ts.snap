@@ -1,0 +1,773 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`toOpenApi should convert to openapi with builder 1`] = `
+{
+  "info": {
+    "title": "My API",
+    "version": "1.0.0",
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/users": {
+      "post": {
+        "description": "Create a user",
+        "operationId": "createUser",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string",
+                  },
+                  "name": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "name",
+                  "email",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "description": "The user to create",
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "email": {
+                      "format": "email",
+                      "type": "string",
+                    },
+                    "id": {
+                      "type": "string",
+                    },
+                    "name": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": undefined,
+        "summary": "Create a user",
+        "tags": [
+          "users",
+        ],
+      },
+    },
+    "/users/{id}": {
+      "delete": {
+        "description": "Delete a user",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+        ],
+        "requestBody": undefined,
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {},
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": undefined,
+        "summary": "Delete a user",
+        "tags": [
+          "users",
+        ],
+      },
+      "get": {
+        "description": "Get a user by id",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+        ],
+        "requestBody": undefined,
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "email": {
+                      "format": "email",
+                      "type": "string",
+                    },
+                    "id": {
+                      "type": "string",
+                    },
+                    "name": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": undefined,
+        "summary": "Get a user by id",
+        "tags": [
+          "users",
+        ],
+      },
+      "put": {
+        "description": "Update a user",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string",
+                  },
+                  "id": {
+                    "type": "string",
+                  },
+                  "name": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "email",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "description": "The user to update",
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "email": {
+                      "format": "email",
+                      "type": "string",
+                    },
+                    "id": {
+                      "type": "string",
+                    },
+                    "name": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": undefined,
+        "summary": "Update a user",
+        "tags": [
+          "users",
+        ],
+      },
+    },
+    "/users?filter={filter}#fragment": {
+      "get": {
+        "description": "Get all users",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+          {
+            "description": "Limit the number of users",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": true,
+              "minimum": 0,
+              "type": "number",
+            },
+          },
+          {
+            "description": "Offset the number of users",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": true,
+              "minimum": 0,
+              "type": "number",
+            },
+          },
+          {
+            "description": "Filter users by name",
+            "in": "query",
+            "name": "filter[]",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string",
+              },
+              "type": "array",
+            },
+          },
+        ],
+        "requestBody": undefined,
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "email": {
+                        "format": "email",
+                        "type": "string",
+                      },
+                      "id": {
+                        "type": "string",
+                      },
+                      "name": {
+                        "type": "string",
+                      },
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "email",
+                    ],
+                    "type": "object",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Success",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "enum": [
+                        "No users found",
+                      ],
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "message",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "No users found",
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "message",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Default error",
+          },
+        },
+        "security": undefined,
+        "summary": "Get all users",
+        "tags": [
+          "users",
+        ],
+      },
+    },
+  },
+  "servers": undefined,
+}
+`;
+
+exports[`toOpenApi should convert to openapi with builder with security 1`] = `
+{
+  "components": {
+    "securitySchemes": {
+      "auth": {
+        "bearerFormat": "JWT",
+        "description": undefined,
+        "scheme": "bearer",
+        "type": "http",
+      },
+    },
+  },
+  "info": {
+    "title": "My API",
+    "version": "1.0.0",
+  },
+  "openapi": "3.0.0",
+  "paths": {
+    "/users": {
+      "post": {
+        "description": "Create a user",
+        "operationId": "createUser",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string",
+                  },
+                  "name": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "name",
+                  "email",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "description": "The user to create",
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "email": {
+                      "format": "email",
+                      "type": "string",
+                    },
+                    "id": {
+                      "type": "string",
+                    },
+                    "name": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": [
+          {
+            "auth": [],
+          },
+        ],
+        "summary": "Create a user",
+        "tags": [
+          "users",
+        ],
+      },
+    },
+    "/users/{id}": {
+      "delete": {
+        "description": "Delete a user",
+        "operationId": "deleteUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+        ],
+        "requestBody": undefined,
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {},
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": [
+          {
+            "auth": [],
+          },
+        ],
+        "summary": "Delete a user",
+        "tags": [
+          "users",
+        ],
+      },
+      "get": {
+        "description": "Get a user by id",
+        "operationId": "getUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+        ],
+        "requestBody": undefined,
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "email": {
+                      "format": "email",
+                      "type": "string",
+                    },
+                    "id": {
+                      "type": "string",
+                    },
+                    "name": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": [
+          {
+            "auth": [],
+          },
+        ],
+        "summary": "Get a user by id",
+        "tags": [
+          "users",
+        ],
+      },
+      "put": {
+        "description": "Update a user",
+        "operationId": "updateUser",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "email": {
+                    "format": "email",
+                    "type": "string",
+                  },
+                  "id": {
+                    "type": "string",
+                  },
+                  "name": {
+                    "type": "string",
+                  },
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "email",
+                ],
+                "type": "object",
+              },
+            },
+          },
+          "description": "The user to update",
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "email": {
+                      "format": "email",
+                      "type": "string",
+                    },
+                    "id": {
+                      "type": "string",
+                    },
+                    "name": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "email",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Success",
+          },
+        },
+        "security": [
+          {
+            "auth": [],
+          },
+        ],
+        "summary": "Update a user",
+        "tags": [
+          "users",
+        ],
+      },
+    },
+    "/users?filter={filter}#fragment": {
+      "get": {
+        "description": "Get all users",
+        "operationId": "getUsers",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "filter",
+            "required": true,
+            "schema": {
+              "type": "string",
+            },
+          },
+          {
+            "description": "Limit the number of users",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 10,
+              "exclusiveMinimum": true,
+              "minimum": 0,
+              "type": "number",
+            },
+          },
+          {
+            "description": "Offset the number of users",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "exclusiveMinimum": true,
+              "minimum": 0,
+              "type": "number",
+            },
+          },
+          {
+            "description": "Filter users by name",
+            "in": "query",
+            "name": "filter[]",
+            "required": true,
+            "schema": {
+              "items": {
+                "type": "string",
+              },
+              "type": "array",
+            },
+          },
+        ],
+        "requestBody": undefined,
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "additionalProperties": false,
+                    "properties": {
+                      "email": {
+                        "format": "email",
+                        "type": "string",
+                      },
+                      "id": {
+                        "type": "string",
+                      },
+                      "name": {
+                        "type": "string",
+                      },
+                    },
+                    "required": [
+                      "id",
+                      "name",
+                      "email",
+                    ],
+                    "type": "object",
+                  },
+                  "type": "array",
+                },
+              },
+            },
+            "description": "Success",
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "enum": [
+                        "No users found",
+                      ],
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "message",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "No users found",
+          },
+          "default": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                    },
+                  },
+                  "required": [
+                    "message",
+                  ],
+                  "type": "object",
+                },
+              },
+            },
+            "description": "Default error",
+          },
+        },
+        "security": [
+          {
+            "auth": [],
+          },
+        ],
+        "summary": "Get all users",
+        "tags": [
+          "users",
+        ],
+      },
+    },
+  },
+  "servers": [
+    {
+      "url": "/api/v1",
+    },
+  ],
+}
+`;

@@ -1,0 +1,17 @@
+{
+  // ts config for es 2021
+  "compilerOptions": {
+    "target": "ES2019",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "lib": ["ES2019"],
+    "outDir": "./lib",
+    "alwaysStrict": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": true,
+    "jsx": "react-jsx"
+  },
+  "exclude": ["node_modules", "lib"]
+}

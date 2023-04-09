@@ -38,9 +38,9 @@ export const HTTP_METHODS = [
   ...HTTP_MUTATION_METHODS,
 ] as const;
 
-export type QueryMethod = typeof HTTP_QUERY_METHODS[number];
-export type MutationMethod = typeof HTTP_MUTATION_METHODS[number];
-export type Method = typeof HTTP_METHODS[number];
+export type QueryMethod = (typeof HTTP_QUERY_METHODS)[number];
+export type MutationMethod = (typeof HTTP_MUTATION_METHODS)[number];
+export type Method = (typeof HTTP_METHODS)[number];
 
 export type RequestFormat =
   | "json" // default
@@ -772,7 +772,7 @@ export interface ZodiosOptions<
   typeProvider?: ZodiosRuntimeTypeProvider<TypeProvider>;
 }
 
-export interface ZodiosEndpointParameter {
+export interface ZodiosEndpointParameter<BaseSchemaType = unknown> {
   /**
    * name of the parameter
    */
@@ -789,12 +789,10 @@ export interface ZodiosEndpointParameter {
    * zod schema of the parameter
    * you can use zod `transform` to transform the value of the parameter before sending it to the server
    */
-  schema: unknown;
+  schema: BaseSchemaType;
 }
 
-export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
-
-export interface ZodiosEndpointError {
+export interface ZodiosEndpointError<BaseSchemaType = unknown> {
   /**
    * status code of the error
    * use 'default' to declare a default error
@@ -807,15 +805,13 @@ export interface ZodiosEndpointError {
   /**
    * schema of the error
    */
-  schema: unknown;
+  schema: BaseSchemaType;
 }
-
-export type ZodiosEndpointErrors = ZodiosEndpointError[];
 
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
-export interface ZodiosEndpointDefinition {
+export interface ZodiosEndpointDefinition<BaseSchemaType = unknown> {
   /**
    * http method : get, post, put, patch, delete
    */
@@ -852,12 +848,14 @@ export interface ZodiosEndpointDefinition {
   /**
    * optional parameters of the endpoint
    */
-  parameters?: readonly ZodiosEndpointParameter[] | ZodiosEndpointParameter[];
+  parameters?:
+    | readonly ZodiosEndpointParameter<BaseSchemaType>[]
+    | ZodiosEndpointParameter<BaseSchemaType>[];
   /**
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
    */
-  response: unknown;
+  response: BaseSchemaType;
   /**
    * optional response status of the endpoint for sucess, default is 200
    * customize it if your endpoint returns a different status code and if you need openapi to generate the correct status code
@@ -870,7 +868,9 @@ export interface ZodiosEndpointDefinition {
   /**
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
-  errors?: readonly ZodiosEndpointError[] | ZodiosEndpointError[];
+  errors?:
+    | readonly ZodiosEndpointError<BaseSchemaType>[]
+    | ZodiosEndpointError<BaseSchemaType>[];
 }
 
 /**
