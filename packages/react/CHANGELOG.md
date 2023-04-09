@@ -1,5 +1,18 @@
 # @zodios/react
 
+## 11.0.0-beta.19
+
+### Major Changes
+
+- 583775e: feat(openapi): add openapi
+
+### Patch Changes
+
+- Updated dependencies [583775e]
+  - @zodios/axios@11.0.0-beta.19
+  - @zodios/fetch@11.0.0-beta.19
+  - @zodios/core@11.0.0-beta.19
+
 ## 11.0.0-beta.18
 
 ### Major Changes
