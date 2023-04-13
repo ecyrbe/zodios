@@ -43,7 +43,7 @@ import {
 
 import type { Assert } from "./utils.types";
 import {
-  ZodiosEndpointDefinitionByPath,
+  FindZodiosEndpointDefinitionByPath,
   ZodiosMatchingErrorsByPath,
 } from "./zodios.types";
 import {
@@ -1053,11 +1053,11 @@ describe("Zodios", () => {
       MockProvider,
       ZodTypeProvider
     >;
-    type Test2 = ZodiosEndpointDefinitionByPath<
+    type Test2 = FindZodiosEndpointDefinitionByPath<
       ApiOf<typeof zodios>,
       "get",
       "/error502"
-    >[number]["errors"];
+    >["errors"];
 
     expect(error).toBeInstanceOf(Error);
     // @ts-ignore

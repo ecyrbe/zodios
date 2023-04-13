@@ -10,6 +10,7 @@ import type {
   FilterArrayByKey,
   IfEquals,
   RequiredKeys,
+  ArrayFindByValue,
 } from "./utils.types";
 import type {
   AnyZodiosTypeProvider,
@@ -54,16 +55,16 @@ type EndpointDefinitionsByMethod<
   M extends Method
 > = FilterArrayByValue<Api, { method: M }>;
 
-export type ZodiosEndpointDefinitionByPath<
+export type FindZodiosEndpointDefinitionByPath<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>
-> = FilterArrayByValue<Api, { method: M; path: Path }>;
+> = ArrayFindByValue<Api, { method: M; path: Path }>;
 
-export type ZodiosEndpointDefinitionByAlias<
+export type FindZodiosEndpointDefinitionByAlias<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string
-> = FilterArrayByValue<Api, { alias: Alias }>;
+> = ArrayFindByValue<Api, { alias: Alias }>;
 
 export type ZodiosPathsByMethod<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
@@ -91,11 +92,11 @@ export type ZodiosResponseByPath<
 > = Frontend extends true
   ? InferOutputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]
+      FindZodiosEndpointDefinitionByPath<Api, M, Path>["response"]
     >
   : InferInputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]
+      FindZodiosEndpointDefinitionByPath<Api, M, Path>["response"]
     >;
 
 export type ZodiosResponseByAlias<
@@ -106,11 +107,11 @@ export type ZodiosResponseByAlias<
 > = Frontend extends true
   ? InferOutputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]
+      FindZodiosEndpointDefinitionByAlias<Api, Alias>["response"]
     >
   : InferInputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]
+      FindZodiosEndpointDefinitionByAlias<Api, Alias>["response"]
     >;
 
 export type ZodiosDefaultErrorForEndpoint<
@@ -127,7 +128,7 @@ type ZodiosDefaultErrorByPath<
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>
 > = FilterArrayByValue<
-  ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+  FindZodiosEndpointDefinitionByPath<Api, M, Path>["errors"],
   {
     status: "default";
   }
@@ -137,7 +138,7 @@ type ZodiosDefaultErrorByAlias<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string
 > = FilterArrayByValue<
-  ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+  FindZodiosEndpointDefinitionByAlias<Api, Alias>["errors"],
   {
     status: "default";
   }
@@ -188,7 +189,7 @@ export type ZodiosErrorByPath<
       TypeProvider,
       IfNever<
         FilterArrayByValue<
-          ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+          FindZodiosEndpointDefinitionByPath<Api, M, Path>["errors"],
           {
             status: Status;
           }
@@ -200,7 +201,7 @@ export type ZodiosErrorByPath<
       TypeProvider,
       IfNever<
         FilterArrayByValue<
-          ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+          FindZodiosEndpointDefinitionByPath<Api, M, Path>["errors"],
           {
             status: Status;
           }
@@ -218,19 +219,19 @@ export type ZodiosErrorsByPath<
 > = Frontend extends true
   ? InferOutputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByPath<
+      FindZodiosEndpointDefinitionByPath<
         Api,
         M,
         Path
-      >[number]["errors"][number]["schema"]
+      >["errors"][number]["schema"]
     >
   : InferInputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByPath<
+      FindZodiosEndpointDefinitionByPath<
         Api,
         M,
         Path
-      >[number]["errors"][number]["schema"]
+      >["errors"][number]["schema"]
     >;
 
 export type ZodiosErrorsByAlias<
@@ -242,11 +243,11 @@ export type ZodiosErrorsByAlias<
 > = Frontend extends true
   ? InferOutputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByAlias<Api, Path>[number]["errors"]
+      FindZodiosEndpointDefinitionByAlias<Api, Path>["errors"]
     >
   : InferInputTypeFromSchema<
       TypeProvider,
-      ZodiosEndpointDefinitionByAlias<Api, Path>[number]["errors"]
+      FindZodiosEndpointDefinitionByAlias<Api, Path>["errors"]
     >;
 
 export type InferFetcherErrors<
@@ -301,7 +302,7 @@ export type ZodiosMatchingErrorsByPath<
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = InferFetcherErrors<
-  ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
+  FindZodiosEndpointDefinitionByPath<Api, M, Path>["errors"],
   TypeProvider,
   FetcherProvider
 >[number];
@@ -312,7 +313,7 @@ export type ZodiosMatchingErrorsByAlias<
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > = InferFetcherErrors<
-  ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+  FindZodiosEndpointDefinitionByAlias<Api, Alias>["errors"],
   TypeProvider,
   FetcherProvider
 >[number];
@@ -328,7 +329,7 @@ export type ZodiosErrorByAlias<
       TypeProvider,
       IfNever<
         FilterArrayByValue<
-          ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+          FindZodiosEndpointDefinitionByAlias<Api, Alias>["errors"],
           {
             status: Status;
           }
@@ -340,7 +341,7 @@ export type ZodiosErrorByAlias<
       TypeProvider,
       IfNever<
         FilterArrayByValue<
-          ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
+          FindZodiosEndpointDefinitionByAlias<Api, Alias>["errors"],
           {
             status: Status;
           }
@@ -349,20 +350,17 @@ export type ZodiosErrorByAlias<
       >
     >;
 
-export type BodySchemaForEndpoint<Endpoint extends ZodiosEndpointDefinition> =
-  FilterArrayByValue<
-    Endpoint["parameters"],
-    { type: "Body" }
-  >[number]["schema"];
+type BodySchemaForEndpoint<Endpoint extends ZodiosEndpointDefinition> =
+  ArrayFindByValue<Endpoint["parameters"], { type: "Body" }>["schema"];
 
-export type BodySchema<
+type BodySchema<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>
-> = FilterArrayByValue<
-  ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
+> = ArrayFindByValue<
+  FindZodiosEndpointDefinitionByPath<Api, M, Path>["parameters"],
   { type: "Body" }
->[number]["schema"];
+>["schema"];
 
 export type ZodiosBodyForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
@@ -385,10 +383,10 @@ export type ZodiosBodyByPath<
 export type BodySchemaByAlias<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Alias extends string
-> = FilterArrayByValue<
-  ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["parameters"],
+> = ArrayFindByValue<
+  FindZodiosEndpointDefinitionByAlias<Api, Alias>["parameters"],
   { type: "Body" }
->[number]["schema"];
+>["schema"];
 
 export type ZodiosBodyByAlias<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
@@ -456,7 +454,7 @@ export type ZodiosQueryParamsByPath<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
-        ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
+        FindZodiosEndpointDefinitionByPath<Api, M, Path>["parameters"],
         { type: "Query" }
       >,
       Frontend,
@@ -474,7 +472,7 @@ export type ZodiosQueryParamsByAlias<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
-        ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["parameters"],
+        FindZodiosEndpointDefinitionByAlias<Api, Alias>["parameters"],
         { type: "Query" }
       >,
       Frontend,
@@ -518,7 +516,7 @@ export type ZodiosPathParamsByPath<
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
   PathParameters = MapSchemaParameters<
     FilterArrayByValue<
-      ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
+      FindZodiosEndpointDefinitionByPath<Api, M, Path>["parameters"],
       { type: "Path" }
     >,
     Frontend,
@@ -538,10 +536,10 @@ export type ZodiosPathParamByAlias<
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  EndpointDefinition extends ZodiosEndpointDefinition = ZodiosEndpointDefinitionByAlias<
+  EndpointDefinition extends ZodiosEndpointDefinition = FindZodiosEndpointDefinitionByAlias<
     Api,
     Alias
-  >[number],
+  >,
   Path = EndpointDefinition["path"],
   PathParameters = MapSchemaParameters<
     FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
@@ -578,7 +576,7 @@ export type ZodiosHeaderParamsByPath<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
-        ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
+        FindZodiosEndpointDefinitionByPath<Api, M, Path>["parameters"],
         { type: "Header" }
       >,
       Frontend,
@@ -596,7 +594,7 @@ export type ZodiosHeaderParamsByAlias<
   UndefinedToOptional<
     MapSchemaParameters<
       FilterArrayByValue<
-        ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["parameters"],
+        FindZodiosEndpointDefinitionByAlias<Api, Alias>["parameters"],
         { type: "Header" }
       >,
       Frontend,

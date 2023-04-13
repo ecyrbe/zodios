@@ -7,7 +7,8 @@
     "@zodios/fetch": "11.0.0-beta.5",
     "@zodios/testing": "11.0.0-beta.8",
     "@zodios/react": "11.0.0-beta.12",
-    "@zodios/express": "11.0.0-beta.17"
+    "@zodios/express": "11.0.0-beta.17",
+    "@zodios/openapi": "10.4.7"
   },
   "changesets": [
     "blue-hounds-sort",
@@ -24,6 +25,7 @@
     "nervous-kings-bow",
     "nice-kids-attend",
     "nice-wombats-boil",
+    "odd-avocados-prove",
     "polite-bugs-confess",
     "polite-points-float",
     "quiet-rockets-dream",

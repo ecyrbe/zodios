@@ -18,10 +18,24 @@ export type FilterArrayByValue<
     : FilterArrayByValue<Tail, C, Acc>
   : Acc;
 
-type Test = FilterArrayByValue<
-  readonly [{ hello: "world"; world: "hello" }, { hello: "world" }],
-  { hello: "world" }
->;
+/**
+ * find the first value in an array type that matches a predicate
+ * @param T - array type
+ * @param C - predicate object to match
+ * @details - this is using tail recursion type optimization from typescript 4.5
+ */
+export type ArrayFindByValue<
+  T extends readonly unknown[] | unknown[] | undefined,
+  C
+> = T extends readonly [infer Head, ...infer Tail]
+  ? Head extends C
+    ? Head
+    : ArrayFindByValue<Tail, C>
+  : T extends [infer Head, ...infer Tail]
+  ? Head extends C
+    ? Head
+    : ArrayFindByValue<Tail, C>
+  : never;
 
 /**
  * filter an array type by key
