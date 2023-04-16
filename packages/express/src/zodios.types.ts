@@ -1,5 +1,6 @@
 import express from "express";
 import type { Request, Response, NextFunction } from "express";
+import http from "node:http";
 import {
   ZodiosEndpointDefinition,
   ZodiosErrorByPath,
@@ -158,14 +159,24 @@ export interface ZodiosRouterOptions<
 
 export interface ZodiosUnknownApp<Context>
   extends Omit<ReturnType<typeof express>, "use">,
-    ZodiosRouterMiddlewares<Context> {}
+    ZodiosRouterMiddlewares<Context> {
+  (
+    req: Request | http.IncomingMessage,
+    res: Response | http.ServerResponse
+  ): any;
+}
 
 export interface ZodiosApiApp<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
   Context,
   TypeProvider extends AnyZodiosTypeProvider
 > extends Omit<ReturnType<typeof express>, Method | "use">,
-    ZodiosRouterMethodMiddlewares<Api, Context, TypeProvider> {}
+    ZodiosRouterMethodMiddlewares<Api, Context, TypeProvider> {
+  (
+    req: Request | http.IncomingMessage,
+    res: Response | http.ServerResponse
+  ): any;
+}
 
 export type ZodiosApp<
   Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],

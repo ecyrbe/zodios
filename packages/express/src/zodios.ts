@@ -25,7 +25,9 @@ import { zodTypeFactory } from "./type-providers/zod.type-provider";
  */
 export function zodiosApp<
   ContextSchema,
-  const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any,
+  const Api extends
+    | readonly ZodiosEndpointDefinition[]
+    | ZodiosEndpointDefinition[] = any,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   api?: Api,
@@ -48,7 +50,7 @@ export function zodiosApp<
     app.use(express.json());
   }
   if (api && validate) {
-    injectParametersValidators(api, app, transform,typeFactory);
+    injectParametersValidators(api, app, transform, typeFactory);
   }
   return app as any;
 }
@@ -60,7 +62,9 @@ export function zodiosApp<
  * @returns
  */
 export function zodiosRouter<
-  const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[],
+  const Api extends
+    | readonly ZodiosEndpointDefinition[]
+    | ZodiosEndpointDefinition[],
   ContextSchema,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
@@ -73,11 +77,12 @@ export function zodiosRouter<
     : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
   TypeProvider
 > {
-  const { 
-    validate = true, 
-    transform = true, 
+  const {
+    validate = true,
+    transform = true,
     typeFactory = zodTypeFactory,
-    ...routerOptions } = options;
+    ...routerOptions
+  } = options;
   const router = options?.router ?? express.Router(routerOptions);
   if (validate) {
     injectParametersValidators(api, router, transform, typeFactory);
@@ -92,7 +97,9 @@ export function zodiosRouter<
  */
 export function zodiosNextApp<
   ContextSchema,
-  const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any,
+  const Api extends
+    | readonly ZodiosEndpointDefinition[]
+    | ZodiosEndpointDefinition[] = any,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 >(
   api?: Api,
@@ -124,7 +131,11 @@ export class ZodiosContext<
     this.typeFactory = options?.typeFactory ?? (zodTypeFactory as any);
   }
 
-  app<const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any>(
+  app<
+    const Api extends
+      | readonly ZodiosEndpointDefinition[]
+      | ZodiosEndpointDefinition[] = any
+  >(
     api?: Api,
     options?: ZodiosAppOptions<ContextSchema, TypeProvider>
   ): ZodiosApp<
@@ -134,10 +145,14 @@ export class ZodiosContext<
       : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
     TypeProvider
   > {
-    return zodiosApp(api, {...options, typeFactory: this.typeFactory});
+    return zodiosApp(api, { ...options, typeFactory: this.typeFactory });
   }
 
-  nextApp<const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[] = any>(
+  nextApp<
+    const Api extends
+      | readonly ZodiosEndpointDefinition[]
+      | ZodiosEndpointDefinition[] = any
+  >(
     api?: Api,
     options?: ZodiosAppOptions<ContextSchema, TypeProvider>
   ): ZodiosApp<
@@ -147,10 +162,14 @@ export class ZodiosContext<
       : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
     TypeProvider
   > {
-    return zodiosNextApp(api, {...options, typeFactory: this.typeFactory});
+    return zodiosNextApp(api, { ...options, typeFactory: this.typeFactory });
   }
 
-  router<const Api extends readonly ZodiosEndpointDefinition[]|ZodiosEndpointDefinition[]>(
+  router<
+    const Api extends
+      | readonly ZodiosEndpointDefinition[]
+      | ZodiosEndpointDefinition[]
+  >(
     api: Api,
     options?: RouterOptions & ZodiosRouterOptions<ContextSchema, TypeProvider>
   ): ZodiosRouter<
@@ -160,7 +179,7 @@ export class ZodiosContext<
       : InferInputTypeFromSchema<TypeProvider, ContextSchema>,
     TypeProvider
   > {
-    return zodiosRouter(api, {...options, typeFactory: this.typeFactory});
+    return zodiosRouter(api, { ...options, typeFactory: this.typeFactory });
   }
 }
 
