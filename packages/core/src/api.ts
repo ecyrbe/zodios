@@ -87,7 +87,7 @@ export function parametersBuilder() {
 
 type ObjectToQueryParameters<
   Type extends "Query" | "Path" | "Header",
-  T extends Record<string, z.ZodType<any, any, any>>,
+  T extends Record<string, unknown>,
   Keys = UnionToTuple<keyof T>
 > = {
   [Index in keyof Keys]: {
@@ -104,24 +104,20 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
   addParameter<
     Name extends string,
     Type extends "Path" | "Query" | "Body" | "Header",
-    Schema extends z.ZodType<any, any, any>
-  >(name: Name, type: Type, schema: Schema) {
+    Schema
+  >(name: Name, type: Type, schema: Schema, description?: string) {
     return new ParametersBuilder<
       [...T, { name: Name; type: Type; description?: string; schema: Schema }]
-    >([
-      ...this.params,
-      { name, type, description: schema.description, schema },
-    ]);
+    >([...this.params, { name, type, description, schema }]);
   }
 
   addParameters<
     Type extends "Query" | "Path" | "Header",
-    Schemas extends Record<string, z.ZodType<any, any, any>>
+    Schemas extends Record<string, unknown>
   >(type: Type, schemas: Schemas) {
     const parameters = Object.keys(schemas).map((key) => ({
       name: key,
       type,
-      description: schemas[key].description,
       schema: schemas[key],
     }));
     return new ParametersBuilder<
@@ -135,46 +131,31 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
     >([...this.params, ...parameters] as any);
   }
 
-  addBody<Schema extends z.ZodType<any, any, any>>(schema: Schema) {
+  addBody<Schema>(schema: Schema) {
     return this.addParameter("body", "Body", schema);
   }
 
-  addQuery<Name extends string, Schema extends z.ZodType<any, any, any>>(
-    name: Name,
-    schema: Schema
-  ) {
+  addQuery<Name extends string, Schema>(name: Name, schema: Schema) {
     return this.addParameter(name, "Query", schema);
   }
 
-  addPath<Name extends string, Schema extends z.ZodType<any, any, any>>(
-    name: Name,
-    schema: Schema
-  ) {
+  addPath<Name extends string, Schema>(name: Name, schema: Schema) {
     return this.addParameter(name, "Path", schema);
   }
 
-  addHeader<Name extends string, Schema extends z.ZodType<any, any, any>>(
-    name: Name,
-    schema: Schema
-  ) {
+  addHeader<Name extends string, Schema>(name: Name, schema: Schema) {
     return this.addParameter(name, "Header", schema);
   }
 
-  addQueries<Schemas extends Record<string, z.ZodType<any, any, any>>>(
-    schemas: Schemas
-  ) {
+  addQueries<Schemas extends Record<string, unknown>>(schemas: Schemas) {
     return this.addParameters("Query", schemas);
   }
 
-  addPaths<Schemas extends Record<string, z.ZodType<any, any, any>>>(
-    schemas: Schemas
-  ) {
+  addPaths<Schemas extends Record<string, unknown>>(schemas: Schemas) {
     return this.addParameters("Path", schemas);
   }
 
-  addHeaders<Schemas extends Record<string, z.ZodType<any, any, any>>>(
-    schemas: Schemas
-  ) {
+  addHeaders<Schemas extends Record<string, unknown>>(schemas: Schemas) {
     return this.addParameters("Header", schemas);
   }
 

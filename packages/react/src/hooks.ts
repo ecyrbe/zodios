@@ -12,7 +12,11 @@ import {
   QueryKey,
   UseInfiniteQueryResult,
 } from "@tanstack/react-query";
-import { ZodiosError, HTTP_MUTATION_METHODS } from "@zodios/core";
+import {
+  ZodiosError,
+  HTTP_MUTATION_METHODS,
+  FindZodiosEndpointDefinitionByAlias,
+} from "@zodios/core";
 import type {
   AnyZodiosFetcherProvider,
   AnyZodiosMethodOptions,
@@ -23,7 +27,6 @@ import type {
   ZodiosResponseByPath,
   ZodiosResponseByAlias,
   ZodiosEndpointDefinition,
-  ZodiosEndpointDefinitionByAlias,
   ZodiosRequestOptionsByPath,
   ZodiosBodyByPath,
   ZodiosBodyByAlias,
@@ -801,16 +804,16 @@ export type ZodiosHooksAliases<
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider
 > = {
-  [Alias in Aliases<Api> as `use${Capitalize<Alias>}`]: ZodiosEndpointDefinitionByAlias<
+  [Alias in Aliases<Api> as `use${Capitalize<Alias>}`]: FindZodiosEndpointDefinitionByAlias<
     Api,
     Alias
-  >[number]["method"] extends infer AliasMethod
+  >["method"] extends infer AliasMethod
     ? AliasMethod extends MutationMethod
       ? {
-          immutable: ZodiosEndpointDefinitionByAlias<
+          immutable: FindZodiosEndpointDefinitionByAlias<
             Api,
             Alias
-          >[number]["immutable"];
+          >["immutable"];
           method: AliasMethod;
         } extends { immutable: true; method: "post" }
         ? // immutable query

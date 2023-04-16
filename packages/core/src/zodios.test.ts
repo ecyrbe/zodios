@@ -70,6 +70,20 @@ describe("Zodios", () => {
       statusText: "Unauthorized",
       data: {},
     }));
+    zodiosMocks.mockRequest("get", "/error/:id/error401", async (conf) => ({
+      status: 401,
+      statusText: "Unauthorized",
+      data: {},
+    }));
+    zodiosMocks.mockRequest(
+      "get",
+      "/error/:id/error401/:message",
+      async (conf) => ({
+        status: 401,
+        statusText: "Unauthorized",
+        data: {},
+      })
+    );
     zodiosMocks.mockRequest("get", "/error502", async (conf) => ({
       status: 502,
       statusText: "Bad Gateway",
@@ -1077,7 +1091,7 @@ describe("Zodios", () => {
   });
 
   it("should match error with params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost`, [
       {
         method: "get",
         alias: "getError401",
@@ -1113,21 +1127,26 @@ describe("Zodios", () => {
       await zodios.getError401({ params });
     } catch (e) {
       error = e;
+      console.log("Match Error params", e);
     }
 
-    expect(isErrorFromAlias(zodios.api, "getError401", error)).toBe(true);
-    expect(isErrorFromAlias(zodios.api, "getError404", error)).toBe(false);
+    expect(zodios.isErrorFromAlias(zodios.api, "getError401", error)).toBe(
+      true
+    );
+    expect(zodios.isErrorFromAlias(zodios.api, "getError404", error)).toBe(
+      false
+    );
 
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
+      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
     ).toBe(true);
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
+      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
     ).toBe(false);
   });
 
   it("should match error with empty params", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost`, [
       {
         method: "get",
         alias: "getError401",
@@ -1165,19 +1184,23 @@ describe("Zodios", () => {
       error = e;
     }
 
-    expect(isErrorFromAlias(zodios.api, "getError401", error)).toBe(true);
-    expect(isErrorFromAlias(zodios.api, "getError404", error)).toBe(false);
+    expect(zodios.isErrorFromAlias(zodios.api, "getError401", error)).toBe(
+      true
+    );
+    expect(zodios.isErrorFromAlias(zodios.api, "getError404", error)).toBe(
+      false
+    );
 
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
+      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
     ).toBe(true);
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
+      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
     ).toBe(false);
   });
 
   it("should match error with optional params at the end", async () => {
-    const zodios = new Zodios(`http://localhost:${port}`, [
+    const zodios = new ZodiosCore(`http://localhost`, [
       {
         method: "get",
         alias: "getError401",
@@ -1216,14 +1239,28 @@ describe("Zodios", () => {
       error = e;
     }
 
-    expect(isErrorFromAlias(zodios.api, "getError401", error)).toBe(true);
-    expect(isErrorFromAlias(zodios.api, "getError404", error)).toBe(false);
+    expect(zodios.isErrorFromAlias(zodios.api, "getError401", error)).toBe(
+      true
+    );
+    expect(zodios.isErrorFromAlias(zodios.api, "getError404", error)).toBe(
+      false
+    );
 
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error401/:message", error)
+      zodios.isErrorFromPath(
+        zodios.api,
+        "get",
+        "/error/:id/error401/:message",
+        error
+      )
     ).toBe(true);
     expect(
-      isErrorFromPath(zodios.api, "get", "/error/:id/error404/:message", error)
+      zodios.isErrorFromPath(
+        zodios.api,
+        "get",
+        "/error/:id/error404/:message",
+        error
+      )
     ).toBe(false);
   });
 

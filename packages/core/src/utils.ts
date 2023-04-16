@@ -1,7 +1,4 @@
-import type {
-  ZodiosEndpointDefinition,
-  ZodiosEndpointError,
-} from "./zodios.types";
+import type { ZodiosEndpointDefinition } from "./zodios.types";
 
 /**
  * omit properties from an object
@@ -54,6 +51,14 @@ export function findEndpointByAlias(
   return api.find((e) => e.alias === alias);
 }
 
+const paramsRegExp = /:([a-zA-Z_][a-zA-Z0-9_]*)/g;
+
+export function pathMatchesUrl(path: string, url: string) {
+  return new RegExp(`^${path.replace(paramsRegExp, () => "([^/]*)")}$`).test(
+    url
+  );
+}
+
 export function findEndpointErrors(
   endpoint: ZodiosEndpointDefinition,
   err: any
@@ -87,6 +92,8 @@ export function findEndpointErrorsByAlias(
   err: any
 ) {
   const endpoint = findEndpointByAlias(api, alias);
+  console.log("For Alias: ", alias);
+  console.log("Found Endpoint: ", endpoint);
 
   return endpoint &&
     err.config &&
@@ -95,10 +102,4 @@ export function findEndpointErrorsByAlias(
     pathMatchesUrl(endpoint.path, err.config.url)
     ? findEndpointErrors(endpoint, err)
     : undefined;
-}
-
-export function pathMatchesUrl(path: string, url: string) {
-  return new RegExp(`^${path.replace(paramsRegExp, () => "([^/]*)")}$`).test(
-    url
-  );
 }
