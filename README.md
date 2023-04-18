@@ -99,7 +99,7 @@ const apiClient = new Zodios(
     {
       method: "get",
       path: "/users/:id", // auto detect :id and ask for it in apiClient get params
-      alias: "getUser", // optionnal alias to call this endpoint with it
+      alias: "getUser", // optional alias to call this endpoint with it
       description: "Get a user",
       response: z.object({
         id: z.number(),
