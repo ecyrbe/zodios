@@ -106,3 +106,8 @@ lib
 
 # Developpement directory
 .devcontainer
+# Turbo
+.turbo
+
+# Output
+lib/**

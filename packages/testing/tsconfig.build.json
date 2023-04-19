@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES6",
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "examples",
+    "website",
+    "**/*.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.d.ts"
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "zodios-next-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "4.13.0",
+    "@zodios/core": "10.7.3",
+    "@zodios/express": "10.4.4",
+    "@zodios/react": "10.4.3",
+    "axios": "1.2.6",
+    "express": "4.18.2",
+    "next": "12.2.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "zod": "3.20.2"
+  },
+  "devDependencies": {
+    "@types/express": "4.17.16",
+    "@types/node": "18.11.18",
+    "@types/react": "18.0.27",
+    "@types/react-dom": "18.0.10",
+    "eslint": "8.32.0",
+    "eslint-config-next": "12.2.5",
+    "typescript": "5.0.2"
+  }
+}

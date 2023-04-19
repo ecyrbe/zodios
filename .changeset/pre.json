@@ -1,0 +1,43 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@zodios/core": "11.0.0-beta.0",
+    "@zodios/axios": "11.0.0-beta.0",
+    "@zodios/fetch": "11.0.0-beta.5",
+    "@zodios/testing": "11.0.0-beta.8",
+    "@zodios/react": "11.0.0-beta.12",
+    "@zodios/express": "11.0.0-beta.17",
+    "@zodios/openapi": "10.4.7"
+  },
+  "changesets": [
+    "blue-hounds-sort",
+    "chilled-emus-own",
+    "curly-shrimps-destroy",
+    "famous-rules-drop",
+    "few-icons-march",
+    "five-apricots-breathe",
+    "gentle-ligers-mix",
+    "good-tigers-tie",
+    "gorgeous-dolls-fry",
+    "long-fans-dress",
+    "lucky-brooms-fry",
+    "nervous-kings-bow",
+    "nice-kids-attend",
+    "nice-wombats-boil",
+    "odd-avocados-prove",
+    "polite-bugs-confess",
+    "polite-points-float",
+    "quiet-rockets-dream",
+    "rare-zoos-serve",
+    "rich-pigs-thank",
+    "short-hounds-mix",
+    "silent-garlics-scream",
+    "slimy-pugs-melt",
+    "slow-worms-destroy",
+    "small-horses-laugh",
+    "soft-seas-lie",
+    "tasty-bags-happen",
+    "twelve-dingos-cover"
+  ]
+}
