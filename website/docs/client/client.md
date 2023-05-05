@@ -92,7 +92,7 @@ const users = await apiClient.getUsers();
 // get user by id
 const user = await apiClient.getUser({ params: { id: 1 } });
 // create user
-const newUser = await apiCLient.createUser({ name: "John", age: 20, email: "jodn@doe.com"});
+const newUser = await apiClient.createUser({ name: "John", age: 20, email: "jodn@doe.com"});
 ```
 
 :::note Path parameters do not need to be defined in the API definition `parameters` array.
