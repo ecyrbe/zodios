@@ -58,7 +58,7 @@ const api = makeApi([
 const apiClient = new Zodios(api);
 
 try {
-  const response = await apiClient.getUser({ id: 1 });
+  const response = await apiClient.getUser({ params: { id: 1 } });
 } catch (error) {
   // you can also do:
   // - isErrorFromPath(zodios.api, "get", "/users/:id", error)
