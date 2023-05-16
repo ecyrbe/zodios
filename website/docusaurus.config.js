@@ -78,7 +78,20 @@ const config = {
           },
           {
             href: "https://github.com/ecyrbe/zodios",
-            label: "GitHub",
+            className: "header-social-link header-github-link",
+            "aria-label": "GitHub Repository",
+            position: "right",
+          },
+          {
+            href: "https://twitter.com/ecyrbedev",
+            className: "header-social-link header-twitter-link",
+            "aria-label": "Twitter",
+            position: "right",
+          },
+          {
+            href: "https://discord.gg/pfSZ2sVAcs",
+            className: "header-social-link header-discord-link",
+            "aria-label": "Discord",
             position: "right",
           },
         ],
@@ -101,6 +114,10 @@ const config = {
               {
                 label: "Twitter",
                 href: "https://twitter.com/ecyrbedev",
+              },
+              {
+                label: "Discord",
+                href: "https://discord.gg/pfSZ2sVAcs",
               },
             ],
           },
