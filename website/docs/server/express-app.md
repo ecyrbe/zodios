@@ -65,7 +65,7 @@ const ctx = zodiosContext(z.object({
   }),
 }));
 
-const app = ctx.app();
+const app = ctx.app(userApi);
 // middleware that adds the user to the context
 app.use(userMiddleware);
 
