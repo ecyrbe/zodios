@@ -317,13 +317,10 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async post<
     Path extends ZodiosPathsByMethod<Api, "post">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "post", Path>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<Api, "post", Path>
   >(
     path: Path,
-    data: TBody,
+    data: ReadonlyDeep<UndefinedIfNever<ZodiosBodyByPath<Api, "post", Path>>>,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -345,13 +342,10 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async put<
     Path extends ZodiosPathsByMethod<Api, "put">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "put", Path>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<Api, "put", Path>
   >(
     path: Path,
-    data: TBody,
+    data: ReadonlyDeep<UndefinedIfNever<ZodiosBodyByPath<Api, "put", Path>>>,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -373,13 +367,10 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async patch<
     Path extends ZodiosPathsByMethod<Api, "patch">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "patch", Path>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<Api, "patch", Path>
   >(
     path: Path,
-    data: TBody,
+    data: ReadonlyDeep<UndefinedIfNever<ZodiosBodyByPath<Api, "patch", Path>>>,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
@@ -400,13 +391,10 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
    */
   async delete<
     Path extends ZodiosPathsByMethod<Api, "delete">,
-    TBody extends ReadonlyDeep<
-      UndefinedIfNever<ZodiosBodyByPath<Api, "delete", Path>>
-    >,
     TConfig extends ZodiosRequestOptionsByPath<Api, "delete", Path>
   >(
     path: Path,
-    data: TBody,
+    data: ReadonlyDeep<UndefinedIfNever<ZodiosBodyByPath<Api, "delete", Path>>>,
     ...[config]: RequiredKeys<TConfig> extends never
       ? [config?: ReadonlyDeep<TConfig>]
       : [config: ReadonlyDeep<TConfig>]
