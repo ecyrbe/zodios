@@ -186,6 +186,23 @@ describe("zodValidationPlugin", () => {
       });
     });
 
+    it("should transform JSON:API body", async () => {
+      const transformed = await plugin.response!(
+        api,
+        createSampleConfig("/transform"),
+        createSampleResponse({
+          headers: {
+            "content-type": "application/vnd.api+json; charset=utf-8",
+          },
+        })
+      );
+
+      expect(transformed.data).toStrictEqual({
+        first: "123_transformed",
+        second: 234,
+      });
+    });
+
     it("should not transform body when transform is disabled", async () => {
       const notTransformed = await pluginWithoutTransform.response!(
         api,
@@ -290,16 +307,16 @@ received:
     url,
   });
 
-  const createSampleResponse = () =>
+  const createSampleResponse = (
+    { headers } = { headers: { "content-type": "application/json" } }
+  ) =>
     ({
       data: {
         first: "123",
         second: 111,
       },
       status: 200,
-      headers: {
-        "content-type": "application/json",
-      },
+      headers: headers,
       config: {},
       statusText: "OK",
     } as unknown as AxiosResponse);
