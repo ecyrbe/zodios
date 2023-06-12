@@ -94,7 +94,10 @@ export function zodValidationPlugin({
             );
           }
           if (
-            response.headers?.["content-type"]?.includes("application/json")
+            response.headers?.["content-type"]?.includes("application/json") ||
+            response.headers?.["content-type"]?.includes(
+              "application/vnd.api+json"
+            )
           ) {
             const parsed = await endpoint.response.safeParseAsync(
               response.data
