@@ -87,11 +87,13 @@ const params = makeParameters([
   {
     name: "limit",
     description: "Limit",
+    type: "Query",
     schema: z.number().positive(),
   },
   {
     name: "offset",
     description: "Offset",
+    type: "Query",
     schema: z.number().positive(),
   },
 ]);
@@ -125,11 +127,13 @@ const api = makeApi([
       {
         name: "limit",
         description: "Limit",
+        type: "Query",
         schema: z.number().positive(),
       },
       {
         name: "offset",
         description: "Offset",
+        type: "Query",
         schema: z.number().positive(),
       },
     ],
