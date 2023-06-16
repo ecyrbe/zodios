@@ -626,7 +626,7 @@ export type ZodiosEndpointErrors = ZodiosEndpointError[];
 /**
  * Zodios enpoint definition that should be used to create a new instance of Zodios
  */
-export type ZodiosEndpointDefinition<R = unknown> = {
+export interface ZodiosEndpointDefinition<R = unknown> {
   /**
    * http method : get, post, put, patch, delete
    */
