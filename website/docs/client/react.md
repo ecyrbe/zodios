@@ -331,7 +331,7 @@ const Users = () => {
     isLoading,
     error,
     invalidate: invalidateUsers, // zodios also provides invalidation helpers
-    key // zodios alo returns the generated key
+    key // zodios also returns the generated key
   } = zodiosHooks.useQuery("/users"); // or useGetUsers();
   const { mutate } = zodiosHooks.useMutation("post", "/users", undefined, {
     onSuccess: () => invalidateUsers(),
