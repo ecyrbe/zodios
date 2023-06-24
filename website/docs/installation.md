@@ -64,7 +64,7 @@ install those even in javascript projects
 
 ```bash npm2yarn
 // if you use express
-npm install --dev @types/axios @types/express
+npm install --dev @types/express
 // or with nextjs
-npm install --dev @types/axios @types/express @types/react @types/react-dom
+npm install --dev @types/express @types/react @types/react-dom
 ```
