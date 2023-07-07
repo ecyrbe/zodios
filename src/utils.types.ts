@@ -253,13 +253,44 @@ export type MapSchemaParameters<
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
 export type PathParamNames<
-  Path,
-  Acc = never
-> = Path extends `${string}:${infer Name}/${infer R}`
-  ? PathParamNames<R, Name | Acc>
-  : Path extends `${string}:${infer Name}`
-  ? Name | Acc
-  : Acc;
+    Path,
+    Acc = never
+> = Path extends `${string}:${infer Name}${'/' | '?' | '#' | '%'}${infer R}`
+    ? PathParamNames<R, SplitBy<Name, ":"> | Acc>
+    : (
+        Path extends `${string}:${infer Name}`
+        ? SplitBy<Name, ":"> | Acc
+        : Acc
+    );
+
+/**
+ * split string by given separator
+ * @param Value - string value to split
+ * @param Separator - separator used to split string
+ * @returns union of split values or never`
+ *
+ * @example
+ * ```ts
+ * type Val = SplitBy<"val1:val2", ":">; // Val = "val1" | "val2"
+ * ```
+ */
+export type SplitBy<
+    Value extends string,
+    Separator extends string,
+    Acc = never
+> = (
+    Separator extends ""
+    ? never
+    : (
+        Value extends `${infer Name}${Separator}${infer R}`
+        ? SplitBy<R, Separator, Name | Acc>
+        : (
+            Value extends ""
+            ? never
+            : Value | Acc
+        )
+    )
+);
 
 /**
  * Check if two type are equal else generate a compiler error
