@@ -20,8 +20,17 @@
    <a href="https://github.com/ecyrbe/zodios/blob/main/LICENSE">
     <img alt="GitHub" src="https://img.shields.io/github/license/ecyrbe/zodios">   
    </a>
-   <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/ecyrbe/zodios/CI">
+   <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ecyrbe/zodios/ci.yml?branch=main">
  </p>
+<p align="center">
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/core?label=%40zodios%2Fcore"/>
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/fetch?label=%40zodios%2Ffetch"/>
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/axios?label=%40zodios%2Faxios"/>
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/react?label=%40zodios%2Freact"/>
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/express?label=%40zodios%2Fexpress"/>
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/openapi?label=%40zodios%2Fopenapi"/>
+   <img alt="Bundle Size" src="https://img.shields.io/bundlephobia/minzip/@zodios/testing?label=%40zodios%2Ftesting"/>
+</p>
 
 https://user-images.githubusercontent.com/633115/185851987-554f5686-cb78-4096-8ff5-c8d61b645608.mp4
 
