@@ -1,16 +1,40 @@
 {
   "name": "@zodios/fetch-batch",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "11.0.0-beta.19",
+  "main": "lib/index.js",
+  "module": "lib/index.mjs",
+  "typings": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib"
+  ],
+  "author": {
+    "name": "ecyrbe",
+    "email": "ecyrbe@gmail.com"
+  },
+  "homepage": "https://github.com/ecyrbe/zodios",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ecyrbe/zodios.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "zodios",
+    "mock",
+    "testing"
+  ],
   "scripts": {
     "prebuild": "rimraf lib",
     "build": "tsup",
     "test": "jest --coverage"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
     "@jest/globals": "29.5.0",
     "@jest/types": "29.5.0",

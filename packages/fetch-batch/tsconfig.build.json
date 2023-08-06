@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "sourceMap": false
+  },
+  "exclude": [
+    "node_modules",
+    "lib",
+    "examples",
+    "**/*.config.ts",
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/*.d.ts"
+  ]
+}
