@@ -1,1 +1,1 @@
-export { BatchData } from "./batching";
+export { BatchData } from "./batch-data";

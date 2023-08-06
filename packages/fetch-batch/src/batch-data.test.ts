@@ -1,6 +1,6 @@
 import express from "express";
 import type { AddressInfo } from "net";
-import { BatchData } from "./batching";
+import { BatchData } from "./batch-data";
 
 describe("BatchData", () => {
   let app: express.Express;
