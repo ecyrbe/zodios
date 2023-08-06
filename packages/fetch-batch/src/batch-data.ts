@@ -12,6 +12,10 @@ export class BatchData {
 
   constructor() {}
 
+  get boundary() {
+    return this.#boundary;
+  }
+
   addRequest(request: Request) {
     const contentId = `request-${this.#requests.size + 1}-${
       this.#contentIdSuffix
