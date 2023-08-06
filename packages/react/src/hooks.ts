@@ -192,9 +192,10 @@ export class ZodiosHooksImpl<
         config as AnyZodiosMethodOptions<FetcherProvider> | undefined,
         ["params", "queries", "body"]
       );
-      return [{ api: this.apiName, path: endpoint.path }, params] as QueryKey;
+      if (Object.keys(params).length > 0)
+        return [this.apiName, endpoint.path, params] as QueryKey;
     }
-    return [{ api: this.apiName, path: endpoint.path }] as QueryKey;
+    return [this.apiName, endpoint.path] as QueryKey;
   }
 
   /**
@@ -222,9 +223,10 @@ export class ZodiosHooksImpl<
         config as AnyZodiosMethodOptions<FetcherProvider> | undefined,
         ["params", "queries", "body"]
       );
-      return [{ api: this.apiName, path: endpoint.path }, params] as QueryKey;
+      if (Object.keys(params).length > 0)
+        return [this.apiName, endpoint.path, params] as QueryKey;
     }
-    return [{ api: this.apiName, path: endpoint.path }] as QueryKey;
+    return [this.apiName, endpoint.path] as QueryKey;
   }
 
   useQuery<
@@ -254,11 +256,7 @@ export class ZodiosHooksImpl<
     invalidate: () => Promise<void>;
     key: QueryKey;
   } {
-    const params = pick(
-      config as AnyZodiosMethodOptions<FetcherProvider> | undefined,
-      ["params", "queries", "body"]
-    );
-    const key = [{ api: this.apiName, path }, params] as QueryKey;
+    const key = this.getKeyByPath("get", path, config as any);
     const query = (queryParams: QueryFunctionContext) =>
       this.zodios.get(path, {
         ...(config as any),
@@ -303,11 +301,7 @@ export class ZodiosHooksImpl<
     invalidate: () => Promise<void>;
     key: QueryKey;
   } {
-    const params = pick(
-      config as AnyZodiosMethodOptions<FetcherProvider> | undefined,
-      ["params", "queries", "body"]
-    );
-    const key = [{ api: this.apiName, path }, params] as QueryKey;
+    const key = this.getKeyByPath("post", path, config as any);
     const query = (queryParams: QueryFunctionContext) =>
       this.zodios.post(path, {
         ...(config as any),
@@ -393,7 +387,7 @@ export class ZodiosHooksImpl<
         queryOptions.getPageParamList() as string[]
       );
     }
-    const key = [{ api: this.apiName, path }, params];
+    const key = [this.apiName, path, params];
     const query = (queryParams: QueryFunctionContext) =>
       this.zodios.get(path, {
         ...config,
@@ -508,7 +502,7 @@ export class ZodiosHooksImpl<
         queryOptions.getPageParamList() as string[]
       );
     }
-    const key = [{ api: this.apiName, path }, params];
+    const key = [this.apiName, path, params];
     const query = (queryParams: QueryFunctionContext) =>
       this.zodios.post(path, {
         ...config,

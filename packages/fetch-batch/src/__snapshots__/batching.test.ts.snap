@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BatchData should be able to batch requests 1`] = `
+"--batch__1675206000000__batch
+content-id: <request-1-1675206000000@zodios.org>
+content-type: application/http; msgtype=request
+
+GET /get HTTP/1.1
+accept: application/json; charset=utf-8
+
+
+--batch__1675206000000__batch
+content-id: <request-2-1675206000000@zodios.org>
+content-type: application/http; msgtype=request
+
+PATCH /patch HTTP/1.1
+accept: application/json; charset=utf-8
+content-type: application/json; charset=utf-8
+
+{"name":"John Doe"}
+--batch__1675206000000__batch--
+"
+`;
