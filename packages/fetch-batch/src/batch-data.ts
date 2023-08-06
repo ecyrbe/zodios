@@ -1,3 +1,9 @@
+type BatchDataForeachCallback = (
+  request: Request,
+  contentId: string,
+  batchdata: BatchData
+) => void;
+
 export class BatchData {
   #requests = new Map<string, Request>();
   #contentIdSuffix = `${Date.now()}@zodios.org`;
@@ -20,8 +26,46 @@ export class BatchData {
     return headers;
   }
 
+  [Symbol.iterator]() {
+    return this.#requests.entries();
+  }
+
+  hasRequest(contentId: string) {
+    return this.#requests.has(contentId);
+  }
+
+  requests() {
+    return this.#requests.values();
+  }
+
+  contentIds() {
+    return this.#requests.keys();
+  }
+
+  entries() {
+    return this.#requests.entries();
+  }
+
+  getRequest(contentId: string) {
+    return this.#requests.get(contentId);
+  }
+
+  forEach(callback: BatchDataForeachCallback) {
+    this.#requests.forEach((request, contentId) =>
+      callback(request, contentId, this)
+    );
+  }
+
+  find(request: Request) {
+    for (const [contentId, req] of this.#requests.entries()) {
+      if (req === request) {
+        return contentId;
+      }
+    }
+  }
+
   stream() {
-    const iterator = this[Symbol.asyncIterator]();
+    const iterator = this.#encodedIterator();
     return new ReadableStream<Uint8Array>({
       async pull(controller) {
         const { value, done } = await iterator.next();
@@ -68,7 +112,7 @@ export class BatchData {
     }
   }
 
-  async *[Symbol.asyncIterator]() {
+  async *#encodedIterator() {
     const boundary = this.#encoder.encode(`--${this.#boundary}\r\n`);
     const boundaryClose = this.#encoder.encode(`--${this.#boundary}--\r\n`);
 
