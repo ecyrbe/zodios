@@ -60,7 +60,7 @@ export class BatchData {
     );
   }
 
-  find(request: Request) {
+  getContentId(request: Request) {
     for (const [contentId, req] of this.#requests.entries()) {
       if (req === request) {
         return contentId;
