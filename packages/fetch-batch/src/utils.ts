@@ -33,21 +33,21 @@ export function findAllIndexOf(
 ): number[] {
   const result: number[] = [];
   let i = 0;
-  let j = 0;
+  let matchingLength = 0;
   const patternLength = pattern.length;
   const srcLength = source.length;
   const lps = getLPS(pattern);
   while (i < srcLength) {
-    if (pattern[j] === source[i]) {
-      j++;
+    if (pattern[matchingLength] === source[i]) {
+      matchingLength++;
       i++;
     }
-    if (j === patternLength) {
-      result.push(i - j);
-      j = lps[j - 1];
-    } else if (i < srcLength && pattern[j] !== source[i]) {
-      if (j !== 0) {
-        j = lps[j - 1];
+    if (matchingLength === patternLength) {
+      result.push(i - matchingLength);
+      matchingLength = lps[matchingLength - 1];
+    } else if (i < srcLength && pattern[matchingLength] !== source[i]) {
+      if (matchingLength !== 0) {
+        matchingLength = lps[matchingLength - 1];
       } else {
         i++;
       }
@@ -73,20 +73,20 @@ export function findAllIndexOf(
  */
 export function findIndexOf(source: Uint8Array, pattern: Uint8Array): number {
   let i = 0;
-  let j = 0;
+  let matchingLength = 0;
   const patternLength = pattern.length;
   const srcLength = source.length;
   const lps = getLPS(pattern);
   while (i < srcLength) {
-    if (pattern[j] === source[i]) {
-      j++;
+    if (pattern[matchingLength] === source[i]) {
+      matchingLength++;
       i++;
     }
-    if (j === patternLength) {
-      return i - j;
-    } else if (i < srcLength && pattern[j] !== source[i]) {
-      if (j !== 0) {
-        j = lps[j - 1];
+    if (matchingLength === patternLength) {
+      return i - matchingLength;
+    } else if (i < srcLength && pattern[matchingLength] !== source[i]) {
+      if (matchingLength !== 0) {
+        matchingLength = lps[matchingLength - 1];
       } else {
         i++;
       }
@@ -110,16 +110,16 @@ export function findIndexOf(source: Uint8Array, pattern: Uint8Array): number {
  */
 export function getLPS(pattern: Uint8Array): number[] {
   const result = [0];
-  let len = 0;
+  let selfMatchingLength = 0;
   let i = 1;
-  const length = pattern.length;
-  while (i < length) {
-    if (pattern[i] === pattern[len]) {
-      len++;
-      result[i] = len;
+  const patternLength = pattern.length;
+  while (i < patternLength) {
+    if (pattern[i] === pattern[selfMatchingLength]) {
+      selfMatchingLength++;
+      result[i] = selfMatchingLength;
       i++;
-    } else if (len !== 0) {
-      len = result[len - 1];
+    } else if (selfMatchingLength !== 0) {
+      selfMatchingLength = result[selfMatchingLength - 1];
     } else {
       result[i] = 0;
       i++;
