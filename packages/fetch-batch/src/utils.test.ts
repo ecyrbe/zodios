@@ -62,6 +62,16 @@ describe("utils", () => {
         expect(result).toBe(3);
       });
 
+      it("should match first when pattern is self repeating", () => {
+        let text = new Uint8Array([
+          1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+          1,
+        ]);
+        let pattern = new Uint8Array([1, 1, 1]);
+        let result = findIndexOf(text, pattern);
+        expect(result).toBe(10);
+      });
+
       it("should match long pattern and text almost matches multiple times", () => {
         let text = new Uint8Array([
           1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 1, 3, 4,
@@ -131,6 +141,16 @@ describe("utils", () => {
         let pattern = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 1, 3]);
         let result = findAllIndexOf(text, pattern);
         expect(result).toEqual([13, 26]);
+      });
+
+      it("should match first when pattern is self repeating", () => {
+        let text = new Uint8Array([
+          1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 1, 1, 1,
+          1,
+        ]);
+        let pattern = new Uint8Array([1, 1, 1]);
+        let result = findAllIndexOf(text, pattern);
+        expect(result).toEqual([10, 16, 17, 18, 19, 20, 21]);
       });
 
       it("should not match when pattern not in source", () => {
