@@ -7,7 +7,7 @@ Content-Type: application/http
 Content-ID: <response-item1:12930812@barnyard.example.com>
 
 HTTP/1.1 200 OK
-Content-Type: application/json
+Content-Type: application/json; charset=UTF-8
 ETag: "etag/pony"
 
 {
@@ -70,7 +70,7 @@ describe("BatchResponse", () => {
             count++;
             expect(response.status).toBe(200);
             expect(response.statusText).toBe("OK");
-            expect(response.headers.get("Content-Type")).toBe(
+            expect(response.headers.get("Content-Type")).toContain(
               "application/json"
             );
             expect(response.json()).resolves.toEqual({
@@ -138,7 +138,9 @@ describe("BatchResponse", () => {
     expect(response2).toBeDefined();
     expect(response2?.status).toBe(200);
     expect(response2?.statusText).toBe("OK");
-    expect(response2?.headers.get("Content-Type")).toBe("application/json");
+    expect(response2?.headers.get("Content-Type")).toContain(
+      "application/json"
+    );
     expect(response2?.json()).resolves.toEqual({
       kind: "farm#animal",
       etag: "etag/pony",
