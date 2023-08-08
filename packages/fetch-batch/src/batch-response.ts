@@ -98,14 +98,14 @@ export class BatchResponse {
    * where the key is the content id of the request
    *
    * Grammar for multipart/mixed content type:
-   * multipart-body := preamble 1*encapsulation close-delimiter epilogue
-   * encapsulation := delimiter body-part CRLF
-   * delimiter := "--" boundary CRLF
+   * multipart-body  := preamble 1*encapsulation close-delimiter epilogue
+   * encapsulation   := delimiter body-part CRLF
+   * delimiter       := "--" boundary CRLF
    * close-delimiter := delimiter "--"
-   * preamble := discard-text
-   * epilogue := discard-text
-   * discard-text := *(*text CRLF)
-   * body-part := *(header-field CRLF) CRLF [HTTP-message]
+   * preamble        := discard-text
+   * epilogue        := discard-text
+   * discard-text    := *(*text CRLF)
+   * body-part       := *(header-field CRLF) CRLF [HTTP-message]
    *
    * Grammar for application/http content type:
    * HTTP-message   := start-line *(header-field CRLF) CRLF [ message-body ]
