@@ -23,7 +23,6 @@ export class BatchRequest {
       const request = new Request(input, init);
       this.#queue.set(request, { resolve, reject });
       if (!this.#timer) {
-        console.log("starting timer");
         const dispatch = this.#dispatch.bind(this);
         this.#timer = setTimeout(dispatch, 0);
       }
@@ -39,7 +38,6 @@ export class BatchRequest {
   async #dispatch() {
     const queue = new Map(this.#queue);
     this.#clear();
-    console.log(`dispatching ${queue.size} requests`);
     if (queue.size === 1) {
       const [request, callbacks] = queue.entries().next().value;
       try {
