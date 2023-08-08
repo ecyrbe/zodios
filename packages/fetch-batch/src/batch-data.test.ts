@@ -97,7 +97,7 @@ describe("BatchData", () => {
 
     expect(Array.from(body.requests())).toEqual([getUser1, renameUser2]);
 
-    expect(Array.from(body.contentIds())).toEqual([
+    expect(Array.from(body.requestIds())).toEqual([
       "request-1-1675206000000@zodios.org",
       "request-2-1675206000000@zodios.org",
     ]);
@@ -106,10 +106,10 @@ describe("BatchData", () => {
       expect(request).toBe(body.getRequest(contentId));
     });
 
-    expect(body.getContentId(getUser1)).toBe(
+    expect(body.getRequestId(getUser1)).toBe(
       "request-1-1675206000000@zodios.org"
     );
-    expect(body.getContentId(renameUser2)).toBe(
+    expect(body.getRequestId(renameUser2)).toBe(
       "request-2-1675206000000@zodios.org"
     );
 
@@ -124,12 +124,10 @@ describe("BatchData", () => {
     body.addRequest(getUser1);
     body.addRequest(renameUser2);
 
-    expect(body.hasRequest("request-1-1675206000000@zodios.org")).toBe(true);
-    expect(body.getRequest("request-1-1675206000000@zodios.org")).toBe(
+    expect(body.getRequest("response-request-1-1675206000000@zodios.org")).toBe(
       getUser1
     );
-    expect(body.hasRequest("request-2-1675206000000@zodios.org")).toBe(true);
-    expect(body.getRequest("request-2-1675206000000@zodios.org")).toBe(
+    expect(body.getRequest("response-request-2-1675206000000@zodios.org")).toBe(
       renameUser2
     );
   });

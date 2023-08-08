@@ -1,12 +1,12 @@
 type BatchDataForeachCallback = (
   request: Request,
-  contentId: string,
+  requestId: string,
   batchdata: BatchData
 ) => void;
 
 export class BatchData {
   #requests = new Map<string, Request>();
-  #contentIdSuffix = `${Date.now()}@zodios.org`;
+  #requestIdSuffix = `${Date.now()}@zodios.org`;
   #boundary = `batch__${Date.now()}__batch`;
   #encoder = new TextEncoder();
 
@@ -17,11 +17,11 @@ export class BatchData {
   }
 
   addRequest(request: Request) {
-    const contentId = `request-${this.#requests.size + 1}-${
-      this.#contentIdSuffix
+    const requestId = `request-${this.#requests.size + 1}-${
+      this.#requestIdSuffix
     }`;
-    this.#requests.set(contentId, request);
-    return contentId;
+    this.#requests.set(requestId, request);
+    return requestId;
   }
 
   getHeaders(init?: HeadersInit) {
@@ -34,15 +34,11 @@ export class BatchData {
     return this.#requests.entries();
   }
 
-  hasRequest(contentId: string) {
-    return this.#requests.has(contentId);
-  }
-
   requests() {
     return this.#requests.values();
   }
 
-  contentIds() {
+  requestIds() {
     return this.#requests.keys();
   }
 
@@ -50,20 +46,24 @@ export class BatchData {
     return this.#requests.entries();
   }
 
-  getRequest(contentId: string) {
-    return this.#requests.get(contentId);
+  getRequest(requestOrResponseId: string) {
+    for (const id of this.requestIds()) {
+      if (requestOrResponseId.includes(id)) {
+        return this.#requests.get(id);
+      }
+    }
   }
 
   forEach(callback: BatchDataForeachCallback) {
-    this.#requests.forEach((request, contentId) =>
-      callback(request, contentId, this)
+    this.#requests.forEach((request, requestId) =>
+      callback(request, requestId, this)
     );
   }
 
-  getContentId(request: Request) {
-    for (const [contentId, req] of this.#requests.entries()) {
+  getRequestId(request: Request) {
+    for (const [requestId, req] of this.#requests.entries()) {
       if (req === request) {
-        return contentId;
+        return requestId;
       }
     }
   }
@@ -91,9 +91,9 @@ export class BatchData {
     return result;
   }
 
-  *#encodePart(contentId: string) {
+  *#encodePart(requestId: string) {
     const headers = new Headers();
-    headers.set("Content-ID", `<${contentId}>`);
+    headers.set("Content-ID", `<${requestId}>`);
     headers.set("Content-Type", "application/http; msgtype=request");
     yield this.#encoder.encode(this.#formatHeaders(headers));
   }
@@ -121,9 +121,9 @@ export class BatchData {
     const boundary = this.#encoder.encode(`--${this.#boundary}\r\n`);
     const boundaryClose = this.#encoder.encode(`--${this.#boundary}--\r\n`);
 
-    for (const [contentId, request] of this.#requests) {
+    for (const [requestId, request] of this.#requests) {
       yield boundary;
-      yield* this.#encodePart(contentId);
+      yield* this.#encodePart(requestId);
       yield* this.#encodeRequest(request);
       yield this.#encoder.encode("\r\n");
     }

@@ -42,7 +42,7 @@ import { concat, findAllIndexOf, findIndexOf } from "./utils";
 const statusLineRegExp = /^HTTP\/\d\.\d (\d{3}) (.*)$/;
 const headerRegExp = /^([^:]+):\s*([^\s]*)\s*$/;
 const contentIdRegExp = /^<?([^>]+)>?$/;
-const boundaryRegExp = /boundary="?([^"]+)"?/;
+const boundaryRegExp = /boundary="?([^";]+)"?;?/;
 
 export class BatchResponse {
   #response: Response;
