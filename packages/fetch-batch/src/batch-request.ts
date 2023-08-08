@@ -1,6 +1,13 @@
 import { BatchData } from "./batch-data";
 import { BatchResponse } from "./batch-response";
 
+/**
+ * A batch request handler
+ *
+ * It will batch all requests made within the same tick (aka within the same event loop)
+ * using a multipart/mixed request with application/http envelopes.
+ * Your server should be able to handle this request and return a multipart/mixed response
+ */
 export class BatchRequest {
   #queue = new Map<
     Request,
@@ -13,11 +20,25 @@ export class BatchRequest {
   #input: RequestInfo | URL;
   #init?: RequestInit;
 
+  /**
+   * create a new batch request handler
+   * @param input - the batch request url
+   * @param init - request init object, same as original fetch
+   */
   constructor(input: RequestInfo | URL, init?: RequestInit) {
     this.#input = input;
     this.#init = init;
   }
 
+  /**
+   * fetch a request and return a promise that resolves with the response
+   *
+   * it will batch all requests made within the same tick (aka within the same event loop)
+   *
+   * @param input - a url or string or a request object, same as original fetch
+   * @param init - request init object, same as original fetch
+   * @returns the response
+   */
   async fetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     return new Promise((resolve, reject) => {
       const request = new Request(input, init);
@@ -29,12 +50,18 @@ export class BatchRequest {
     });
   }
 
+  /**
+   * clear the batch queue
+   */
   #clear() {
     clearTimeout(this.#timer);
-    this.#queue.clear();
     this.#timer = undefined;
+    this.#queue.clear();
   }
 
+  /**
+   * process all the batched requests within the same tick
+   */
   async #dispatch() {
     const queue = new Map(this.#queue);
     this.#clear();
