@@ -20,7 +20,7 @@ ETag: "etag/pony"
 }
 
 --batch_foobarbaz
-Content-Type: application/http
+Content-Type: application/http; msgtype=response; msgtype is optional and even this comment should be ignored
 Content-ID: response-item2:12930812@barnyard.example.com
 
 HTTP/1.1 200 OK

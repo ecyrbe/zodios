@@ -40,7 +40,7 @@
 import { concat, findAllIndexOf, findIndexOf } from "./utils";
 
 const statusLineRegExp = /^HTTP\/\d\.\d (\d{3}) (.*)$/;
-const headerRegExp = /^([^:]+):\s*([^\s]*)\s*$/;
+const headerRegExp = /^([^\s:]+):\s*(.*?)(?=\s*$|[\r\n])/;
 const contentIdRegExp = /^<?([^>]+)>?$/;
 const boundaryRegExp = /boundary="?([^";]+)"?;?/;
 
