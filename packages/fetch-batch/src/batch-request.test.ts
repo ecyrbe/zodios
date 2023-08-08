@@ -126,4 +126,30 @@ describe("BatchRequest", () => {
     });
     expect(nothing.status).toBe(304);
   });
+
+  it("should error if batch endpoint errors", async () => {
+    const client = new BatchRequest(`http://localhost:${port}/batch-error`, {
+      method: "POST",
+    });
+
+    let error;
+    try {
+      const [user1, user2, nothing] = await Promise.all([
+        client
+          .fetch(`http://localhost:${port}/users/1`)
+          .then((res) => res.json()),
+        client
+          .fetch(`http://localhost:${port}/users/2`)
+          .then((res) => res.json()),
+        client.fetch(`http://localhost:${port}/users/1`),
+      ]);
+    } catch (e) {
+      error = e;
+    }
+
+    expect(error).toBeDefined();
+    expect((error as Error).message).toBe(
+      "Batch endpoint error: 404 Not Found"
+    );
+  });
 });

@@ -58,20 +58,30 @@ export class BatchRequest {
           headers: batchData.getHeaders(this.#init?.headers),
           body: batchData.stream(),
         });
-        const batchResponse = new BatchResponse(response);
-        for await (const [contentId, response] of batchResponse) {
-          const request = batchData.getRequest(contentId);
-          if (request) {
-            const callbacks = queue.get(request);
-            queue.delete(request);
-            if (callbacks) {
-              callbacks.resolve(response);
+        if (response.ok) {
+          const batchResponse = new BatchResponse(response);
+          for await (const [contentId, response] of batchResponse) {
+            const request = batchData.getRequest(contentId);
+            if (request) {
+              const callbacks = queue.get(request);
+              queue.delete(request);
+              if (callbacks) {
+                callbacks.resolve(response);
+              }
             }
           }
-        }
-        if (queue.size > 0) {
+          if (queue.size > 0) {
+            for (const callbacks of queue.values()) {
+              callbacks.reject(new Error("response count mismatch"));
+            }
+          }
+        } else {
           for (const callbacks of queue.values()) {
-            callbacks.reject(new Error("response count mismatch"));
+            callbacks.reject(
+              new Error(
+                `Batch endpoint error: ${response.status} ${response.statusText}`
+              )
+            );
           }
         }
       } catch (error) {
