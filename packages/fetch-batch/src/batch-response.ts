@@ -49,6 +49,8 @@ export class BatchResponse {
   #decoder = new TextDecoder();
   #encoder = new TextEncoder();
   #responses = new Map<string, Response>();
+  #newline = this.#encoder.encode("\r\n");
+  #divider = this.#encoder.encode("\r\n\r\n");
   #parsed = false;
 
   constructor(response: Response) {
@@ -129,7 +131,6 @@ export class BatchResponse {
 
     const buffers: Uint8Array[] = await this.#readChuncks();
     const data = concat(buffers);
-    const crlfBytes = this.#encoder.encode("\r\n");
     const boundaryBytes = this.#encoder.encode(`--${boundary}\r\n`);
     const endBoundaryBytes = this.#encoder.encode(`--${boundary}--\r\n`);
     const boundaryIndexes = findAllIndexOf(data, boundaryBytes);
@@ -141,7 +142,7 @@ export class BatchResponse {
     }
     const indexes = boundaryIndexes.map((index, i) => ({
       start: index + boundaryBytes.length,
-      end: (boundaryIndexes[i + 1] || endBoundaryIndex) - crlfBytes.length,
+      end: (boundaryIndexes[i + 1] || endBoundaryIndex) - this.#newline.length,
     }));
     for (const { start, end } of indexes) {
       const parsedResponse = this.#parseEmbededResponse(
@@ -201,8 +202,7 @@ export class BatchResponse {
    * ```
    */
   #parseEmbededResponse(data: Uint8Array) {
-    const crlfX2Bytes = this.#encoder.encode("\r\n\r\n");
-    const partHeadersEndIndex = findIndexOf(data, crlfX2Bytes);
+    const partHeadersEndIndex = findIndexOf(data, this.#divider);
     if (partHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid part, no headers found");
     }
@@ -214,14 +214,16 @@ export class BatchResponse {
     }
 
     const partBodyBytes = data.subarray(
-      partHeadersEndIndex + crlfX2Bytes.length
+      partHeadersEndIndex + this.#divider.length
     );
-    const responseHeadersEndIndex = findIndexOf(partBodyBytes, crlfX2Bytes);
+    const responseHeadersEndIndex = findIndexOf(partBodyBytes, this.#divider);
     if (responseHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid response");
     }
-    const crlfBytes = this.#encoder.encode("\r\n");
-    const responseStatusLineEndIndex = findIndexOf(partBodyBytes, crlfBytes);
+    const responseStatusLineEndIndex = findIndexOf(
+      partBodyBytes,
+      this.#newline
+    );
     if (responseStatusLineEndIndex === -1) {
       throw new Error("BatchResponse: Invalid response status line");
     }
@@ -230,11 +232,11 @@ export class BatchResponse {
       responseStatusLineEndIndex
     );
     const responseHeadersBytes = partBodyBytes.subarray(
-      responseStatusLineEndIndex + crlfBytes.length,
+      responseStatusLineEndIndex + this.#newline.length,
       responseHeadersEndIndex
     );
     const responseBodyBytes = partBodyBytes.subarray(
-      responseHeadersEndIndex + crlfX2Bytes.length
+      responseHeadersEndIndex + this.#divider.length
     );
     const responseStatusLine = this.#parseStatusLine(responseStatusLineBytes);
     const responseHeaders = this.#parseHeaders(responseHeadersBytes);
