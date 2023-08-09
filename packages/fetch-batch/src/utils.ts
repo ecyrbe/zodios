@@ -43,17 +43,22 @@ export class SearchArray<TArray extends TypedArray> {
   }
 
   /**
-   * Knuth-Morris-Pratt algorithm to compute the longest prefix that is also a suffix
+   * Knuth-Morris-Pratt algorithm to compute the failure array
    *
    * complexity: O(m) where m is the length of pattern
    *
-   * The longest prefix that is also a suffix is used to determine where the next match
-   * could begin, thus bypassing re-examination of previously matched characters.
+   * The algorithm is based on the fact that when a mismatch occurs,
+   * the pattern itself embodies sufficient information to determine
+   * where the next match could begin, thus bypassing re-examination
+   * of previously matched characters.
+   *
+   * The failure array is an array of integers where the value at index i denotes the length
+   * of the longest proper prefix of the substring pattern[0..i] which is also a suffix of this substring.
    *
    * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
    *
    * @param pattern - the pattern to search for
-   * @returns an array of length where the value at index i is the length of the longest prefix that is also a suffix of pattern[0..i]
+   * @returns
    */
   #getLPS(pattern: TArray): number[] {
     const result = [0];
@@ -90,7 +95,7 @@ export class SearchArray<TArray extends TypedArray> {
    * @param pattern - the pattern to search for
    * @returns the index where the pattern occurs in the source array or -1 if it does not occur
    */
-  findIndexOf(source: TArray): number {
+  search(source: TArray): number {
     let i = 0;
     let matchingLength = 0;
     const srcLength = source.length;
@@ -127,7 +132,7 @@ export class SearchArray<TArray extends TypedArray> {
    * @param pattern - the pattern to search for
    * @returns the array of indices where the pattern occurs in the source array
    */
-  findAllIndexOf(source: TArray): number[] {
+  searchAll(source: TArray): number[] {
     const result: number[] = [];
     let i = 0;
     let matchingLength = 0;

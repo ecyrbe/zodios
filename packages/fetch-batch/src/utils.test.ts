@@ -33,12 +33,12 @@ describe("utils", () => {
   });
 
   describe("Knuth-Morris-Pratt algorithm", () => {
-    describe("findIndexOf", () => {
+    describe("search", () => {
       it("should match simple pattern", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([2, 3, 4]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toBe(1);
       });
 
@@ -46,7 +46,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([6, 7]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toBe(5);
       });
 
@@ -54,7 +54,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([1, 2]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toBe(0);
       });
 
@@ -62,7 +62,7 @@ describe("utils", () => {
         let text = new Uint8Array([3, 4, 5, 1, 2, 6, 7, 1, 2]);
         let pattern = new Uint8Array([1, 2]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toBe(3);
       });
 
@@ -73,7 +73,7 @@ describe("utils", () => {
         ]);
         let pattern = new Uint8Array([1, 1, 1]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toBe(10);
       });
 
@@ -84,7 +84,7 @@ describe("utils", () => {
         ]);
         let pattern = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 1, 3]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toEqual(13);
       });
 
@@ -92,17 +92,17 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([8, 9]);
         const search = new SearchArray(pattern);
-        let result = search.findIndexOf(text);
+        let result = search.search(text);
         expect(result).toBe(-1);
       });
     });
 
-    describe("findAllIndexOf", () => {
+    describe("searchAll", () => {
       it("should match simple pattern", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([2, 3, 4]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([1]);
       });
 
@@ -110,7 +110,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([6, 7]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([5]);
       });
 
@@ -118,7 +118,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([1, 2]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([0]);
       });
 
@@ -126,7 +126,7 @@ describe("utils", () => {
         let text = new Uint8Array([3, 4, 5, 1, 2, 6, 7, 1, 2]);
         let pattern = new Uint8Array([1, 2]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([3, 7]);
       });
 
@@ -134,7 +134,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 1, 2, 1, 2]);
         let pattern = new Uint8Array([1, 2, 1, 2]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([0, 2]);
       });
 
@@ -142,7 +142,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 1, 2, 1, 2]);
         let pattern = new Uint8Array([1, 2, 1]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([0, 2]);
       });
 
@@ -153,7 +153,7 @@ describe("utils", () => {
         ]);
         let pattern = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 1, 3]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([13, 26]);
       });
 
@@ -164,7 +164,7 @@ describe("utils", () => {
         ]);
         let pattern = new Uint8Array([1, 1, 1]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([10, 16, 17, 18, 19, 20, 21]);
       });
 
@@ -172,7 +172,7 @@ describe("utils", () => {
         let text = new Uint8Array([1, 2, 3, 4, 5, 6, 7]);
         let pattern = new Uint8Array([8, 9]);
         const search = new SearchArray(pattern);
-        let result = search.findAllIndexOf(text);
+        let result = search.searchAll(text);
         expect(result).toEqual([]);
       });
     });

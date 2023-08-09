@@ -51,13 +51,11 @@ describe("BatchRequest", () => {
     app.use(express.raw({ type: "multipart/mixed" }));
 
     app.post("/batch", (req, res) => {
-      console.log("received batch request");
       res.setHeader(
         "Content-Type",
         "multipart/mixed; boundary=batch__1675206000000__batch"
       );
       const body = req.body.toString();
-      console.log(`received body: ${body}`);
       // extract the requests ids
       const regex = /content-id:\s*<([^>]+)>/g;
       const matches = [...body.matchAll(regex)];
@@ -68,12 +66,10 @@ describe("BatchRequest", () => {
           // replace the response placeholders with the actual response
           response = response.replace(`PLACEHOLDER${i + 1}`, id);
         });
-      console.log(`sending response: ${response}`);
       res.status(200).send(response);
     });
 
     app.get("/users/:id", (req, res) => {
-      console.log("received user request");
       res.status(200).json({
         id: req.params.id,
         name: "john doe",

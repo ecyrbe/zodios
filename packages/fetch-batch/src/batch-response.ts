@@ -137,8 +137,8 @@ export class BatchResponse {
     const searchEndBoundary = new SearchArray(
       this.#encoder.encode(`--${boundary}--\r\n`)
     );
-    const boundaryIndexes = searchBoundary.findAllIndexOf(data);
-    const endBoundaryIndex = searchEndBoundary.findIndexOf(data);
+    const boundaryIndexes = searchBoundary.searchAll(data);
+    const endBoundaryIndex = searchEndBoundary.search(data);
     if (endBoundaryIndex === -1) {
       throw new Error(
         "BatchResponse: Invalid response, no ending boundary found"
@@ -208,7 +208,7 @@ export class BatchResponse {
    * ```
    */
   #parseEmbededResponse(data: Uint8Array) {
-    const partHeadersEndIndex = this.#searchDivider.findIndexOf(data);
+    const partHeadersEndIndex = this.#searchDivider.search(data);
     if (partHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid part, no headers found");
     }
@@ -222,13 +222,12 @@ export class BatchResponse {
     const partBodyBytes = data.subarray(
       partHeadersEndIndex + this.#searchDivider.pattern.length
     );
-    const responseHeadersEndIndex =
-      this.#searchDivider.findIndexOf(partBodyBytes);
+    const responseHeadersEndIndex = this.#searchDivider.search(partBodyBytes);
     if (responseHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid response");
     }
     const responseStatusLineEndIndex =
-      this.#searchNewline.findIndexOf(partBodyBytes);
+      this.#searchNewline.search(partBodyBytes);
     if (responseStatusLineEndIndex === -1) {
       throw new Error("BatchResponse: Invalid response status line");
     }

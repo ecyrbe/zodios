@@ -34,7 +34,6 @@ describe("BatchData", () => {
     app.use(express.raw({ type: "multipart/mixed" }));
 
     app.post("/batch", (req, res) => {
-      console.log("received batch request");
       res.json({
         url: req.url,
         method: req.method,
