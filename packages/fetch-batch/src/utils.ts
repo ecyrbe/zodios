@@ -12,118 +12,142 @@ export function concat(arrays: Uint8Array[]) {
   return result;
 }
 
-/**
- * Knuth-Morris-Pratt algorithm that finds all occurrences of pattern in a Uint8Array
- *
- * complexity: O(n + m) where n is the length of text and m is the length of pattern
- *
- * The algorithm is based on the fact that when a mismatch occurs, the pattern itself
- * embodies sufficient information to determine where the next match could begin, thus
- * bypassing re-examination of previously matched characters.
- *
- * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
- *
- * @param source - the array to search in
- * @param pattern - the pattern to search for
- * @returns the array of indices where the pattern occurs in the source array
- */
-export function findAllIndexOf(
-  source: Uint8Array,
-  pattern: Uint8Array
-): number[] {
-  const result: number[] = [];
-  let i = 0;
-  let matchingLength = 0;
-  const patternLength = pattern.length;
-  const srcLength = source.length;
-  const lps = getLPS(pattern);
-  while (i < srcLength) {
-    if (pattern[matchingLength] === source[i]) {
-      matchingLength++;
-      i++;
-    }
-    if (matchingLength === patternLength) {
-      result.push(i - matchingLength);
-      matchingLength = lps[matchingLength - 1];
-    } else if (i < srcLength && pattern[matchingLength] !== source[i]) {
-      if (matchingLength !== 0) {
-        matchingLength = lps[matchingLength - 1];
+type TypedArray =
+  | Uint8Array
+  | Uint8ClampedArray
+  | Uint16Array
+  | Uint32Array
+  | Int8Array
+  | Int16Array
+  | Int32Array
+  | BigUint64Array
+  | BigInt64Array
+  | Float32Array
+  | Float64Array;
+
+export class SearchArray<TArray extends TypedArray> {
+  #pattern: TArray;
+  #lps: number[];
+
+  constructor(pattern: TArray) {
+    this.#pattern = pattern;
+    this.#lps = this.#getLPS(pattern);
+  }
+
+  get pattern() {
+    return this.#pattern;
+  }
+
+  get lps() {
+    return this.#lps;
+  }
+
+  /**
+   * Knuth-Morris-Pratt algorithm to compute the longest prefix that is also a suffix
+   *
+   * complexity: O(m) where m is the length of pattern
+   *
+   * The longest prefix that is also a suffix is used to determine where the next match
+   * could begin, thus bypassing re-examination of previously matched characters.
+   *
+   * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
+   *
+   * @param pattern - the pattern to search for
+   * @returns an array of length where the value at index i is the length of the longest prefix that is also a suffix of pattern[0..i]
+   */
+  #getLPS(pattern: TArray): number[] {
+    const result = [0];
+    let selfMatchingLength = 0;
+    let i = 1;
+    const patternLength = pattern.length;
+    while (i < patternLength) {
+      if (pattern[i] === pattern[selfMatchingLength]) {
+        selfMatchingLength++;
+        result[i] = selfMatchingLength;
+        i++;
+      } else if (selfMatchingLength !== 0) {
+        selfMatchingLength = result[selfMatchingLength - 1];
       } else {
+        result[i] = 0;
         i++;
       }
     }
+    return result;
   }
-  return result;
-}
 
-/**
- * Knuth-Morris-Pratt algorithm that finds the first occurrence of pattern in a Uint8Array
- *
- * complexity: O(n + m) where n is the length of text and m is the length of pattern
- *
- * The algorithm is based on the fact that when a mismatch occurs, the pattern itself
- * embodies sufficient information to determine where the next match could begin, thus
- * bypassing re-examination of previously matched characters.
- *
- * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
- *
- * @param source - the array to search in
- * @param pattern - the pattern to search for
- * @returns the index where the pattern occurs in the source array or -1 if it does not occur
- */
-export function findIndexOf(source: Uint8Array, pattern: Uint8Array): number {
-  let i = 0;
-  let matchingLength = 0;
-  const patternLength = pattern.length;
-  const srcLength = source.length;
-  const lps = getLPS(pattern);
-  while (i < srcLength) {
-    if (pattern[matchingLength] === source[i]) {
-      matchingLength++;
-      i++;
-    }
-    if (matchingLength === patternLength) {
-      return i - matchingLength;
-    } else if (i < srcLength && pattern[matchingLength] !== source[i]) {
-      if (matchingLength !== 0) {
-        matchingLength = lps[matchingLength - 1];
-      } else {
+  /**
+   * Knuth-Morris-Pratt algorithm that finds the first occurrence of pattern in a Uint8Array
+   *
+   * complexity: O(n + m) where n is the length of text and m is the length of pattern
+   *
+   * The algorithm is based on the fact that when a mismatch occurs, the pattern itself
+   * embodies sufficient information to determine where the next match could begin, thus
+   * bypassing re-examination of previously matched characters.
+   *
+   * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
+   *
+   * @param source - the array to search in
+   * @param pattern - the pattern to search for
+   * @returns the index where the pattern occurs in the source array or -1 if it does not occur
+   */
+  findIndexOf(source: TArray): number {
+    let i = 0;
+    let matchingLength = 0;
+    const srcLength = source.length;
+    while (i < srcLength) {
+      if (this.#pattern[matchingLength] === source[i]) {
+        matchingLength++;
         i++;
       }
+      if (matchingLength === this.#pattern.length) {
+        return i - matchingLength;
+      } else if (i < srcLength && this.#pattern[matchingLength] !== source[i]) {
+        if (matchingLength !== 0) {
+          matchingLength = this.#lps[matchingLength - 1];
+        } else {
+          i++;
+        }
+      }
     }
+    return -1;
   }
-  return -1;
-}
 
-/**
- * Knuth-Morris-Pratt algorithm to compute the longest prefix that is also a suffix
- *
- * complexity: O(m) where m is the length of pattern
- *
- * The longest prefix that is also a suffix is used to determine where the next match
- * could begin, thus bypassing re-examination of previously matched characters.
- *
- * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
- *
- * @param pattern - the pattern to search for
- * @returns an array of length where the value at index i is the length of the longest prefix that is also a suffix of pattern[0..i]
- */
-export function getLPS(pattern: Uint8Array): number[] {
-  const result = [0];
-  let selfMatchingLength = 0;
-  let i = 1;
-  const patternLength = pattern.length;
-  while (i < patternLength) {
-    if (pattern[i] === pattern[selfMatchingLength]) {
-      selfMatchingLength++;
-      result[i] = selfMatchingLength;
-      i++;
-    } else if (selfMatchingLength !== 0) {
-      selfMatchingLength = result[selfMatchingLength - 1];
-    } else {
-      result[i] = 0;
-      i++;
+  /**
+   * Knuth-Morris-Pratt algorithm that finds all occurrences of pattern in a Uint8Array
+   *
+   * complexity: O(n + m) where n is the length of text and m is the length of pattern
+   *
+   * The algorithm is based on the fact that when a mismatch occurs, the pattern itself
+   * embodies sufficient information to determine where the next match could begin, thus
+   * bypassing re-examination of previously matched characters.
+   *
+   * The algorithm is described in detail here: https://en.wikipedia.org/wiki/Knuth%E2%80%93Morris%E2%80%93Pratt_algorithm
+   *
+   * @param source - the array to search in
+   * @param pattern - the pattern to search for
+   * @returns the array of indices where the pattern occurs in the source array
+   */
+  findAllIndexOf(source: TArray): number[] {
+    const result: number[] = [];
+    let i = 0;
+    let matchingLength = 0;
+    const srcLength = source.length;
+    while (i < srcLength) {
+      if (this.#pattern[matchingLength] === source[i]) {
+        matchingLength++;
+        i++;
+      }
+      if (matchingLength === this.#pattern.length) {
+        result.push(i - matchingLength);
+        matchingLength = this.#lps[matchingLength - 1];
+      } else if (i < srcLength && this.#pattern[matchingLength] !== source[i]) {
+        if (matchingLength !== 0) {
+          matchingLength = this.#lps[matchingLength - 1];
+        } else {
+          i++;
+        }
+      }
     }
+    return result;
   }
-  return result;
 }

@@ -37,7 +37,7 @@
  * ```
  */
 
-import { concat, findAllIndexOf, findIndexOf } from "./utils";
+import { concat, SearchArray } from "./utils";
 
 const statusLineRegExp = /^HTTP\/\d\.\d (\d{3}) (.*)$/;
 const headerRegExp = /^([^\s:]+):\s*(.*?)(?=\s*$)/;
@@ -49,8 +49,8 @@ export class BatchResponse {
   #decoder = new TextDecoder();
   #encoder = new TextEncoder();
   #responses = new Map<string, Response>();
-  #newline = this.#encoder.encode("\r\n");
-  #divider = this.#encoder.encode("\r\n\r\n");
+  #searchNewline = new SearchArray(this.#encoder.encode("\r\n"));
+  #searchDivider = new SearchArray(this.#encoder.encode("\r\n\r\n"));
   #parsed = false;
 
   constructor(response: Response) {
@@ -131,18 +131,24 @@ export class BatchResponse {
 
     const buffers: Uint8Array[] = await this.#readChuncks();
     const data = concat(buffers);
-    const boundaryBytes = this.#encoder.encode(`--${boundary}\r\n`);
-    const endBoundaryBytes = this.#encoder.encode(`--${boundary}--\r\n`);
-    const boundaryIndexes = findAllIndexOf(data, boundaryBytes);
-    const endBoundaryIndex = findIndexOf(data, endBoundaryBytes);
+    const searchBoundary = new SearchArray(
+      this.#encoder.encode(`--${boundary}\r\n`)
+    );
+    const searchEndBoundary = new SearchArray(
+      this.#encoder.encode(`--${boundary}--\r\n`)
+    );
+    const boundaryIndexes = searchBoundary.findAllIndexOf(data);
+    const endBoundaryIndex = searchEndBoundary.findIndexOf(data);
     if (endBoundaryIndex === -1) {
       throw new Error(
         "BatchResponse: Invalid response, no ending boundary found"
       );
     }
     const indexes = boundaryIndexes.map((index, i) => ({
-      start: index + boundaryBytes.length,
-      end: (boundaryIndexes[i + 1] || endBoundaryIndex) - this.#newline.length,
+      start: index + searchBoundary.pattern.length,
+      end:
+        (boundaryIndexes[i + 1] || endBoundaryIndex) -
+        this.#searchNewline.pattern.length,
     }));
     for (const { start, end } of indexes) {
       const parsedResponse = this.#parseEmbededResponse(
@@ -202,7 +208,7 @@ export class BatchResponse {
    * ```
    */
   #parseEmbededResponse(data: Uint8Array) {
-    const partHeadersEndIndex = findIndexOf(data, this.#divider);
+    const partHeadersEndIndex = this.#searchDivider.findIndexOf(data);
     if (partHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid part, no headers found");
     }
@@ -214,16 +220,15 @@ export class BatchResponse {
     }
 
     const partBodyBytes = data.subarray(
-      partHeadersEndIndex + this.#divider.length
+      partHeadersEndIndex + this.#searchDivider.pattern.length
     );
-    const responseHeadersEndIndex = findIndexOf(partBodyBytes, this.#divider);
+    const responseHeadersEndIndex =
+      this.#searchDivider.findIndexOf(partBodyBytes);
     if (responseHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid response");
     }
-    const responseStatusLineEndIndex = findIndexOf(
-      partBodyBytes,
-      this.#newline
-    );
+    const responseStatusLineEndIndex =
+      this.#searchNewline.findIndexOf(partBodyBytes);
     if (responseStatusLineEndIndex === -1) {
       throw new Error("BatchResponse: Invalid response status line");
     }
@@ -232,11 +237,11 @@ export class BatchResponse {
       responseStatusLineEndIndex
     );
     const responseHeadersBytes = partBodyBytes.subarray(
-      responseStatusLineEndIndex + this.#newline.length,
+      responseStatusLineEndIndex + this.#searchNewline.pattern.length,
       responseHeadersEndIndex
     );
     const responseBodyBytes = partBodyBytes.subarray(
-      responseHeadersEndIndex + this.#divider.length
+      responseHeadersEndIndex + this.#searchDivider.pattern.length
     );
     const responseStatusLine = this.#parseStatusLine(responseStatusLineBytes);
     const responseHeaders = this.#parseHeaders(responseHeadersBytes);
