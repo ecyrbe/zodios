@@ -1,5 +1,25 @@
 # Batch support for fetch
 
+## Main interface
+
+This allows to batch automatically all requests made within the same tick (aka the same event loop cycle)
+
+```ts
+    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+      method: "POST",
+    });
+    const [user1, user2, nothing] = await Promise.all([
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client
+        .fetch(`http://localhost:${port}/users/2`)
+        .then((res) => res.json()),
+    ]);
+```
+
+## Behind the scenes
+
 ```ts
     // individual requests must target the same host
     const getUser1 = new Request(`http://localhost:${port}/get`, {
