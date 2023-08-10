@@ -1,4 +1,4 @@
-type BatchDataForeachCallback = (
+export type BatchDataForeachCallback = (
   request: Request,
   requestId: string,
   batchdata: BatchData
