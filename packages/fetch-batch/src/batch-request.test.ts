@@ -205,13 +205,12 @@ describe("BatchRequest", () => {
     expect(nothing.status).toBe("fulfilled");
   });
 
-  it("should cancel all requests if asked to before batching", async () => {
-    const controller = new AbortController();
-    controller.abort();
+  it("should not cancel requests if asked to before batching", async () => {
     const client = new BatchRequest(`http://localhost:${port}/batch`, {
       method: "POST",
-      signal: controller.signal,
     });
+
+    client.cancel();
 
     const [user1Promise, user2Promise, nothingPromise] = [
       client
@@ -227,16 +226,14 @@ describe("BatchRequest", () => {
       nothingPromise,
     ]);
 
-    expect(user1.status).toBe("rejected");
-    expect(user2.status).toBe("rejected");
-    expect(nothing.status).toBe("rejected");
+    expect(user1.status).toBe("fulfilled");
+    expect(user2.status).toBe("fulfilled");
+    expect(nothing.status).toBe("fulfilled");
   });
 
   it("should cancel all requests if asked to after batching", async () => {
-    const controller = new AbortController();
     const client = new BatchRequest(`http://localhost:${port}/batch`, {
       method: "POST",
-      signal: controller.signal,
     });
 
     const [user1Promise, user2Promise, nothingPromise] = [
@@ -246,7 +243,7 @@ describe("BatchRequest", () => {
       client.fetch(`http://localhost:${port}/users/2`),
       client.fetch(`http://localhost:${port}/users/1`),
     ];
-    controller.abort();
+    client.cancel();
 
     const [user1, user2, nothing] = await Promise.allSettled([
       user1Promise,
@@ -257,5 +254,23 @@ describe("BatchRequest", () => {
     expect(user1.status).toBe("rejected");
     expect(user2.status).toBe("rejected");
     expect(nothing.status).toBe("rejected");
+
+    const [user1Promise2, user2Promise2, nothingPromise2] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/2`),
+      client.fetch(`http://localhost:${port}/users/1`),
+    ];
+
+    const [user12, user22, nothing2] = await Promise.allSettled([
+      user1Promise2,
+      user2Promise2,
+      nothingPromise2,
+    ]);
+
+    expect(user12.status).toBe("fulfilled");
+    expect(user22.status).toBe("fulfilled");
+    expect(nothing2.status).toBe("fulfilled");
   });
 });

@@ -27,6 +27,7 @@ export class BatchRequest {
   #timer?: ReturnType<typeof setTimeout>;
   #input: RequestInfo | URL;
   #init?: RequestInit;
+  #controller?: AbortController;
 
   /**
    * create a new batch request handler
@@ -36,6 +37,16 @@ export class BatchRequest {
   constructor(input: RequestInfo | URL, init?: RequestInit) {
     this.#input = input;
     this.#init = init;
+  }
+
+  /**
+   * cancel all pending requests
+   * if no request is pending, it does nothing
+   */
+  cancel() {
+    if (this.#controller) {
+      this.#controller.abort();
+    }
   }
 
   /**
@@ -53,6 +64,7 @@ export class BatchRequest {
       this.#queue.set(request, { resolve, reject });
       if (!this.#timer) {
         const dispatch = this.#dispatch.bind(this);
+        this.#controller = new AbortController();
         this.#timer = setTimeout(dispatch, 0);
       }
     });
@@ -64,6 +76,7 @@ export class BatchRequest {
   #clear() {
     clearTimeout(this.#timer);
     this.#timer = undefined;
+    this.#controller = undefined;
     this.#queue.clear();
   }
 
@@ -72,6 +85,7 @@ export class BatchRequest {
    */
   async #dispatch() {
     const queue = new Map(this.#queue);
+    const controller = this.#controller;
     this.#clear();
     cancelAbortedRequests(queue);
     if (queue.size === 1) {
@@ -93,6 +107,7 @@ export class BatchRequest {
           ...this.#init,
           headers: batchData.getHeaders(this.#init?.headers),
           body: batchData.stream(),
+          signal: controller?.signal,
         });
         if (response.ok) {
           const batchResponse = new BatchResponse(response);
