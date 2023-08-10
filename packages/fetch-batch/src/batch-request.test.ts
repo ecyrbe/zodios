@@ -148,4 +148,63 @@ describe("BatchRequest", () => {
       "Batch endpoint error: 404 Not Found"
     );
   });
+
+  it("should cancel one request if asked to", async () => {
+    // use signal to cancel the request 2
+
+    const controller = new AbortController();
+    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+      method: "POST",
+    });
+
+    const [user1Promise, user2Promise, nothingPromise] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/2`, {
+        signal: controller.signal,
+      }),
+      client.fetch(`http://localhost:${port}/users/1`),
+    ];
+    controller.abort();
+
+    const [user1, user2, nothing] = await Promise.allSettled([
+      user1Promise,
+      user2Promise,
+      nothingPromise,
+    ]);
+
+    expect(user1.status).toBe("fulfilled");
+    expect(user2.status).toBe("rejected");
+    expect(nothing.status).toBe("fulfilled");
+  });
+
+  it("should cancel all requests if asked to", async () => {
+    // use signal to cancel the BatchRequest
+
+    const controller = new AbortController();
+    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+      method: "POST",
+      signal: controller.signal,
+    });
+
+    const [user1Promise, user2Promise, nothingPromise] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/2`),
+      client.fetch(`http://localhost:${port}/users/1`),
+    ];
+    controller.abort();
+
+    const [user1, user2, nothing] = await Promise.allSettled([
+      user1Promise,
+      user2Promise,
+      nothingPromise,
+    ]);
+
+    expect(user1.status).toBe("rejected");
+    expect(user2.status).toBe("rejected");
+    expect(nothing.status).toBe("rejected");
+  });
 });

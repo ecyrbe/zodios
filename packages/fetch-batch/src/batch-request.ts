@@ -93,7 +93,11 @@ export class BatchRequest {
               const callbacks = queue.get(request);
               queue.delete(request);
               if (callbacks) {
-                callbacks.resolve(response);
+                if (request.signal.aborted) {
+                  callbacks.reject(new Error("request aborted"));
+                } else {
+                  callbacks.resolve(response);
+                }
               }
             }
           }
