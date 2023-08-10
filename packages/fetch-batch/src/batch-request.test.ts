@@ -293,23 +293,21 @@ describe("BatchRequest", () => {
 
     const controller = new AbortController();
 
-    const [user1Promise, user2Promise, nothingPromise] = [
-      client
-        .fetch(`http://localhost:${port}/users/1`, {
-          signal: controller.signal,
-        })
-        .then((res) => res.json()),
-      client
-        .fetch(`http://localhost:${port}/users/2`, {
-          signal: controller.signal,
-        })
-        .then((res) => res.json()),
-      client
-        .fetch(`http://localhost:${port}/users/1`, {
-          signal: controller.signal,
-        })
-        .then((res) => res.json()),
-    ];
+    const user1Promise = client
+      .fetch(`http://localhost:${port}/users/1`, {
+        signal: controller.signal,
+      })
+      .then((res) => res.json());
+    const user2Promise = client
+      .fetch(`http://localhost:${port}/users/2`, {
+        signal: controller.signal,
+      })
+      .then((res) => res.json());
+    const nothingPromise = client
+      .fetch(`http://localhost:${port}/users/1`, {
+        signal: controller.signal,
+      })
+      .then((res) => res.json());
     await sleep(100);
     controller.abort();
 
