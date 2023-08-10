@@ -1,6 +1,20 @@
 import { BatchData } from "./batch-data";
 import { BatchResponse } from "./batch-response";
 
+type BatchCallbacks = {
+  resolve: (value: Response) => void;
+  reject: (reason?: unknown) => void;
+};
+
+function cancelAbortedRequests(queue: Map<Request, BatchCallbacks>) {
+  for (const [request, callbacks] of queue.entries()) {
+    if (request.signal.aborted) {
+      queue.delete(request);
+      callbacks.reject(new Error("request aborted"));
+    }
+  }
+}
+
 /**
  * A batch request handler
  *
@@ -9,13 +23,7 @@ import { BatchResponse } from "./batch-response";
  * Your server should be able to handle this request and return a multipart/mixed response
  */
 export class BatchRequest {
-  #queue = new Map<
-    Request,
-    {
-      resolve: (value: Response) => void;
-      reject: (reason?: any) => void;
-    }
-  >();
+  #queue = new Map<Request, BatchCallbacks>();
   #timer?: ReturnType<typeof setTimeout>;
   #input: RequestInfo | URL;
   #init?: RequestInit;
@@ -65,6 +73,7 @@ export class BatchRequest {
   async #dispatch() {
     const queue = new Map(this.#queue);
     this.#clear();
+    cancelAbortedRequests(queue);
     if (queue.size === 1) {
       const [request, callbacks] = queue.entries().next().value;
       try {

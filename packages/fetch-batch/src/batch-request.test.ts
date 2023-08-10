@@ -149,9 +149,35 @@ describe("BatchRequest", () => {
     );
   });
 
-  it("should cancel one request if asked to", async () => {
-    // use signal to cancel the request 2
+  it("should cancel one request if asked to before batching", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+      method: "POST",
+    });
 
+    const [user1Promise, user2Promise, nothingPromise] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/2`, {
+        signal: controller.signal,
+      }),
+      client.fetch(`http://localhost:${port}/users/1`),
+    ];
+
+    const [user1, user2, nothing] = await Promise.allSettled([
+      user1Promise,
+      user2Promise,
+      nothingPromise,
+    ]);
+
+    expect(user1.status).toBe("fulfilled");
+    expect(user2.status).toBe("rejected");
+    expect(nothing.status).toBe("fulfilled");
+  });
+
+  it("should cancel one request if asked to after batching", async () => {
     const controller = new AbortController();
     const client = new BatchRequest(`http://localhost:${port}/batch`, {
       method: "POST",
@@ -179,9 +205,34 @@ describe("BatchRequest", () => {
     expect(nothing.status).toBe("fulfilled");
   });
 
-  it("should cancel all requests if asked to", async () => {
-    // use signal to cancel the BatchRequest
+  it("should cancel all requests if asked to before batching", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+      method: "POST",
+      signal: controller.signal,
+    });
 
+    const [user1Promise, user2Promise, nothingPromise] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/2`),
+      client.fetch(`http://localhost:${port}/users/1`),
+    ];
+
+    const [user1, user2, nothing] = await Promise.allSettled([
+      user1Promise,
+      user2Promise,
+      nothingPromise,
+    ]);
+
+    expect(user1.status).toBe("rejected");
+    expect(user2.status).toBe("rejected");
+    expect(nothing.status).toBe("rejected");
+  });
+
+  it("should cancel all requests if asked to after batching", async () => {
     const controller = new AbortController();
     const client = new BatchRequest(`http://localhost:${port}/batch`, {
       method: "POST",
