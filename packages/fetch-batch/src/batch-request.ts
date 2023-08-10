@@ -25,6 +25,22 @@ function cancelAbortedRequests(queue: Map<Request, BatchCallbacks>) {
   }
 }
 
+function cancelRequestInQueue(
+  queue: Map<Request, BatchCallbacks>,
+  request: Request,
+  controller?: AbortController
+) {
+  const callbacks = queue.get(request);
+  if (callbacks) {
+    queue.delete(request);
+    callbacks.reject(new DOMException("Aborted", "AbortError"));
+    if (queue.size === 0) {
+      // abort the batch request if all requests are aborted
+      controller?.abort();
+    }
+  }
+}
+
 function isMultipartMixed(headers: Headers) {
   return headers.get("Content-Type")?.startsWith("multipart/mixed");
 }
@@ -129,7 +145,7 @@ export class BatchRequest {
     for (const request of queue.keys()) {
       batchData.addRequest(request);
       request.signal?.addEventListener("abort", () =>
-        this.#cancelRequestInQueue(queue, request)
+        cancelRequestInQueue(queue, request, controller)
       );
     }
     try {
@@ -168,18 +184,6 @@ export class BatchRequest {
     } catch (error) {
       for (const callbacks of queue.values()) {
         callbacks.reject(error);
-      }
-    }
-  }
-
-  #cancelRequestInQueue(queue: Map<Request, BatchCallbacks>, request: Request) {
-    const callbacks = queue.get(request);
-    if (callbacks) {
-      queue.delete(request);
-      callbacks.reject(new DOMException("Aborted", "AbortError"));
-      if (queue.size === 0) {
-        // abort the batch request if all requests are aborted
-        this.#controller?.abort();
       }
     }
   }
