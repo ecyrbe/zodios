@@ -290,7 +290,7 @@ export type SplitMany<
   ? ConcatSplits<Split<Str, FirstSep>, RestSep>
   : [Str, ...Acc];
 
-type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]"];
+type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]", "%"];
 
 type FilterParams<Params, Acc extends string[] = []> = Params extends [
   infer First,
