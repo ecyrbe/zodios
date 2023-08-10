@@ -130,11 +130,7 @@ export class BatchRequest {
           }
         } else {
           for (const callbacks of queue.values()) {
-            callbacks.reject(
-              new Error(
-                `Batch endpoint error: ${response.status} ${response.statusText}`
-              )
-            );
+            callbacks.resolve(response.clone());
           }
         }
       } catch (error) {

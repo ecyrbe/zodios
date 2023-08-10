@@ -40,6 +40,8 @@ HTTP/1.1 304 Not Modified
 Epilogue can be anything
 and should be ignored`.replace(/\n/g, "\r\n");
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 describe("BatchRequest", () => {
   let app: express.Express;
   let server: ReturnType<typeof app.listen>;
@@ -69,10 +71,23 @@ describe("BatchRequest", () => {
       res.status(200).send(response);
     });
 
+    app.post("/batch-pending", async (req, res) => {
+      await sleep(1000);
+      res.status(504).json({
+        error: "timeout",
+      });
+    });
+
     app.get("/users/:id", (req, res) => {
       res.status(200).json({
         id: req.params.id,
         name: "john doe",
+      });
+    });
+
+    app.post("/batch-error", (req, res) => {
+      res.status(500).json({
+        error: "internal server error",
       });
     });
 
@@ -128,25 +143,22 @@ describe("BatchRequest", () => {
       method: "POST",
     });
 
-    let error;
-    try {
-      const [user1, user2, nothing] = await Promise.all([
-        client
-          .fetch(`http://localhost:${port}/users/1`)
-          .then((res) => res.json()),
-        client
-          .fetch(`http://localhost:${port}/users/2`)
-          .then((res) => res.json()),
-        client.fetch(`http://localhost:${port}/users/1`),
-      ]);
-    } catch (e) {
-      error = e;
-    }
-
-    expect(error).toBeDefined();
-    expect((error as Error).message).toBe(
-      "Batch endpoint error: 404 Not Found"
-    );
+    const [user1, user2, nothing] = await Promise.all([
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client
+        .fetch(`http://localhost:${port}/users/2`)
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/1`),
+    ]);
+    expect(user1).toEqual({
+      error: "internal server error",
+    });
+    expect(user2).toEqual({
+      error: "internal server error",
+    });
+    expect(nothing.status).toBe(500);
   });
 
   it("should cancel one request if asked to before batching", async () => {
@@ -272,5 +284,79 @@ describe("BatchRequest", () => {
     expect(user12.status).toBe("fulfilled");
     expect(user22.status).toBe("fulfilled");
     expect(nothing2.status).toBe("fulfilled");
+  });
+
+  it("should cancel all individual requests if asked to after batching", async () => {
+    const client = new BatchRequest(`http://localhost:${port}/batch-pending`, {
+      method: "POST",
+    });
+
+    const controller = new AbortController();
+
+    const [user1Promise, user2Promise, nothingPromise] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`, {
+          signal: controller.signal,
+        })
+        .then((res) => res.json()),
+      client.fetch(`http://localhost:${port}/users/2`, {
+        signal: controller.signal,
+      }),
+      client.fetch(`http://localhost:${port}/users/1`, {
+        signal: controller.signal,
+      }),
+    ];
+    await sleep(100);
+    controller.abort();
+
+    const [user1, user2, nothing] = await Promise.allSettled([
+      user1Promise,
+      user2Promise,
+      nothingPromise,
+    ]);
+
+    expect(user1.status).toBe("rejected");
+    expect((user1 as PromiseRejectedResult).reason).toBeInstanceOf(
+      DOMException
+    );
+    expect(user2.status).toBe("rejected");
+    expect((user2 as PromiseRejectedResult).reason).toBeInstanceOf(
+      DOMException
+    );
+    expect(nothing.status).toBe("rejected");
+    expect((nothing as PromiseRejectedResult).reason).toBeInstanceOf(
+      DOMException
+    );
+
+    const [user12, user22, nothing2] = await Promise.allSettled([
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+      client
+        .fetch(`http://localhost:${port}/users/2`)
+        .then((res) => res.json()),
+      client
+        .fetch(`http://localhost:${port}/users/1`)
+        .then((res) => res.json()),
+    ]);
+
+    expect(user12.status).toBe("fulfilled");
+    expect((user12 as PromiseFulfilledResult<{ error: string }>).value).toEqual(
+      {
+        error: "timeout",
+      }
+    );
+    expect(user22.status).toBe("fulfilled");
+    expect((user22 as PromiseFulfilledResult<{ error: string }>).value).toEqual(
+      {
+        error: "timeout",
+      }
+    );
+    expect(nothing2.status).toBe("fulfilled");
+    expect(
+      (nothing2 as PromiseFulfilledResult<{ error: string }>).value
+    ).toEqual({
+      error: "timeout",
+    });
   });
 });
