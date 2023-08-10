@@ -111,7 +111,9 @@ export class BatchRequest {
           body: batchData.stream(),
           signal: controller?.signal,
         });
-        if (response.ok) {
+        if (
+          response.headers.get("Content-Type")?.startsWith("multipart/mixed")
+        ) {
           const batchResponse = new BatchResponse(response);
           for await (const [contentId, response] of batchResponse) {
             const request = batchData.getRequest(contentId);
@@ -129,6 +131,10 @@ export class BatchRequest {
             }
           }
         } else {
+          // response is not not multipart/mixed, so it's probably an error by an intermediary proxy
+          // let's just resolve all requests with the same response
+          // this is not ideal, but it's better than rejecting all requests
+          // it allows the user to handle the error in a more granular way
           for (const callbacks of queue.values()) {
             callbacks.resolve(response.clone());
           }

@@ -71,6 +71,7 @@ describe("BatchRequest", () => {
       res.status(200).send(response);
     });
 
+    // simulate a proxy timeout that don't handle multipart/mixed
     app.post("/batch-pending", async (req, res) => {
       await sleep(1000);
       res.status(504).json({
@@ -78,16 +79,17 @@ describe("BatchRequest", () => {
       });
     });
 
+    // simulate an internal server error that don't send back multipart/mixed
+    app.post("/batch-error", (req, res) => {
+      res.status(500).json({
+        error: "internal server error",
+      });
+    });
+
     app.get("/users/:id", (req, res) => {
       res.status(200).json({
         id: req.params.id,
         name: "john doe",
-      });
-    });
-
-    app.post("/batch-error", (req, res) => {
-      res.status(500).json({
-        error: "internal server error",
       });
     });
 
