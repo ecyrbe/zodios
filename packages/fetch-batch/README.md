@@ -18,6 +18,32 @@ This allows to batch automatically all requests made within the same tick (aka t
     ]);
 ```
 
+## canceling individual requests
+
+You can cancel requests individually using standard AborController.
+If all requests are canceled, the batched request is canceled as well to return as soon as possible.
+
+```ts
+    const controller = new AbortController();
+    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+      method: "POST",
+    });
+    const [user1, user2, nothing] = [
+      client
+        .fetch(`http://localhost:${port}/users/1`, {
+          signal: controller.signal,
+        })
+        .then((res) => res.json()),
+      client
+        .fetch(`http://localhost:${port}/users/2`)
+        .then((res) => res.json()),
+    ];
+    controller.abort();
+    Promise.all([user1, user2]).catch((err) => {
+      expect(err.name).toBe("AbortError");
+    });
+```
+
 ## Behind the scenes
 
 ```ts
