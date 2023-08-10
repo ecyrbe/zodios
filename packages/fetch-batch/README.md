@@ -5,8 +5,9 @@
 This allows to batch automatically all requests made within the same tick (aka the same event loop cycle)
 
 ```ts
-    const client = new BatchRequest(`/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `/batch`, 
+      init: { method: "POST" }
     });
 
     const [user1, user2] = await Promise.all([
@@ -22,14 +23,47 @@ This allows to batch automatically all requests made within the same tick (aka t
     expect(user2).toEqual({ id: 2, name: "Jane Doe" });
 ```
 
+## Always Batch
+
+By default if only one request is pending, the request is sent immediately to the final endpoint without using the batch endpoint.
+If you want to always use the batch endpoint, you can use the `alwaysBatch` option.
+
+```ts
+    const client = new BatchRequest({
+      input: `/batch`, 
+      init: {
+        method: "POST",
+      },
+      alwaysBatch: true
+    });
+```
+
+## Custom fetch
+
+If the platform you are running does not support fetch, but  library has a 100% compatible one, you can use it instead.
+Or if you have a fetch with intrumented telemetry, you can use it as well.
+
+```ts
+    const client = new BatchRequest({
+      input: `/batch`, 
+      init: {
+        method: "POST",
+      },
+      fetch: myFetch
+    });
+```
+
 ## canceling individual requests
 
 You can cancel requests individually using standard AborController.
 If all requests are canceled, the batched request is canceled as well to return as soon as possible.
 
 ```ts
-    const client = new BatchRequest(`/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `/batch`, 
+      init: {
+        method: "POST",
+      }
     });
 
     const controller = new AbortController();

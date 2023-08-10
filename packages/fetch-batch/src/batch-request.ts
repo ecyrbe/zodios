@@ -6,6 +6,16 @@ type BatchCallbacks = {
   reject: (reason?: unknown) => void;
 };
 
+type BatchRequestOptions = {
+  fetch?: typeof fetch;
+  alwaysBatch?: boolean;
+};
+
+type BatchRequestEndpoint = {
+  input: RequestInfo | URL;
+  init?: RequestInit;
+};
+
 function cancelAbortedRequests(queue: Map<Request, BatchCallbacks>) {
   for (const [request, callbacks] of queue.entries()) {
     if (request.signal.aborted) {
@@ -13,6 +23,10 @@ function cancelAbortedRequests(queue: Map<Request, BatchCallbacks>) {
       callbacks.reject(new DOMException("Aborted", "AbortError"));
     }
   }
+}
+
+function isMultipartMixed(headers: Headers) {
+  return headers.get("Content-Type")?.startsWith("multipart/mixed");
 }
 
 /**
@@ -27,16 +41,25 @@ export class BatchRequest {
   #timer?: ReturnType<typeof setTimeout>;
   #input: RequestInfo | URL;
   #init?: RequestInit;
+  #fetch: typeof fetch;
   #controller?: AbortController;
+  #alwaysBatch: boolean;
 
   /**
    * create a new batch request handler
-   * @param input - the batch request url
-   * @param init - request init object, same as original fetch
+   * @param batchEndpoint - the endpoint to send the batch request to with it's fetch init options
+   * @param options - options to allow to use a custom fetch function or to allways batch requests even if there is only one request pending.
+   *
+   * @details allwaysBatch set to false by default, meaning it will not batch requests if there is only one request pending.
    */
-  constructor(input: RequestInfo | URL, init?: RequestInit) {
-    this.#input = input;
-    this.#init = init;
+  constructor(
+    batchEndpoint: BatchRequestEndpoint,
+    options?: BatchRequestOptions
+  ) {
+    this.#input = batchEndpoint.input;
+    this.#init = batchEndpoint.init;
+    this.#fetch = options?.fetch ?? fetch;
+    this.#alwaysBatch = options?.alwaysBatch ?? false;
   }
 
   /**
@@ -87,62 +110,64 @@ export class BatchRequest {
     const controller = this.#controller;
     this.#clear();
     cancelAbortedRequests(queue);
-    if (queue.size === 1) {
+
+    if (queue.size === 0) {
+      return;
+    }
+    if (queue.size === 1 && !this.#alwaysBatch) {
       const [request, callbacks] = queue.entries().next().value;
       try {
-        // no need to use batch if there is only one request
-        const response = await fetch(request);
+        const response = await this.#fetch(request);
         callbacks.resolve(response);
       } catch (error) {
         callbacks.reject(error);
       }
-    } else if (queue.size > 1) {
-      const batchData = new BatchData();
-      for (const request of queue.keys()) {
-        batchData.addRequest(request);
-        request.signal?.addEventListener("abort", () =>
-          this.#cancelRequestInQueue(queue, request)
-        );
-      }
-      try {
-        const response = await fetch(this.#input, {
-          ...this.#init,
-          headers: batchData.getHeaders(this.#init?.headers),
-          body: batchData.stream(),
-          signal: controller?.signal,
-        });
-        if (
-          response.headers.get("Content-Type")?.startsWith("multipart/mixed")
-        ) {
-          const batchResponse = new BatchResponse(response);
-          for await (const [contentId, response] of batchResponse) {
-            const request = batchData.getRequest(contentId);
-            if (request) {
-              const callbacks = queue.get(request);
-              queue.delete(request);
-              if (callbacks) {
-                callbacks.resolve(response);
-              }
+      return;
+    }
+
+    const batchData = new BatchData();
+    for (const request of queue.keys()) {
+      batchData.addRequest(request);
+      request.signal?.addEventListener("abort", () =>
+        this.#cancelRequestInQueue(queue, request)
+      );
+    }
+    try {
+      const response = await this.#fetch(this.#input, {
+        ...this.#init,
+        headers: batchData.getHeaders(this.#init?.headers),
+        body: batchData.stream(),
+        signal: controller?.signal,
+      });
+      if (isMultipartMixed(response.headers)) {
+        const batchResponse = new BatchResponse(response);
+        for await (const [contentId, response] of batchResponse) {
+          const request = batchData.getRequest(contentId);
+          if (request) {
+            const callbacks = queue.get(request);
+            queue.delete(request);
+            if (callbacks) {
+              callbacks.resolve(response);
             }
           }
-          if (queue.size > 0) {
-            for (const callbacks of queue.values()) {
-              callbacks.reject(new Error("response count mismatch"));
-            }
-          }
-        } else {
-          // response is not not multipart/mixed, so it's probably an error by an intermediary proxy
-          // let's just resolve all requests with the same response
-          // this is not ideal, but it's better than rejecting all requests
-          // it allows the user to handle the error in a more granular way
+        }
+        if (queue.size > 0) {
           for (const callbacks of queue.values()) {
-            callbacks.resolve(response.clone());
+            callbacks.reject(new Error("response count mismatch"));
           }
         }
-      } catch (error) {
+      } else {
+        // response is not not multipart/mixed, so it's probably an error by an intermediary proxy
+        // let's just resolve all requests with the same response
+        // this is not ideal, but it's better than rejecting all requests
+        // it allows the user to handle the error in a more granular way
         for (const callbacks of queue.values()) {
-          callbacks.reject(error);
+          callbacks.resolve(response.clone());
         }
+      }
+    } catch (error) {
+      for (const callbacks of queue.values()) {
+        callbacks.reject(error);
       }
     }
   }

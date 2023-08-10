@@ -102,8 +102,11 @@ describe("BatchRequest", () => {
   });
 
   it("should be able to fetch one request", async () => {
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch`,
+      init: {
+        method: "POST",
+      },
     });
     const user7 = await client
       .fetch(`http://localhost:${port}/users/7`)
@@ -116,8 +119,11 @@ describe("BatchRequest", () => {
   });
 
   it("should be able to fetch multiple requests", async () => {
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch`,
+      init: {
+        method: "POST",
+      },
     });
     const [user1, user2, nothing] = await Promise.all([
       client
@@ -141,8 +147,11 @@ describe("BatchRequest", () => {
   });
 
   it("should error if batch endpoint errors", async () => {
-    const client = new BatchRequest(`http://localhost:${port}/batch-error`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch-error`,
+      init: {
+        method: "POST",
+      },
     });
 
     const [user1, user2, nothing] = await Promise.all([
@@ -166,8 +175,11 @@ describe("BatchRequest", () => {
   it("should cancel one request if asked to before batching", async () => {
     const controller = new AbortController();
     controller.abort();
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch`,
+      init: {
+        method: "POST",
+      },
     });
 
     const [user1Promise, user2Promise, nothingPromise] = [
@@ -193,8 +205,11 @@ describe("BatchRequest", () => {
 
   it("should cancel one request if asked to after batching", async () => {
     const controller = new AbortController();
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch`,
+      init: {
+        method: "POST",
+      },
     });
 
     const [user1Promise, user2Promise, nothingPromise] = [
@@ -220,8 +235,11 @@ describe("BatchRequest", () => {
   });
 
   it("should not cancel requests if asked to before batching", async () => {
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch`,
+      init: {
+        method: "POST",
+      },
     });
 
     client.cancel();
@@ -246,8 +264,11 @@ describe("BatchRequest", () => {
   });
 
   it("should cancel all requests if asked to after batching", async () => {
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch`,
+      init: {
+        method: "POST",
+      },
     });
 
     const [user1Promise, user2Promise, nothingPromise] = [
@@ -289,8 +310,11 @@ describe("BatchRequest", () => {
   });
 
   it("should cancel all individual requests if asked to after batching", async () => {
-    const client = new BatchRequest(`http://localhost:${port}/batch-pending`, {
-      method: "POST",
+    const client = new BatchRequest({
+      input: `http://localhost:${port}/batch-pending`,
+      init: {
+        method: "POST",
+      },
     });
 
     const controller = new AbortController();
