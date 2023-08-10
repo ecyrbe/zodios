@@ -299,36 +299,25 @@ describe("BatchRequest", () => {
           signal: controller.signal,
         })
         .then((res) => res.json()),
-      client.fetch(`http://localhost:${port}/users/2`, {
-        signal: controller.signal,
-      }),
-      client.fetch(`http://localhost:${port}/users/1`, {
-        signal: controller.signal,
-      }),
+      client
+        .fetch(`http://localhost:${port}/users/2`, {
+          signal: controller.signal,
+        })
+        .then((res) => res.json()),
+      client
+        .fetch(`http://localhost:${port}/users/1`, {
+          signal: controller.signal,
+        })
+        .then((res) => res.json()),
     ];
     await sleep(100);
     controller.abort();
 
-    const [user1, user2, nothing] = await Promise.allSettled([
-      user1Promise,
-      user2Promise,
-      nothingPromise,
-    ]);
+    await expect(user1Promise).rejects.toThrow("Aborted");
+    await expect(user2Promise).rejects.toThrow("Aborted");
+    await expect(nothingPromise).rejects.toThrow("Aborted");
 
-    expect(user1.status).toBe("rejected");
-    expect((user1 as PromiseRejectedResult).reason).toBeInstanceOf(
-      DOMException
-    );
-    expect(user2.status).toBe("rejected");
-    expect((user2 as PromiseRejectedResult).reason).toBeInstanceOf(
-      DOMException
-    );
-    expect(nothing.status).toBe("rejected");
-    expect((nothing as PromiseRejectedResult).reason).toBeInstanceOf(
-      DOMException
-    );
-
-    const [user12, user22, nothing2] = await Promise.allSettled([
+    const [user12, user22, nothing2] = await Promise.all([
       client
         .fetch(`http://localhost:${port}/users/1`)
         .then((res) => res.json()),
@@ -340,22 +329,13 @@ describe("BatchRequest", () => {
         .then((res) => res.json()),
     ]);
 
-    expect(user12.status).toBe("fulfilled");
-    expect((user12 as PromiseFulfilledResult<{ error: string }>).value).toEqual(
-      {
-        error: "timeout",
-      }
-    );
-    expect(user22.status).toBe("fulfilled");
-    expect((user22 as PromiseFulfilledResult<{ error: string }>).value).toEqual(
-      {
-        error: "timeout",
-      }
-    );
-    expect(nothing2.status).toBe("fulfilled");
-    expect(
-      (nothing2 as PromiseFulfilledResult<{ error: string }>).value
-    ).toEqual({
+    expect(user12).toEqual({
+      error: "timeout",
+    });
+    expect(user22).toEqual({
+      error: "timeout",
+    });
+    expect(nothing2).toEqual({
       error: "timeout",
     });
   });
