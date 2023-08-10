@@ -248,18 +248,82 @@ export type MapSchemaParameters<
   : Acc;
 
 /**
+ * Split string into a tuple, using a simple string literal separator
+ * @description - This is a simple implementation of split, it does not support multiple separators
+ *  A more complete implementation is built on top of this one
+ * @param Str - String to split
+ * @param Sep - Separator, must be a string literal not a union of string literals
+ * @returns Tuple of strings
+ */
+export type Split<
+  Str,
+  Sep extends string,
+  Acc extends string[] = []
+> = Str extends ""
+  ? Acc
+  : Str extends `${infer T}${Sep}${infer U}`
+  ? Split<U, Sep, [...Acc, T]>
+  : [...Acc, Str];
+
+type ConcatSplits<
+  Parts extends string[],
+  Seps extends string[],
+  Acc extends string[] = []
+> = Parts extends [infer First extends string, ...infer Rest extends string[]]
+  ? ConcatSplits<Rest, Seps, [...Acc, ...SplitMany<First, Seps>]>
+  : Acc;
+
+/**
+ * Split a string into a tuple.
+ * @param Str - The string to split.
+ * @param Sep - The separators to split on, a tuple of strings with one or more characters.
+ * @returns The tuple of each split. if sep is an empty string, returns a tuple of each character.
+ */
+export type SplitMany<
+  Str extends string,
+  Sep extends string[],
+  Acc extends string[] = []
+> = Sep extends [
+  infer FirstSep extends string,
+  ...infer RestSep extends string[]
+]
+  ? ConcatSplits<Split<Str, FirstSep>, RestSep>
+  : [Str, ...Acc];
+
+type PathSeparator = ["/", "?", "&", "#", "=", "(", ")", "[", "]"];
+
+type FilterParams<Params, Acc extends string[] = []> = Params extends [
+  infer First,
+  ...infer Rest
+]
+  ? First extends `:${infer Param}`
+    ? FilterParams<Rest, [...Acc, ...Split<Param, ":">]>
+    : FilterParams<Rest, Acc>
+  : Acc;
+
+/**
+ * Extract Path Params from a path
+ * @param Path - Path to extract params from
+ * @returns Path params
+ * @example
+ * ```ts
+ * type Path = "/users/:id/posts/:postId"
+ * type PathParams = ApiPathToParams<Path>
+ * // output: ["id", "postId"]
+ * ```
+ */
+export type ApiPathToParams<Path extends string> = FilterParams<
+  SplitMany<Path, PathSeparator>
+>;
+
+/**
  * get all parameters from an API path
  * @param Path - API path
  * @details - this is using tail recursion type optimization from typescript 4.5
  */
-export type PathParamNames<
-  Path,
-  Acc = never
-> = Path extends `${string}:${infer Name}/${infer R}`
-  ? PathParamNames<R, Name | Acc>
-  : Path extends `${string}:${infer Name}`
-  ? Name | Acc
-  : Acc;
+export type PathParamNames<Path> = Path extends string
+  ? ApiPathToParams<Path>[number]
+  : never;
 
 /**
  * Check if two type are equal else generate a compiler error

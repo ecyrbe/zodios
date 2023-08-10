@@ -55,6 +55,14 @@ const getComment = makeEndpoint({
   path: "/comments/:id",
   alias: "getComment",
   description: "Get a comment",
+  parameters: [
+    {
+      name: "id",
+      description: "Comment ID",
+      type: "Path",
+      schema: z.number(),
+    },
+  ],
   response: devComment,
 });
 

@@ -351,13 +351,11 @@ export type ZodiosPathParamsForEndpoint<
     FilterArrayByValue<Endpoint["parameters"], { type: "Path" }>,
     Frontend
   >
-> = NeverIfEmpty<{
-  [K in PathParamNames<Endpoint["path"]>]: PathParameters extends {
-    [Key in K]: any;
-  }
-    ? PathParameters[K]
-    : string | number;
-}>;
+> = NeverIfEmpty<
+  {
+    [K in PathParamNames<Endpoint["path"]>]: string | number;
+  } & PathParameters
+>;
 
 /**
  * Get path params for a given endpoint by path
@@ -374,11 +372,11 @@ export type ZodiosPathParamsByPath<
     >,
     Frontend
   >
-> = NeverIfEmpty<{
-  [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
-    ? PathParameters[K]
-    : string | number;
-}>;
+> = NeverIfEmpty<
+  {
+    [K in PathParamNames<Path>]: string | number;
+  } & PathParameters
+>;
 
 /**
  * Get path params for a given endpoint by alias
@@ -396,11 +394,11 @@ export type ZodiosPathParamByAlias<
     FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
     Frontend
   >
-> = NeverIfEmpty<{
-  [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
-    ? PathParameters[K]
-    : string | number;
-}>;
+> = NeverIfEmpty<
+  {
+    [K in PathParamNames<Path>]: string | number;
+  } & PathParameters
+>;
 
 export type ZodiosHeaderParamsForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
@@ -682,7 +680,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
   errors?: Array<ZodiosEndpointError>;
-};
+}
 
 export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 

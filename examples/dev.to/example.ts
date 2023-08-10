@@ -20,4 +20,6 @@ devTo.use(
   })
 );
 
-devTo.get("/articles/me/all").then(console.log);
+const result = devTo.get("/articles/:id", {
+  params: { id: 123 },
+});
