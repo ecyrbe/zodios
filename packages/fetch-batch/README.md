@@ -5,17 +5,21 @@
 This allows to batch automatically all requests made within the same tick (aka the same event loop cycle)
 
 ```ts
-    const client = new BatchRequest(`http://localhost:${port}/batch`, {
+    const client = new BatchRequest(`/batch`, {
       method: "POST",
     });
-    const [user1, user2, nothing] = await Promise.all([
+
+    const [user1, user2] = await Promise.all([
       client
-        .fetch(`http://localhost:${port}/users/1`)
+        .fetch(`/users/1`)
         .then((res) => res.json()),
       client
-        .fetch(`http://localhost:${port}/users/2`)
+        .fetch(`/users/2`)
         .then((res) => res.json()),
     ]);
+
+    expect(user1).toEqual({ id: 1, name: "John Doe" });
+    expect(user2).toEqual({ id: 2, name: "Jane Doe" });
 ```
 
 ## canceling individual requests
@@ -24,20 +28,22 @@ You can cancel requests individually using standard AborController.
 If all requests are canceled, the batched request is canceled as well to return as soon as possible.
 
 ```ts
-    const client = new BatchRequest(`http://localhost:${port}/batch-pending`, {
+    const client = new BatchRequest(`/batch`, {
       method: "POST",
     });
 
     const controller = new AbortController();
 
     const user1 = client
-      .fetch(`http://localhost:${port}/users/1`, { signal: controller.signal }).then((res) => res.json());
+      .fetch(`/users/1`, { signal: controller.signal }).then((res) => res.json());
 
     const user2 = client
-      .fetch(`http://localhost:${port}/users/2`, { signal: controller.signal }).then((res) => res.json());
+      .fetch(`/users/2`, { signal: controller.signal }).then((res) => res.json());
 
-    await sleep(100); // be sure requests are sent
-    controller.abort(); // abort all requests afterwards
+    // be sure requests are sent
+    await sleep(100);
+    // abort all requests afterwards
+    controller.abort();
 
     await expect(user1).rejects.toThrow("Aborted");
     await expect(user2).resolves.toEqual({ id: 2, name: "Jane Doe" });
