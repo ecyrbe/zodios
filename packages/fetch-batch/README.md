@@ -39,9 +39,8 @@ If all requests are canceled, the batched request is canceled as well to return 
         .then((res) => res.json()),
     ];
     controller.abort();
-    Promise.all([user1, user2]).catch((err) => {
-      expect(err.name).toBe("AbortError");
-    });
+    await expect(user1).rejects.toThrow("Aborted");
+    await expect(user2).resolves.toEqual({ id: 2, name: "Jane Doe" });
 ```
 
 ## Behind the scenes
