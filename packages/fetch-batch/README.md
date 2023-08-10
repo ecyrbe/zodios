@@ -83,11 +83,11 @@ If all requests are canceled, the batched request is canceled as well to return 
       .fetch(`/users/1`, { signal: controller.signal }).then((res) => res.json());
 
     const user2 = client
-      .fetch(`/users/2`, { signal: controller.signal }).then((res) => res.json());
+      .fetch(`/users/2`).then((res) => res.json());
 
     // be sure requests are sent
     await sleep(100);
-    // abort request 2 afterwards
+    // abort request 1 afterwards
     controller.abort();
 
     await expect(user1).rejects.toThrow("Aborted");
