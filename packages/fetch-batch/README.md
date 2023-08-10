@@ -29,28 +29,27 @@ By default if only one request is pending, the request is sent immediately to th
 If you want to always use the batch endpoint, you can use the `alwaysBatch` option.
 
 ```ts
-    const client = new BatchRequest({
-      input: `/batch`, 
-      init: {
-        method: "POST",
-      },
-      alwaysBatch: true
-    });
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, { alwaysBatch: true });
 ```
 
 ## Custom fetch
 
-If the platform you are running does not support fetch, but  library has a 100% compatible one, you can use it instead.
-Or if you have a fetch with intrumented telemetry, you can use it as well.
+If the platform you are running does not support fetch, but a library has a 100% compatible one, you should use it as a polyfill.
+Batch request assumes there is a fetch implementation that is 100% compatible with the standard one.
+
+You can't just provite a custom fetch because behind the scene batch request uses the following objects :
+- Request
+- Response
+- AbortSignal
+- AbortController
+- ReadStream 
+
+All of which are part of the standard fetch API.
+
+👉 Custom fetch should only be used for intrumented fetch, A.K.A a fetch overload that adds caching, telemetry, logs, etc.
 
 ```ts
-    const client = new BatchRequest({
-      input: `/batch`, 
-      init: {
-        method: "POST",
-      },
-      fetch: myFetch
-    });
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, { fetch: myFetch });
 ```
 
 ## canceling individual requests
