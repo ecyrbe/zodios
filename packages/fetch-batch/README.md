@@ -1,5 +1,17 @@
 # Batch support for fetch
 
+Batching is a technique that allows to send multiple requests in a single HTTP request.
+This is useful to reduce the number of roundtrips between the client and the server and to reduce the number of requests on the server.
+Because HTTPS requests are expensive, batching can greatly improve the performance of your application.
+It also allows to bypass browser limitations on the number of concurrent requests.
+
+However, if your service is already using HTTP/2, you should not use this library as HTTP/2 already supports multiplexing in a better way.
+Indeed it also does supports interleaving the data of multiple requests allowing a slower request to be received before a faster one if it has fewer data to send.
+
+These features are not supported by this library, that does batching in a FIFO way. This should be OK for most REST APIs.
+
+So it's advised to not updload or download large files using this library, since one large file could block the response of a REST api that took longer to start sending data.
+
 ## Main interface
 
 This allows to batch automatically all requests made within the same tick (aka the same event loop cycle)
@@ -83,6 +95,10 @@ If all requests are canceled, the batched request is canceled as well to return 
 ```
 
 ## Behind the scenes
+
+Fetch batch uses multipart/mixed to send multiple requests in a single HTTP request.
+Each individual request is sent as a part of the multipart/mixed request with application/http content type.
+Each part is separated by a boundary. And each part starts with a Content-ID header that is used to match the response to the request.
 
 ```ts
     // individual requests must target the same host
