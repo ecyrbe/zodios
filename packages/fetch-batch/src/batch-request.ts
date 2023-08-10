@@ -10,7 +10,7 @@ function cancelAbortedRequests(queue: Map<Request, BatchCallbacks>) {
   for (const [request, callbacks] of queue.entries()) {
     if (request.signal.aborted) {
       queue.delete(request);
-      callbacks.reject(new Error("request aborted"));
+      callbacks.reject(new DOMException("Aborted", "AbortError"));
     }
   }
 }
@@ -118,7 +118,9 @@ export class BatchRequest {
               queue.delete(request);
               if (callbacks) {
                 if (request.signal.aborted) {
-                  callbacks.reject(new Error("request aborted"));
+                  callbacks.reject(
+                    new DOMException("request aborted", "AbortError")
+                  );
                 } else {
                   callbacks.resolve(response);
                 }
