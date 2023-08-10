@@ -91,7 +91,13 @@ describe("utils.types", () => {
     });
 
     it("should allow path params in query string", () => {
-      type Input = PathParamNames<"/endpoint/:param1?:param2">;
+      type Input = PathParamNames<"/endpoint/:param1?param=:param2">;
+      //    ^?
+      const test: Assert<Input, "param1" | "param2"> = true;
+    });
+
+    it("should allow path params in fragment string", () => {
+      type Input = PathParamNames<"/endpoint/:param1#:param2">;
       //    ^?
       const test: Assert<Input, "param1" | "param2"> = true;
     });
