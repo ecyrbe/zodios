@@ -42,7 +42,7 @@ If all requests are canceled, the batched request is canceled as well to return 
 
     // be sure requests are sent
     await sleep(100);
-    // abort all requests afterwards
+    // abort request 2 afterwards
     controller.abort();
 
     await expect(user1).rejects.toThrow("Aborted");
