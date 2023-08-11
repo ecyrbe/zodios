@@ -24,7 +24,7 @@ import {
 } from "./plugins";
 import type { PickRequired, ReadonlyDeep } from "./utils.types";
 import { checkApi } from "./api";
-import type { AnyZodiosTypeProvider, ZodTypeProvider,ZodiosRuntimeTypeProvider } from "./type-providers";
+import type { AnyZodiosTypeProvider, ZodTypeProvider } from "./type-providers";
 import { zodTypeProvider } from "./type-providers";
 import {
   AnyZodiosFetcherProvider,
@@ -58,7 +58,9 @@ export interface ZodiosBase<
  * zodios api client
  */
 export class ZodiosCoreImpl<
-  const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
+  const Api extends
+    | readonly ZodiosEndpointDefinition[]
+    | ZodiosEndpointDefinition[],
   FetcherProvider extends AnyZodiosFetcherProvider,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
 > implements ZodiosBase<Api, FetcherProvider, TypeProvider>
@@ -407,7 +409,6 @@ export class ZodiosCoreImpl<
    * @returns - if true, the error type is narrowed to the matching endpoint errors
    */
   isErrorFromPath<M extends Method, Path extends ZodiosPathsByMethod<Api, M>>(
-    api: Api,
     method: M,
     path: Path,
     error: unknown
@@ -419,7 +420,7 @@ export class ZodiosCoreImpl<
     TypeProvider
   > {
     return this.isDefinedError(error, (err) =>
-      findEndpointErrorsByPath(api, method, path, err)
+      findEndpointErrorsByPath(this.api, method, path, err)
     );
   }
 
@@ -431,7 +432,6 @@ export class ZodiosCoreImpl<
    * @returns - if true, the error type is narrowed to the matching endpoint errors
    */
   isErrorFromAlias<Alias extends Aliases<Api>>(
-    api: Api,
     alias: Alias,
     error: unknown
   ): error is ZodiosMatchingErrorsByAlias<
@@ -441,7 +441,7 @@ export class ZodiosCoreImpl<
     TypeProvider
   > {
     return this.isDefinedError(error, (err) =>
-      findEndpointErrorsByAlias(api, alias, err)
+      findEndpointErrorsByAlias(this.api, alias, err)
     );
   }
 }
@@ -456,7 +456,9 @@ export type ZodiosInstance<
 
 export interface ZodiosCore {
   new <
-    const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
+    const Api extends
+      | readonly ZodiosEndpointDefinition[]
+      | ZodiosEndpointDefinition[],
     FetcherProvider extends AnyZodiosFetcherProvider,
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(
@@ -465,7 +467,9 @@ export interface ZodiosCore {
       TypeOfFetcherOptions<FetcherProvider>
   ): ZodiosInstance<Api, FetcherProvider, TypeProvider>;
   new <
-    const Api extends readonly ZodiosEndpointDefinition[] | ZodiosEndpointDefinition[],
+    const Api extends
+      | readonly ZodiosEndpointDefinition[]
+      | ZodiosEndpointDefinition[],
     FetcherProvider extends AnyZodiosFetcherProvider,
     TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider
   >(

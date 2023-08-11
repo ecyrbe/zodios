@@ -1076,13 +1076,13 @@ describe("Zodios", () => {
     expect(error).toBeInstanceOf(Error);
     // @ts-ignore
     expect(error.response?.status).toBe(502);
-    if (zodios.isErrorFromPath(zodios.api, "get", "/error502", error)) {
+    if (zodios.isErrorFromPath("get", "/error502", error)) {
       expect(error.response.status).toBe(502);
       expect(error.response?.data).toEqual({
         error: { message: "bad gateway" },
       });
     }
-    if (zodios.isErrorFromAlias(zodios.api, "getError502", error)) {
+    if (zodios.isErrorFromAlias("getError502", error)) {
       expect(error.response.status).toBe(502);
       expect(error.response?.data).toEqual({
         error: { message: "bad gateway" },
@@ -1130,19 +1130,15 @@ describe("Zodios", () => {
       console.log("Match Error params", e);
     }
 
-    expect(zodios.isErrorFromAlias(zodios.api, "getError401", error)).toBe(
+    expect(zodios.isErrorFromAlias("getError401", error)).toBe(true);
+    expect(zodios.isErrorFromAlias("getError404", error)).toBe(false);
+
+    expect(zodios.isErrorFromPath("get", "/error/:id/error401", error)).toBe(
       true
     );
-    expect(zodios.isErrorFromAlias(zodios.api, "getError404", error)).toBe(
+    expect(zodios.isErrorFromPath("get", "/error/:id/error404", error)).toBe(
       false
     );
-
-    expect(
-      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
-    ).toBe(true);
-    expect(
-      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
-    ).toBe(false);
   });
 
   it("should match error with empty params", async () => {
@@ -1184,19 +1180,15 @@ describe("Zodios", () => {
       error = e;
     }
 
-    expect(zodios.isErrorFromAlias(zodios.api, "getError401", error)).toBe(
+    expect(zodios.isErrorFromAlias("getError401", error)).toBe(true);
+    expect(zodios.isErrorFromAlias("getError404", error)).toBe(false);
+
+    expect(zodios.isErrorFromPath("get", "/error/:id/error401", error)).toBe(
       true
     );
-    expect(zodios.isErrorFromAlias(zodios.api, "getError404", error)).toBe(
+    expect(zodios.isErrorFromPath("get", "/error/:id/error404", error)).toBe(
       false
     );
-
-    expect(
-      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error401", error)
-    ).toBe(true);
-    expect(
-      zodios.isErrorFromPath(zodios.api, "get", "/error/:id/error404", error)
-    ).toBe(false);
   });
 
   it("should match error with optional params at the end", async () => {
@@ -1239,28 +1231,14 @@ describe("Zodios", () => {
       error = e;
     }
 
-    expect(zodios.isErrorFromAlias(zodios.api, "getError401", error)).toBe(
-      true
-    );
-    expect(zodios.isErrorFromAlias(zodios.api, "getError404", error)).toBe(
-      false
-    );
+    expect(zodios.isErrorFromAlias("getError401", error)).toBe(true);
+    expect(zodios.isErrorFromAlias("getError404", error)).toBe(false);
 
     expect(
-      zodios.isErrorFromPath(
-        zodios.api,
-        "get",
-        "/error/:id/error401/:message",
-        error
-      )
+      zodios.isErrorFromPath("get", "/error/:id/error401/:message", error)
     ).toBe(true);
     expect(
-      zodios.isErrorFromPath(
-        zodios.api,
-        "get",
-        "/error/:id/error404/:message",
-        error
-      )
+      zodios.isErrorFromPath("get", "/error/:id/error404/:message", error)
     ).toBe(false);
   });
 
@@ -1283,12 +1261,8 @@ describe("Zodios", () => {
     expect(error).toBeInstanceOf(Error);
     // @ts-ignore
     expect(error.response?.status).toBe(502);
-    expect(zodios.isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(
-      false
-    );
-    expect(zodios.isErrorFromAlias(zodios.api, "getError502", error)).toBe(
-      false
-    );
+    expect(zodios.isErrorFromPath("get", "/error502", error)).toBe(false);
+    expect(zodios.isErrorFromAlias("getError502", error)).toBe(false);
   });
 
   it("should return response when disabling validation", async () => {

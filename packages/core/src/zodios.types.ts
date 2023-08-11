@@ -764,6 +764,12 @@ export interface ZodiosOptions<
    */
   sendDefaults?: boolean;
 
+  /**
+   * Should zodios throw on error? Default: true
+   * if false, zodios will return the error in the response else it will throw
+   */
+  throwOnError?: boolean;
+
   fetcherFactory?: ZodiosFetcherFactory<FetcherProvider>;
 
   /**

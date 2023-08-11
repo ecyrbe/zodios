@@ -1,10 +1,9 @@
 import { AnyZodiosFetcherProvider } from "../fetcher-providers";
 import type { ZodiosPlugin } from "../zodios.types";
 
-export function headerPlugin<FetcherProvider extends AnyZodiosFetcherProvider>(
-  key: string,
-  value: string
-): ZodiosPlugin<FetcherProvider> {
+export function headerPlugin<
+  FetcherProvider extends AnyZodiosFetcherProvider = AnyZodiosFetcherProvider
+>(key: string, value: string): ZodiosPlugin<FetcherProvider> {
   return {
     request: async (_, config) => {
       return {
