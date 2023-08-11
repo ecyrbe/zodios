@@ -496,14 +496,14 @@ export type ZodiosPathParamsForEndpoint<
     FilterArrayByValue<Endpoint["parameters"], { type: "Path" }>,
     Frontend,
     TypeProvider
-  >
-> = NeverIfEmpty<{
-  [K in PathParamNames<Endpoint["path"]>]: PathParameters extends {
-    [Key in K]: any;
-  }
-    ? PathParameters[K]
-    : string | number;
-}>;
+  >,
+  Path = Endpoint["path"],
+  $PathParamNames extends string = PathParamNames<Path>
+> = NeverIfEmpty<
+  {
+    [K in $PathParamNames]: string | number | boolean;
+  } & PathParameters
+>;
 
 /**
  * Get path params for a given endpoint by path
@@ -521,12 +521,13 @@ export type ZodiosPathParamsByPath<
     >,
     Frontend,
     TypeProvider
-  >
-> = NeverIfEmpty<{
-  [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
-    ? PathParameters[K]
-    : string | number;
-}>;
+  >,
+  $PathParamNames extends string = PathParamNames<Path>
+> = NeverIfEmpty<
+  {
+    [K in $PathParamNames]: string | number | boolean;
+  } & PathParameters
+>;
 
 /**
  * Get path params for a given endpoint by alias
@@ -536,21 +537,22 @@ export type ZodiosPathParamByAlias<
   Alias extends string,
   Frontend extends boolean = true,
   TypeProvider extends AnyZodiosTypeProvider = ZodTypeProvider,
-  EndpointDefinition extends ZodiosEndpointDefinition = FindZodiosEndpointDefinitionByAlias<
+  Endpoint extends ZodiosEndpointDefinition = FindZodiosEndpointDefinitionByAlias<
     Api,
     Alias
   >,
-  Path = EndpointDefinition["path"],
+  Path = Endpoint["path"],
   PathParameters = MapSchemaParameters<
-    FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
+    FilterArrayByValue<Endpoint["parameters"], { type: "Path" }>,
     Frontend,
     TypeProvider
-  >
-> = NeverIfEmpty<{
-  [K in PathParamNames<Path>]: PathParameters extends { [Key in K]: any }
-    ? PathParameters[K]
-    : string | number;
-}>;
+  >,
+  $PathParamNames extends string = PathParamNames<Path>
+> = NeverIfEmpty<
+  {
+    [K in $PathParamNames]: string | number | boolean;
+  } & PathParameters
+>;
 
 export type ZodiosHeaderParamsForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
