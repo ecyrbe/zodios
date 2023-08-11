@@ -20,4 +20,7 @@ devTo.use(
   })
 );
 
-devTo.get("/articles/me/all").then(console.log);
+devTo
+  .get("/articles/:id", { params: { id: 2 } })
+  .then((user) => console.log(user));
+//        ^?

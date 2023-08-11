@@ -52,6 +52,25 @@ const jsonplaceholderApi = makeApi([
     description: "Get a user",
     response: userSchema,
   },
+  {
+    method: "post",
+    path: "/users",
+    description: "Create a user",
+    alias: "createUser",
+    parameters: [
+      {
+        name: "body",
+        type: "Body",
+        schema: t.type({ name: t.string }),
+      },
+      {
+        name: "Content-Type",
+        type: "Header",
+        schema: t.string,
+      },
+    ],
+    response: userSchema,
+  },
 ]);
 
 async function bootstrap() {
@@ -73,6 +92,11 @@ async function bootstrap() {
   const user = await apiClient.get("/users/:id", { params: { id: 7 } });
   //    ^?
   console.log(user);
+  const user2 = await apiClient.createUser({
+    //    ^?
+    body: { name: "Nicholas" },
+    headers: { "Content-Type": "application/json" },
+  });
 }
 
 bootstrap();

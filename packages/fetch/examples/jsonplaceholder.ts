@@ -78,17 +78,15 @@ async function bootstrap() {
   console.log(users);
   const user = await apiClient.getUser({ params: { id: 7 } });
   console.log(user);
-  const createdUser = await apiClient.createUser(
-    { name: "john doe" },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    }
-  );
+  const createdUser = await apiClient.createUser({
+    body: { name: "john doe" },
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
   console.log(createdUser);
-  const deletedUser = await apiClient.deleteUser(undefined, {
+  const deletedUser = await apiClient.deleteUser({
     params: { id: 7 },
   });
   console.log(deletedUser);
