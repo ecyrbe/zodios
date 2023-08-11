@@ -371,10 +371,11 @@ export type ZodiosPathParamsByPath<
       { type: "Path" }
     >,
     Frontend
-  >
+  >,
+  $PathParamNames extends string = PathParamNames<Path>
 > = NeverIfEmpty<
   {
-    [K in PathParamNames<Path>]: string | number;
+    [K in $PathParamNames]: string | number | boolean;
   } & PathParameters
 >;
 
@@ -393,10 +394,11 @@ export type ZodiosPathParamByAlias<
   PathParameters = MapSchemaParameters<
     FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
     Frontend
-  >
+  >,
+  $PathParamNames extends string = PathParamNames<Path>
 > = NeverIfEmpty<
   {
-    [K in PathParamNames<Path>]: string | number;
+    [K in $PathParamNames]: string | number | boolean;
   } & PathParameters
 >;
 
