@@ -1,4 +1,4 @@
-import { Zodios } from "../../src/index";
+import { ZodiosCore } from "../../src";
 import { articlesApi } from "./articles";
 import { commentsApi } from "./comments";
 import { followsApi } from "./follows";
@@ -6,7 +6,7 @@ import { followersApi } from "./followers";
 import { userApi } from "./users";
 import { pluginApiKey } from "./api-key-plugin";
 
-export const devTo = new Zodios("https://dev.to/api", [
+export const devTo = new ZodiosCore("https://dev.to/api", [
   ...articlesApi,
   ...commentsApi,
   ...followsApi,
@@ -20,4 +20,8 @@ devTo.use(
   })
 );
 
-devTo.get("/articles/me/all").then(console.log);
+const result = devTo.get("/comments/:id", {
+  params: {
+    id: "7",
+  },
+});

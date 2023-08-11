@@ -3010,3 +3010,10 @@ containing the updated stream needs to be sent.
 ]);
 
 export const api = new ZodiosCore(endpoints);
+const result = api.post("/v1/connections/create", {
+  body: {
+    destinationId: "123",
+    sourceId: "123",
+    status: "active",
+  },
+});
