@@ -829,7 +829,7 @@ received:
     }
     expect(error).toBeInstanceOf(Error);
     expect((error as any).response?.status).toBe(502);
-    if (zodios.isErrorFromPath(zodios.api, "get", "/error502", error)) {
+    if (zodios.isErrorFromPath("get", "/error502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
@@ -839,7 +839,7 @@ received:
         error: { message: "bad gateway" },
       });
     }
-    if (zodios.isErrorFromAlias(zodios.api, "getError502", error)) {
+    if (zodios.isErrorFromAlias("getError502", error)) {
       expect(error.response.status).toBe(502);
       if (error.response.status === 502) {
         const data = error.response.data;
@@ -886,12 +886,8 @@ received:
 
     expect(error).toBeInstanceOf(Error);
     expect((error as any).response?.status).toBe(502);
-    expect(zodios.isErrorFromPath(zodios.api, "get", "/error502", error)).toBe(
-      false
-    );
-    expect(zodios.isErrorFromAlias(zodios.api, "getError502", error)).toBe(
-      false
-    );
+    expect(zodios.isErrorFromPath("get", "/error502", error)).toBe(false);
+    expect(zodios.isErrorFromAlias("getError502", error)).toBe(false);
   });
 
   it("should return response when disabling validation", async () => {

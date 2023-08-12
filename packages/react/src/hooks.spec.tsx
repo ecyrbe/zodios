@@ -191,10 +191,7 @@ describe("zodios hooks", () => {
       const key = apiHooks.getKeyByPath("get", "/users/:id", {
         params: { id: 1 },
       });
-      expect(key).toEqual([
-        { api: "test", path: "/users/:id" },
-        { params: { id: 1 } },
-      ]);
+      expect(key).toEqual(["test", "/users/:id", { params: { id: 1 } }]);
     });
 
     it("should be serialisable", () => {
@@ -203,7 +200,7 @@ describe("zodios hooks", () => {
       });
       expect(
         JSON.stringify(key, (k, v) => (v === undefined ? null : v))
-      ).toEqual('[{"api":"test","path":"/users/:id"},{"params":{"id":1}}]');
+      ).toEqual('["test","/users/:id",{"params":{"id":1}}]');
     });
 
     it("should throw on invalid endpoint", () => {
@@ -217,7 +214,7 @@ describe("zodios hooks", () => {
 
     it("should get back endpoint invalidation key", () => {
       const key = apiHooks.getKeyByPath("get", "/users/:id");
-      expect(key).toEqual([{ api: "test", path: "/users/:id" }]);
+      expect(key).toEqual(["test", "/users/:id"]);
     });
 
     it("should throw on invalid invalidation endpoint", () => {
@@ -231,10 +228,7 @@ describe("zodios hooks", () => {
       const key = apiHooks.getKeyByAlias("getUser", {
         params: { id: 1 },
       });
-      expect(key).toEqual([
-        { api: "test", path: "/users/:id" },
-        { params: { id: 1 } },
-      ]);
+      expect(key).toEqual(["test", "/users/:id", { params: { id: 1 } }]);
     });
 
     it("should throw on invalid alias", () => {
@@ -248,7 +242,7 @@ describe("zodios hooks", () => {
 
     it("should get back alias invalidation key", () => {
       const key = apiHooks.getKeyByAlias("getUser");
-      expect(key).toEqual([{ api: "test", path: "/users/:id" }]);
+      expect(key).toEqual(["test", "/users/:id"]);
     });
 
     it("should throw on invalid invalidation alias", () => {
