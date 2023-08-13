@@ -62,16 +62,16 @@ export class SearchArray<TArray extends TypedArray> {
    */
   #getLPS(pattern: TArray): number[] {
     const result = [0];
-    let selfMatchingLength = 0;
+    let matchingLength = 0;
     let i = 1;
     const patternLength = pattern.length;
     while (i < patternLength) {
-      if (pattern[i] === pattern[selfMatchingLength]) {
-        selfMatchingLength++;
-        result[i] = selfMatchingLength;
+      if (pattern[i] === pattern[matchingLength]) {
+        matchingLength++;
+        result[i] = matchingLength;
         i++;
-      } else if (selfMatchingLength !== 0) {
-        selfMatchingLength = result[selfMatchingLength - 1];
+      } else if (matchingLength !== 0) {
+        matchingLength = result[matchingLength - 1];
       } else {
         result[i] = 0;
         i++;
