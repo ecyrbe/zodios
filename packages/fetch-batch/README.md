@@ -20,7 +20,8 @@ This allows to batch automatically all requests made within the same tick (aka t
     const client = new BatchRequest({
       input: `/batch`, 
       init: { method: "POST" }
-    });
+    },
+    (response) => new BatchResponse(response));
 
     const [user1, user2] = await Promise.all([
       client
@@ -41,7 +42,7 @@ By default if only one request is pending, the request is sent immediately to th
 If you want to always use the batch endpoint, you can use the `alwaysBatch` option.
 
 ```ts
-    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, { alwaysBatch: true });
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, (response) => new BatchResponse(response), { alwaysBatch: true });
 ```
 
 ## Custom fetch
@@ -61,7 +62,18 @@ All of which are part of the standard fetch API.
 👉 Custom fetch should only be used for intrumented fetch, A.K.A a fetch overload that adds caching, telemetry, logs, etc.
 
 ```ts
-    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, { fetch: myFetch });
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, (response) => new BatchResponse(response), { fetch: myFetch });
+```
+
+## Streaming
+
+Batch request supports streaming, for the request body nothing to do, it's supported out the box. and for the response body you can replace the BatchResponse contructor
+by BatchStreamResponse.
+Streaming is useful to reduce the memory footprint of your application, especially if you are downloading large contents.
+Also it allows to handle the one response from a batched request as soon as it's available, instead of waiting for the whole batch to be completed.
+
+```ts
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, (response) => new BatchStreamResponse(response));
 ```
 
 ## canceling individual requests
@@ -75,7 +87,7 @@ If all requests are canceled, the batched request is canceled as well to return 
       init: {
         method: "POST",
       }
-    });
+    }, (response) => new BatchResponse(response));
 
     const controller = new AbortController();
 
