@@ -369,7 +369,6 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
 
 export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
   #response: Response;
-  #responses = new Map<string, Response>();
   #options?: HttpBatchTansformerOptions;
 
   constructor(response: Response, options?: HttpBatchTansformerOptions) {
@@ -444,7 +443,6 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
           statusText,
           headers: responseHeaders,
         });
-        this.#responses.set(contentId, response);
         yield [contentId, response] as [string, Response];
       } else {
         currentBodyStreamSource = new HttpBodyStreamSource(reader);
@@ -454,7 +452,6 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
           statusText,
           headers: responseHeaders,
         });
-        this.#responses.set(contentId, response);
         yield [contentId, response] as [string, Response];
       }
     }

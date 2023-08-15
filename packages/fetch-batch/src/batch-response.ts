@@ -48,10 +48,8 @@ import {
 export class BatchResponse implements AsyncIterable<[string, Response]> {
   #response: Response;
   #encoder = new TextEncoder();
-  #responses = new Map<string, Response>();
   #searchNewline = new SearchArray(this.#encoder.encode("\r\n"));
   #searchDivider = new SearchArray(this.#encoder.encode("\r\n\r\n"));
-  #parsed = false;
 
   constructor(response: Response) {
     this.#response = response;
@@ -63,16 +61,6 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * if not already, it parses the multipart/mixed response and yields a response for each request
    * allowing to handle each response individually
    *
-   * @returns an async iterator that yields a response for each request
-   */
-  async *[Symbol.asyncIterator]() {
-    if (!this.#parsed) {
-      await this.#parseResponse();
-    }
-    yield* this.#responses.entries();
-  }
-
-  /**
    * parse the multipart/mixed response and store each response in a map
    * where the key is the content id of the request
    *
@@ -95,8 +83,10 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * field-name     := <ANY ASCII CHARACTERS EXCEPT CTLs ":" and SPACE>
    * field-value    := <ASCII CHARACTERS EXCEPT CR and LF>
    * message-body   := *OCTET ; message body may be any OCTET but should not contain the same delimiter as the enclosing multipart type
+   *
+   * @returns an async iterator that yields a response for each request
    */
-  async #parseResponse() {
+  async *[Symbol.asyncIterator]() {
     const contentType = this.#response.headers.get("content-type");
     if (!contentType?.startsWith("multipart/mixed")) {
       throw new Error(
@@ -134,10 +124,12 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
         data.subarray(start, end)
       );
       if (parsedResponse) {
-        this.#responses.set(parsedResponse.contentId, parsedResponse.response);
+        yield [parsedResponse.contentId, parsedResponse.response] as [
+          string,
+          Response
+        ];
       }
     }
-    this.#parsed = true;
   }
 
   /**
