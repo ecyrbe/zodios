@@ -370,9 +370,11 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
 export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
   #response: Response;
   #responses = new Map<string, Response>();
+  #options?: HttpBatchTansformerOptions;
 
-  constructor(response: Response) {
+  constructor(response: Response, options?: HttpBatchTansformerOptions) {
     this.#response = response;
+    this.#options = options;
   }
 
   /**
@@ -398,7 +400,7 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
       throw new Error("BatchResponse: Empty response body");
 
     const stream = this.#response.body.pipeThrough(
-      new TransformStream(new HttpBatchTansformer(boundary))
+      new TransformStream(new HttpBatchTansformer(boundary, this.#options))
     );
     const reader = stream.getReader();
     let currentBodyStreamSource: HttpBodyStreamSource | undefined;
@@ -460,7 +462,8 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
 }
 
 export function makeBatchStreamResponse(
-  response: Response
+  response: Response,
+  options?: HttpBatchTansformerOptions
 ): BatchStreamResponse {
-  return new BatchStreamResponse(response);
+  return new BatchStreamResponse(response, options);
 }

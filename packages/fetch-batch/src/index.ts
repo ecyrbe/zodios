@@ -1,5 +1,9 @@
 export { BatchData, BatchDataForeachCallback } from "./batch-data";
-export { BatchResponse } from "./batch-response";
+export { BatchResponse, makeBatchResponse } from "./batch-response";
+export {
+  BatchStreamResponse,
+  makeBatchStreamResponse,
+} from "./batch-response-stream";
 export { BatchRequest } from "./batch-request";
 export type {
   BatchRequestEndpoint,
