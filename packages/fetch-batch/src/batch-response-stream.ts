@@ -304,8 +304,15 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
       this.#completedPromiseResolve = resolve;
     });
   }
+
   completed() {
     return this.#completedPromise;
+  }
+
+  #setCompleted() {
+    this.#completed = true;
+    this.#completedPromiseResolve();
+    this.#reading = false;
   }
 
   async #consumeAllBody() {
@@ -317,13 +324,11 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
 
   async pull(controller: ReadableStreamDefaultController<Uint8Array>) {
     if (this.#completed) return controller.close();
+
     this.#reading = true;
+
     if (this.#cancelled) {
-      // cancel is still pending else pull would not have been called
-      // just close without reading
-      this.#completed = true;
-      this.#completedPromiseResolve();
-      this.#reading = false;
+      this.#setCompleted();
       return controller.close();
     }
 
@@ -332,37 +337,28 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
       if (body && !body?.done) {
         await this.#consumeAllBody();
       }
-      this.#completed = true;
-      this.#completedPromiseResolve();
-      this.#reading = false;
+      this.#setCompleted();
       return controller.close();
     }
     if (body?.type !== STATUS_BODY) {
-      this.#completed = true;
-      this.#completedPromiseResolve();
-      this.#reading = false;
+      this.#setCompleted();
       controller.close();
       throw new Error(`Unexpected body type ${body?.type}`);
     }
     if (bodyDone || body.done) {
-      this.#completed = true;
       if (body.data) controller.enqueue(body.data);
-      this.#completedPromiseResolve();
-      this.#reading = false;
+      this.#setCompleted();
       return controller.close();
-    } else {
-      controller.enqueue(body.data);
-      this.#reading = false;
     }
+    controller.enqueue(body.data);
+    this.#reading = false;
   }
   async cancel() {
     this.#cancelled = true;
     if (!this.#completed && !this.#reading) {
       this.#reading = true;
       await this.#consumeAllBody();
-      this.#completed = true;
-      this.#completedPromiseResolve();
-      this.#reading = false;
+      this.#setCompleted();
     }
   }
 }
