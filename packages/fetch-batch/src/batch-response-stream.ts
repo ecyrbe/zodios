@@ -83,6 +83,11 @@ export class HttpBatchTansformer
   #maxChunkBodySize: number;
   #epilogueSize = 0;
 
+  /**
+   * create a transformer for multipart/mixed content type that handle application/http envelop
+   * @param boundary - boundary string to separate each part
+   * @param options - options for the transformer to protect against overflow attacks
+   */
   constructor(boundary: string, options?: HttpBatchTansformerOptions) {
     this.#boundary = boundary;
     this.#searchStartBoundary = new SearchArray(
@@ -100,6 +105,12 @@ export class HttpBatchTansformer
     this.#maxChunkBodySize = options?.maxChunkBodySize ?? 1 * 1024 * 1024;
   }
 
+  /**
+   * transform readable stream of Uint8Array to an stream of HttpMultipartChunk
+   * @param chunk - chunk of data to parse
+   * @param controller - transform stream controller
+   * @returns void
+   */
   transform(
     chunk: Uint8Array,
     controller: TransformStreamDefaultController<HttpMultipartChunk>
@@ -154,6 +165,11 @@ export class HttpBatchTansformer
     return false;
   }
 
+  /**
+   * parse the multipart/mixed header
+   * @param controller - transform stream controller
+   * @returns true if header is parsed and advance to next state
+   */
   #parseMultipart(
     controller: TransformStreamDefaultController<HttpMultipartChunk>
   ) {
@@ -175,6 +191,11 @@ export class HttpBatchTansformer
     return false;
   }
 
+  /**
+   * parse http status line - keep in mind that status line is terminated by newline
+   * @param controller - transform stream controller
+   * @returns true if status line is parsed and advance to next state
+   */
   #parseStatusLine(
     controller: TransformStreamDefaultController<HttpMultipartChunk>
   ) {
@@ -196,6 +217,11 @@ export class HttpBatchTansformer
     return false;
   }
 
+  /**
+   * parse http header block - keep in mind that header block is terminated by an empty line
+   * @param controller - transform stream controller
+   * @returns true if header is completly parsed and advance to next state
+   */
   #parseHeader(
     controller: TransformStreamDefaultController<HttpMultipartChunk>
   ) {
@@ -227,8 +253,8 @@ export class HttpBatchTansformer
    * the last bytes being the size of the end boundary
    * this allows to stream the body chunks to as a ReadableStream
    *
-   * @param controller
-   * @returns
+   * @param controller - transform stream controller
+   * @returns true if body end is found and advance to next state
    */
   #parseBody(controller: TransformStreamDefaultController<HttpMultipartChunk>) {
     const index = this.#searchBoundary.search(this.#buffer!);
@@ -298,6 +324,16 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
   #cancelled = false;
   #completedPromise: Promise<void>;
   #completedPromiseResolve!: () => void;
+
+  /**
+   * Create a new HttpBodyStreamSource
+   *
+   * The HttpBodyStreamSource is a ReadableStreamSource that will
+   * read the body of a multipart stream that will complete when
+   * a boundary is found
+   *
+   * @param reader - the reader of the multipart stream
+   */
   constructor(reader: ReadableStreamDefaultReader<HttpMultipartChunk>) {
     this.#reader = reader;
     this.#completedPromise = new Promise<void>((resolve) => {
@@ -305,23 +341,40 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
     });
   }
 
+  /**
+   * a promise fired when the body is completely read
+   * @returns a promise that will resolve when the body is completly read from the stream
+   */
   completed() {
     return this.#completedPromise;
   }
 
+  /**
+   * resolve the completed promise and set the completed flags
+   */
   #setCompleted() {
     this.#completed = true;
     this.#completedPromiseResolve();
     this.#reading = false;
   }
 
-  async #consumeAllBody() {
+  /**
+   * consume the body until a boundary is found
+   * this is used when the stream is cancelled
+   * to discard the rest of the body
+   */
+  async #consumeBody() {
     while (true) {
       const { value, done } = await this.#reader.read();
       if (done || value.done) break;
     }
   }
 
+  /**
+   * pull one chunk from the body at a time
+   * @param controller - the controller of the readable stream
+   * @returns void
+   */
   async pull(controller: ReadableStreamDefaultController<Uint8Array>) {
     if (this.#completed) return controller.close();
 
@@ -335,7 +388,7 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
     const { value: body, done: bodyDone } = await this.#reader.read();
     if (this.#cancelled) {
       if (body && !body?.done) {
-        await this.#consumeAllBody();
+        await this.#consumeBody();
       }
       this.#setCompleted();
       return controller.close();
@@ -357,7 +410,7 @@ class HttpBodyStreamSource implements UnderlyingDefaultSource<Uint8Array> {
     this.#cancelled = true;
     if (!this.#completed && !this.#reading) {
       this.#reading = true;
-      await this.#consumeAllBody();
+      await this.#consumeBody();
       this.#setCompleted();
     }
   }
