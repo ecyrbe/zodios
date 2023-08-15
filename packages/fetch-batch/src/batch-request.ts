@@ -131,10 +131,9 @@ export class BatchRequest {
         for await (const [contentId, response] of batchResponse) {
           const request = batchData.getRequest(contentId);
           if (request) {
-            request.signal?.addEventListener("abort", () => {
-              console.log("aborting response");
-              response.body?.cancel();
-            });
+            request.signal?.addEventListener("abort", () =>
+              response.body?.cancel()
+            );
             const callbacks = queue.get(request);
             queue.delete(request);
             if (callbacks) {
