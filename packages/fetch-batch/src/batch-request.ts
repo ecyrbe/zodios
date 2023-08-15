@@ -1,5 +1,4 @@
 import { BatchData } from "./batch-data";
-import { BatchResponse } from "./batch-response";
 import {
   cancelAbortedRequests,
   cancelRequestInQueue,
@@ -27,6 +26,7 @@ export class BatchRequest {
   #fetch: typeof fetch;
   #controller?: AbortController;
   #alwaysBatch: boolean;
+  #makeBatchResponse: (response: Response) => AsyncIterable<[string, Response]>;
 
   /**
    * create a new batch request handler
@@ -37,12 +37,16 @@ export class BatchRequest {
    */
   constructor(
     batchEndpoint: BatchRequestEndpoint,
+    makeBatchResponse: (
+      response: Response
+    ) => AsyncIterable<[string, Response]>,
     options?: BatchRequestOptions
   ) {
     this.#input = batchEndpoint.input;
     this.#init = batchEndpoint.init;
     this.#fetch = options?.fetch ?? fetch;
     this.#alwaysBatch = options?.alwaysBatch ?? false;
+    this.#makeBatchResponse = makeBatchResponse;
   }
 
   /**
@@ -123,10 +127,14 @@ export class BatchRequest {
         signal: controller?.signal,
       });
       if (isMultipartMixed(response.headers)) {
-        const batchResponse = new BatchResponse(response);
+        const batchResponse = this.#makeBatchResponse(response);
         for await (const [contentId, response] of batchResponse) {
           const request = batchData.getRequest(contentId);
           if (request) {
+            request.signal?.addEventListener("abort", () => {
+              console.log("aborting response");
+              response.body?.cancel();
+            });
             const callbacks = queue.get(request);
             queue.delete(request);
             if (callbacks) {
