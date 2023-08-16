@@ -20,8 +20,15 @@ export function parseBoundary(response: Response) {
   if (!boundary) {
     throw new Error("BatchResponse: Invalid boundary");
   }
-  if (!response.body) throw new Error("BatchResponse: Empty response body");
   return boundary;
+}
+
+export function ensureBody(
+  body: ReadableStream<Uint8Array> | null
+): asserts body is ReadableStream<Uint8Array> {
+  if (!body) {
+    throw new Error("BatchResponse: Empty response body");
+  }
 }
 
 /**

@@ -1,5 +1,6 @@
 import { concat, SearchArray } from "./utils";
 import {
+  ensureBody,
   parseBoundary,
   parseContentId,
   parseHeaders,
@@ -435,7 +436,8 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
    */
   async *[Symbol.asyncIterator]() {
     const boundary = parseBoundary(this.#response);
-    const stream = this.#response.body!.pipeThrough(
+    ensureBody(this.#response.body);
+    const stream = this.#response.body.pipeThrough(
       new TransformStream(new HttpBatchTansformer(boundary, this.#options))
     );
     const reader = stream.getReader();

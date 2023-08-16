@@ -39,6 +39,7 @@
 
 import { concat, SearchArray } from "./utils";
 import {
+  ensureBody,
   parseBoundary,
   parseContentId,
   parseHeaders,
@@ -88,7 +89,7 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    */
   async *[Symbol.asyncIterator]() {
     const boundary = parseBoundary(this.#response);
-    const buffers: Uint8Array[] = await this.#readChuncks();
+    const buffers = await this.#readChuncks();
     const data = concat(buffers);
     const searchBoundary = new SearchArray(
       this.#encoder.encode(`--${boundary}\r\n`)
@@ -127,8 +128,9 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * @returns - the combined data of the multipart/mixed response body in a single Uint8Array
    */
   async #readChuncks() {
+    ensureBody(this.#response.body);
     const buffers: Uint8Array[] = [];
-    const reader = this.#response.body!.getReader();
+    const reader = this.#response.body.getReader();
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
