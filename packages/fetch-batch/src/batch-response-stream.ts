@@ -1,6 +1,6 @@
 import { concat, SearchArray } from "./utils";
 import {
-  boundaryRegExp,
+  parseBoundary,
   parseContentId,
   parseHeaders,
   parseStatusLine,
@@ -434,20 +434,8 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
    * @returns an async iterator that yields a response for each request
    */
   async *[Symbol.asyncIterator]() {
-    const contentType = this.#response.headers.get("content-type");
-    if (!contentType?.startsWith("multipart/mixed")) {
-      throw new Error(
-        "BatchResponse: Invalid content type, expected multipart/mixed"
-      );
-    }
-    const boundary = contentType.match(boundaryRegExp)?.[1];
-    if (!boundary) {
-      throw new Error("BatchResponse: Invalid boundary");
-    }
-    if (!this.#response.body)
-      throw new Error("BatchResponse: Empty response body");
-
-    const stream = this.#response.body.pipeThrough(
+    const boundary = parseBoundary(this.#response);
+    const stream = this.#response.body!.pipeThrough(
       new TransformStream(new HttpBatchTansformer(boundary, this.#options))
     );
     const reader = stream.getReader();
@@ -456,57 +444,70 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
     while (true) {
       // we wait until previous body is consumed or cancelled
       await currentBodyStreamSource?.completed();
-      const { value: part, done: partDone } = await reader.read();
-      if (partDone) {
-        break;
-      }
-      if (part.type !== STATUS_MULTIPART_HEADER) {
-        throw new Error("BatchResponse: Invalid multipart header");
-      }
-      const partHeaders = parseHeaders(part.data);
-      const contentId = parseContentId(partHeaders);
-      const contentType = partHeaders.get("content-type");
-      if (!contentType?.startsWith("application/http")) {
-        throw new Error(
-          "BatchResponse: Invalid content type, expected application/http"
-        );
-      }
-      const { value: statusLine, done: statusLineDone } = await reader.read();
-      if (statusLineDone || statusLine.type !== STATUS_STATUSLINE) {
-        throw new Error("BatchResponse: Invalid status line");
-      }
-      const { status, statusText } = parseStatusLine(statusLine.data);
-      const { value: headers, done: headersDone } = await reader.read();
-      if (headersDone || headers.type !== STATUS_HEADER) {
-        throw new Error("BatchResponse: Invalid headers");
-      }
-      const responseHeaders = parseHeaders(headers.data);
-      if (status === 204 || status === 304) {
-        const { value: body, done: bodyDone } = await reader.read();
-        if (body && (body.type !== STATUS_BODY || !body.done)) {
-          throw new Error("BatchResponse: Body not empty");
-        }
-        currentBodyStreamSource = undefined;
-        const response = new Response(undefined, {
-          status,
-          statusText,
-          headers: responseHeaders,
-        });
-        yield [contentId, response] as [string, Response];
-      } else {
-        currentBodyStreamSource = new HttpBodyStreamSource(reader);
-        const bodyStream = new ReadableStream(currentBodyStreamSource);
-        const response = new Response(bodyStream, {
-          status,
-          statusText,
-          headers: responseHeaders,
-        });
-        yield [contentId, response] as [string, Response];
-      }
+      const multipart = await this.#parseMultipartHeader(reader);
+      if (multipart.done) break;
+      const embedded = await this.#parseEmbeddedResponse(reader);
+      currentBodyStreamSource = embedded.bodyStreamSource;
+      yield [multipart.contentId, embedded.response] as [string, Response];
     }
   }
-}
 
+  async #parseMultipartHeader(
+    reader: ReadableStreamDefaultReader<HttpMultipartChunk>
+  ) {
+    const { value, done } = await reader.read();
+
+    if (done) return { done };
+    if (value.type !== STATUS_MULTIPART_HEADER) {
+      throw new Error("BatchResponse: Invalid multipart header");
+    }
+    const partHeaders = parseHeaders(value.data);
+    const contentId = parseContentId(partHeaders);
+    const contentType = partHeaders.get("content-type");
+    if (!contentType || !contentType.startsWith("application/http")) {
+      throw new Error(
+        "BatchResponse: Invalid content type, expected application/http"
+      );
+    }
+    return { done, contentId };
+  }
+
+  async #parseEmbeddedResponse(
+    reader: ReadableStreamDefaultReader<HttpMultipartChunk>
+  ) {
+    const { value: statusLine, done: statusLineDone } = await reader.read();
+    if (statusLineDone || statusLine.type !== STATUS_STATUSLINE) {
+      throw new Error("BatchResponse: Invalid status line");
+    }
+    const { status, statusText } = parseStatusLine(statusLine.data);
+    const { value: headers, done: headersDone } = await reader.read();
+    if (headersDone || headers.type !== STATUS_HEADER) {
+      throw new Error("BatchResponse: Invalid headers");
+    }
+    const responseHeaders = parseHeaders(headers.data);
+    if (status === 204 || status === 304) {
+      const { value: body, done: bodyDone } = await reader.read();
+      if (body && (body.type !== STATUS_BODY || !body.done)) {
+        throw new Error("BatchResponse: Body not empty");
+      }
+      return {
+        response: new Response(undefined, {
+          status,
+          statusText,
+          headers: responseHeaders,
+        }),
+      };
+    }
+    const bodyStreamSource = new HttpBodyStreamSource(reader);
+    const bodyStream = new ReadableStream(bodyStreamSource);
+    const response = new Response(bodyStream, {
+      status,
+      statusText,
+      headers: responseHeaders,
+    });
+    return { bodyStreamSource, response };
+  }
+}
 export function makeBatchStreamResponse(
   response: Response,
   options?: HttpBatchTansformerOptions

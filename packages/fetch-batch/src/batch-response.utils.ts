@@ -1,7 +1,28 @@
-export const statusLineRegExp = /^HTTP\/\d\.\d (\d{3}) (.*)$/;
-export const headerRegExp = /^([^\s:]+):\s*(.*?)(?=\s*$)/;
-export const contentIdRegExp = /^<?([^>]+)>?$/;
-export const boundaryRegExp = /boundary="?([^";]+)"?;?/;
+const statusLineRegExp = /^HTTP\/\d\.\d (\d{3}) (.*)$/;
+const headerRegExp = /^([^\s:]+):\s*(.*?)(?=\s*$)/;
+const contentIdRegExp = /^<?([^>]+)>?$/;
+const boundaryRegExp = /boundary="?([^";]+)"?;?/;
+
+/**
+ * parse the headers from a multipart/mixed response and extract the boundary
+ * @param response - The response to parse the boundary from
+ * @returns the boundary
+ * @throws if the response is not multipart/mixed or if the boundary is not found or if there is no response body
+ */
+export function parseBoundary(response: Response) {
+  const contentType = response.headers.get("content-type");
+  if (!contentType?.startsWith("multipart/mixed")) {
+    throw new Error(
+      "BatchResponse: Invalid content type, expected multipart/mixed"
+    );
+  }
+  const boundary = contentType.match(boundaryRegExp)?.[1];
+  if (!boundary) {
+    throw new Error("BatchResponse: Invalid boundary");
+  }
+  if (!response.body) throw new Error("BatchResponse: Empty response body");
+  return boundary;
+}
 
 /**
  * parse content id from headers

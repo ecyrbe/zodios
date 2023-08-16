@@ -39,7 +39,7 @@
 
 import { concat, SearchArray } from "./utils";
 import {
-  boundaryRegExp,
+  parseBoundary,
   parseContentId,
   parseHeaders,
   parseStatusLine,
@@ -87,17 +87,7 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * @returns an async iterator that yields a response for each request
    */
   async *[Symbol.asyncIterator]() {
-    const contentType = this.#response.headers.get("content-type");
-    if (!contentType?.startsWith("multipart/mixed")) {
-      throw new Error(
-        "BatchResponse: Invalid content type, expected multipart/mixed"
-      );
-    }
-    const boundary = contentType.match(boundaryRegExp)?.[1];
-    if (!boundary) {
-      throw new Error("BatchResponse: Invalid boundary");
-    }
-
+    const boundary = parseBoundary(this.#response);
     const buffers: Uint8Array[] = await this.#readChuncks();
     const data = concat(buffers);
     const searchBoundary = new SearchArray(
@@ -120,7 +110,7 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
         this.#searchNewline.pattern.length,
     }));
     for (const { start, end } of indexes) {
-      const parsedResponse = this.#parseEmbededResponse(
+      const parsedResponse = this.#parseEmbeddedResponse(
         data.subarray(start, end)
       );
       if (parsedResponse) {
@@ -137,10 +127,8 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * @returns - the combined data of the multipart/mixed response body in a single Uint8Array
    */
   async #readChuncks() {
-    if (!this.#response.body)
-      throw new Error("BatchResponse: Empty response body");
     const buffers: Uint8Array[] = [];
-    const reader = this.#response.body.getReader();
+    const reader = this.#response.body!.getReader();
     while (true) {
       const { done, value } = await reader.read();
       if (done) {
@@ -178,7 +166,7 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * }
    * ```
    */
-  #parseEmbededResponse(data: Uint8Array) {
+  #parseEmbeddedResponse(data: Uint8Array) {
     const partHeadersEndIndex = this.#searchDivider.search(data);
     if (partHeadersEndIndex === -1) {
       throw new Error("BatchResponse: Invalid part, no headers found");
