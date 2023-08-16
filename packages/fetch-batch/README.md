@@ -153,9 +153,4 @@ Each part is separated by a boundary. And each part starts with a Content-ID hea
       else if(contentId === body.getRequestId(renameUser2))
         console.log('renameUser2 response',await response.json())
     }
-    // or directly with request / response matching
-    const getUser1Response = await batched.getResponse(body.getRequestId(getUser1));
-    console.log('getUser1 response',await getUser1Response.json())
-    const renameUser2Response = await batched.getResponse(body.getRequestId(renameUser2));
-    console.log('renameUser2 response',await renameUser2Response.json())
 ```
