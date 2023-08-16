@@ -1,4 +1,9 @@
-export { BatchData, BatchDataForeachCallback } from "./batch-data";
+export { BatchData, makeBatchData } from "./batch-data";
+export {
+  ReactNativeBatchData,
+  makeReactNativeBatchData,
+} from "./batch-data-react-native";
+export { BatchDataForeachCallback, IBatchData } from "./batch-data.types";
 export { BatchResponse, makeBatchResponse } from "./batch-response";
 export {
   BatchStreamResponse,

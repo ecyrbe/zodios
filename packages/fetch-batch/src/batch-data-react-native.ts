@@ -1,10 +1,9 @@
 import { IBatchData, BatchDataForeachCallback } from "./batch-data.types";
 
-export class BatchData implements IBatchData {
+export class ReactNativeBatchData implements IBatchData {
   #requests = new Map<string, Request>();
   #requestIdSuffix = `${Date.now()}@zodios.org`;
   #boundary = `batch__${Date.now()}__batch`;
-  #encoder = new TextEncoder();
 
   constructor() {}
 
@@ -64,18 +63,8 @@ export class BatchData implements IBatchData {
     }
   }
 
-  body() {
-    const iterator = this.#encodedIterator();
-    return new ReadableStream<Uint8Array>({
-      async pull(controller) {
-        const { value, done } = await iterator.next();
-        if (done) {
-          controller.close();
-        } else {
-          controller.enqueue(value);
-        }
-      },
-    });
+  async body() {
+    return this.#format();
   }
 
   #formatHeaders(headers: Headers) {
@@ -87,46 +76,37 @@ export class BatchData implements IBatchData {
     return result;
   }
 
-  *#encodePart(requestId: string) {
+  #formatPart(requestId: string) {
     const headers = new Headers();
     headers.set("Content-ID", `<${requestId}>`);
     headers.set("Content-Type", "application/http; msgtype=request");
-    yield this.#encoder.encode(this.#formatHeaders(headers));
+    return this.#formatHeaders(headers);
   }
 
-  async *#encodeRequest(request: Request) {
+  async #formatRequest(request: Request) {
     const url = new URL(request.url);
-    yield this.#encoder.encode(
-      `${request.method} ${url.pathname}${url.search}${url.hash} HTTP/1.1\r\n`
+    return (
+      `${request.method} ${url.pathname}${url.search}${url.hash} HTTP/1.1\r\n` +
+      this.#formatHeaders(request.headers) +
+      (await request.text())
     );
-    yield this.#encoder.encode(this.#formatHeaders(request.headers));
-    if (request.body) {
-      const reader = request.body.getReader();
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) {
-          reader.releaseLock();
-          break;
-        }
-        yield value;
-      }
-    }
   }
 
-  async *#encodedIterator() {
-    const boundary = this.#encoder.encode(`--${this.#boundary}\r\n`);
-    const boundaryClose = this.#encoder.encode(`--${this.#boundary}--\r\n`);
-
+  async #format() {
+    let result = "";
+    const boundary = `--${this.#boundary}\r\n`;
+    const boundaryClose = `--${this.#boundary}--\r\n`;
     for (const [requestId, request] of this.#requests) {
-      yield boundary;
-      yield* this.#encodePart(requestId);
-      yield* this.#encodeRequest(request);
-      yield this.#encoder.encode("\r\n");
+      result += boundary;
+      result += this.#formatPart(requestId);
+      result += await this.#formatRequest(request);
+      result += "\r\n";
     }
-    yield boundaryClose;
+    result += boundaryClose;
+    return result;
   }
 }
 
-export function makeBatchData() {
-  return new BatchData();
+export function makeReactNativeBatchData() {
+  return new ReactNativeBatchData();
 }

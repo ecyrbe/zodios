@@ -1,4 +1,4 @@
-import { BatchData } from "./batch-data";
+import type { IBatchData } from "./batch-data.types";
 import {
   cancelAbortedRequests,
   cancelRequestInQueue,
@@ -26,6 +26,7 @@ export class BatchRequest {
   #fetch: typeof fetch;
   #controller?: AbortController;
   #alwaysBatch: boolean;
+  #makeBatchData: () => IBatchData;
   #makeBatchResponse: (response: Response) => AsyncIterable<[string, Response]>;
 
   /**
@@ -37,16 +38,14 @@ export class BatchRequest {
    */
   constructor(
     batchEndpoint: BatchRequestEndpoint,
-    makeBatchResponse: (
-      response: Response
-    ) => AsyncIterable<[string, Response]>,
-    options?: BatchRequestOptions
+    options: BatchRequestOptions
   ) {
     this.#input = batchEndpoint.input;
     this.#init = batchEndpoint.init;
-    this.#fetch = options?.fetch ?? fetch;
-    this.#alwaysBatch = options?.alwaysBatch ?? false;
-    this.#makeBatchResponse = makeBatchResponse;
+    this.#fetch = options.fetch ?? fetch;
+    this.#alwaysBatch = options.alwaysBatch ?? false;
+    this.#makeBatchData = options.makeBatchData;
+    this.#makeBatchResponse = options.makeBatchResponse;
   }
 
   /**
@@ -112,18 +111,26 @@ export class BatchRequest {
       return;
     }
 
-    const batchData = new BatchData();
+    const batchData = this.#makeBatchData();
     for (const request of queue.keys()) {
       batchData.addRequest(request);
       request.signal?.addEventListener("abort", () =>
         cancelRequestInQueue(queue, request, controller)
       );
     }
+    let body: ReadableStream<Uint8Array> | string | undefined;
+    const batchBody = batchData.body();
+    if (batchBody instanceof ReadableStream) {
+      body = batchBody;
+    } else if (batchBody instanceof Promise) {
+      body = await batchBody;
+    }
+
     try {
       const response = await this.#fetch(this.#input, {
         ...this.#init,
         headers: batchData.getHeaders(this.#init?.headers),
-        body: batchData.stream(),
+        body,
         signal: controller?.signal,
       });
       if (isMultipartMixed(response.headers)) {

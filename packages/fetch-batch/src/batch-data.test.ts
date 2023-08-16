@@ -65,7 +65,7 @@ describe("BatchData", () => {
     const batched = await fetch(`http://localhost:${port}/batch`, {
       method: "POST",
       headers: body.getHeaders(),
-      body: body.stream(),
+      body: body.body(),
     }).then((response) => response.json());
 
     expect(batched.url).toBe("/batch");
