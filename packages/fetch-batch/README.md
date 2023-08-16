@@ -21,7 +21,10 @@ This allows to batch automatically all requests made within the same tick (aka t
       input: `/batch`, 
       init: { method: "POST" }
     },
-    (response) => new BatchResponse(response));
+    {
+      makeBatchData: () => new BatchData(),
+      makeBatchResponse: (response) => new BatchStreamResponse(response))
+    });
 
     const [user1, user2] = await Promise.all([
       client
@@ -42,7 +45,11 @@ By default if only one request is pending, the request is sent immediately to th
 If you want to always use the batch endpoint, you can use the `alwaysBatch` option.
 
 ```ts
-    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, (response) => new BatchResponse(response), { alwaysBatch: true });
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, {
+      makeBatchData: () => new BatchData(),
+      makeBatchResponse: (response) => new BatchStreamResponse(response)),
+      alwaysBatch: true 
+    });
 ```
 
 ## Custom fetch
@@ -62,7 +69,11 @@ All of which are part of the standard fetch API.
 👉 Custom fetch should only be used for intrumented fetch, A.K.A a fetch overload that adds caching, telemetry, logs, etc.
 
 ```ts
-    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, (response) => new BatchResponse(response), { fetch: myFetch });
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, {
+      makeBatchData: () => new BatchData(),
+      makeBatchResponse: (response) => new BatchStreamResponse(response)),
+      fetch: myFetch 
+    });
 ```
 
 ## Streaming
@@ -73,7 +84,21 @@ Streaming is useful to reduce the memory footprint of your application, especial
 Also it allows to handle the one response from a batched request as soon as it's available, instead of waiting for the whole batch to be completed.
 
 ```ts
-    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, (response) => new BatchStreamResponse(response));
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, {
+      makeBatchData: () => new BatchData(),
+      makeBatchResponse: (response) => new BatchStreamResponse(response))
+    });
+```
+
+## React Native
+
+React Native does not support ReadableStream, so you need to use a polyfill or use dedicated react native implementation for BatchData and BatchResponse.
+
+```ts
+    const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, {
+      makeBatchData: () => new ReactNativeBatchData(),
+      makeBatchResponse: (response) => new ReactNativeBatchResponse(response))
+    });
 ```
 
 ## canceling individual requests
@@ -87,7 +112,10 @@ If all requests are canceled, the batched request is canceled as well to return 
       init: {
         method: "POST",
       }
-    }, (response) => new BatchResponse(response));
+    }, {
+      makeBatchData: () => new BatchData(),
+      makeBatchResponse: (response) => new BatchStreamResponse(response))
+    });
 
     const controller = new AbortController();
 
