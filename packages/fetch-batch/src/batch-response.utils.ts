@@ -56,7 +56,10 @@ export function parseContentId(headers: Headers) {
  * @returns the status and status text
  */
 export function parseStatusLine(statusLineBytes: Uint8Array) {
-  const statusLine = new TextDecoder().decode(statusLineBytes);
+  return parseStatusLineString(new TextDecoder().decode(statusLineBytes));
+}
+
+export function parseStatusLineString(statusLine: string) {
   const match = statusLine.match(statusLineRegExp);
   if (!match) {
     throw new Error("BatchResponse: Invalid response status line");
@@ -79,7 +82,11 @@ export function parseStatusLine(statusLineBytes: Uint8Array) {
  * @returns
  */
 export function parseHeaders(headersBytes: Uint8Array) {
-  const decodedHeaders = new TextDecoder().decode(headersBytes).split("\r\n");
+  return parseHeadersString(new TextDecoder().decode(headersBytes));
+}
+
+export function parseHeadersString(headersStr: string) {
+  const decodedHeaders = headersStr.split("\r\n");
   const headers = new Headers();
   let lastKey: string | undefined;
   for (const header of decodedHeaders) {

@@ -3,6 +3,7 @@ import type { AddressInfo } from "net";
 import { BatchRequest } from "./batch-request";
 import { makeBatchResponse } from "./batch-response";
 import { makeBatchStreamResponse } from "./batch-response-stream";
+import { makeReactNativeBatchResponse } from "./batch-response-react-native";
 
 const responseDatas = [
   `Preamble
@@ -64,6 +65,8 @@ describe.each([
   { make: makeBatchResponse, batch: "/batch-stream" },
   { make: makeBatchStreamResponse, batch: "/batch" },
   { make: makeBatchStreamResponse, batch: "/batch-stream" },
+  { make: makeReactNativeBatchResponse, batch: "/batch" },
+  { make: makeReactNativeBatchResponse, batch: "/batch-stream" },
 ])(`BatchRequest $make.name with endpoint '$batch'`, ({ make, batch }) => {
   let app: express.Express;
   let server: ReturnType<typeof app.listen>;
