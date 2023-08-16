@@ -49,7 +49,7 @@ export interface HttpBatchTansformerOptions {
  * multipart-body  := preamble 1*encapsulation close-delimiter epilogue
  * encapsulation   := delimiter body-part CRLF
  * delimiter       := "--" boundary CRLF
- * close-delimiter := delimiter "--"
+ * close-delimiter := "--" boundary "--" CRLF
  * preamble        := discard-text
  * epilogue        := discard-text
  * discard-text    := *(*text CRLF)
