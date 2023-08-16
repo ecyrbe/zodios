@@ -1,6 +1,7 @@
 import express from "express";
 import type { AddressInfo } from "net";
-import { BatchData } from "./batch-data";
+import { makeBatchData } from "./batch-data";
+import { makeReactNativeBatchData } from "./batch-data-react-native";
 
 function getUser1Req(port: number) {
   return new Request(`http://localhost:${port}/get`, {
@@ -24,110 +25,113 @@ function renameUser2Req(port: number) {
   });
 }
 
-describe("BatchData", () => {
-  let app: express.Express;
-  let server: ReturnType<typeof app.listen>;
-  let port: number;
+describe.each([{ make: makeBatchData }, { make: makeReactNativeBatchData }])(
+  "BatchData $make.name",
+  ({ make }) => {
+    let app: express.Express;
+    let server: ReturnType<typeof app.listen>;
+    let port: number;
 
-  beforeAll(() => {
-    const app = express();
-    app.use(express.raw({ type: "multipart/mixed" }));
+    beforeAll(() => {
+      const app = express();
+      app.use(express.raw({ type: "multipart/mixed" }));
 
-    app.post("/batch", (req, res) => {
-      res.json({
-        url: req.url,
-        method: req.method,
-        headers: req.headers,
-        data: req.body.toString(),
+      app.post("/batch", (req, res) => {
+        res.json({
+          url: req.url,
+          method: req.method,
+          headers: req.headers,
+          data: req.body.toString(),
+        });
       });
+
+      server = app.listen(0);
+      port = (server.address() as AddressInfo).port;
+
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date(2023, 1, 1));
     });
 
-    server = app.listen(0);
-    port = (server.address() as AddressInfo).port;
-
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date(2023, 1, 1));
-  });
-
-  afterAll((done) => {
-    jest.useRealTimers();
-    server.close(done);
-  });
-
-  it("should be able to batch requests", async () => {
-    const getUser1 = getUser1Req(port);
-    const renameUser2 = renameUser2Req(port);
-
-    const body = new BatchData();
-    body.addRequest(getUser1);
-    body.addRequest(renameUser2);
-
-    const batched = await fetch(`http://localhost:${port}/batch`, {
-      method: "POST",
-      headers: body.getHeaders(),
-      body: body.body(),
-    }).then((response) => response.json());
-
-    expect(batched.url).toBe("/batch");
-    expect(batched.method).toBe("POST");
-    expect(batched.headers["content-type"]).toContain("multipart/mixed");
-    expect(batched.data).toMatchSnapshot();
-  });
-
-  it("should be able to iterate over requests", async () => {
-    const getUser1 = getUser1Req(port);
-    const renameUser2 = renameUser2Req(port);
-
-    const body = new BatchData();
-    body.addRequest(getUser1);
-    body.addRequest(renameUser2);
-
-    const requests: Request[] = [];
-    for (const [, request] of body) {
-      requests.push(request);
-    }
-    expect(requests).toEqual([getUser1, renameUser2]);
-
-    const requests2: Request[] = [];
-    for (const [, request] of body.entries()) {
-      requests2.push(request);
-    }
-    expect(requests2).toEqual([getUser1, renameUser2]);
-
-    expect(Array.from(body.requests())).toEqual([getUser1, renameUser2]);
-
-    expect(Array.from(body.requestIds())).toEqual([
-      "request-1-1675206000000@zodios.org",
-      "request-2-1675206000000@zodios.org",
-    ]);
-
-    body.forEach((request, contentId) => {
-      expect(request).toBe(body.getRequest(contentId));
+    afterAll((done) => {
+      jest.useRealTimers();
+      server.close(done);
     });
 
-    expect(body.getRequestId(getUser1)).toBe(
-      "request-1-1675206000000@zodios.org"
-    );
-    expect(body.getRequestId(renameUser2)).toBe(
-      "request-2-1675206000000@zodios.org"
-    );
+    it("should be able to batch requests", async () => {
+      const getUser1 = getUser1Req(port);
+      const renameUser2 = renameUser2Req(port);
 
-    expect(body.boundary).toBe("batch__1675206000000__batch");
-  });
+      const body = make();
+      body.addRequest(getUser1);
+      body.addRequest(renameUser2);
 
-  it("should be able to get request by content id", async () => {
-    const getUser1 = getUser1Req(port);
-    const renameUser2 = renameUser2Req(port);
+      const batched = await fetch(`http://localhost:${port}/batch`, {
+        method: "POST",
+        headers: body.getHeaders(),
+        body: await body.body(),
+      }).then((response) => response.json());
 
-    const body = new BatchData();
-    body.addRequest(getUser1);
-    body.addRequest(renameUser2);
+      expect(batched.url).toBe("/batch");
+      expect(batched.method).toBe("POST");
+      expect(batched.headers["content-type"]).toContain("multipart/mixed");
+      expect(batched.data).toMatchSnapshot();
+    });
 
-    expect(body.getRequest("response-request-1-1675206000000@zodios.org")).toBe(
-      getUser1
-    );
-    expect(body.getRequest("response-request-2-1675206000000@zodios.org")).toBe(
-      renameUser2
-    );
-  });
-});
+    it("should be able to iterate over requests", async () => {
+      const getUser1 = getUser1Req(port);
+      const renameUser2 = renameUser2Req(port);
+
+      const body = make();
+      body.addRequest(getUser1);
+      body.addRequest(renameUser2);
+
+      const requests: Request[] = [];
+      for (const [, request] of body) {
+        requests.push(request);
+      }
+      expect(requests).toEqual([getUser1, renameUser2]);
+
+      const requests2: Request[] = [];
+      for (const [, request] of body.entries()) {
+        requests2.push(request);
+      }
+      expect(requests2).toEqual([getUser1, renameUser2]);
+
+      expect(Array.from(body.requests())).toEqual([getUser1, renameUser2]);
+
+      expect(Array.from(body.requestIds())).toEqual([
+        "request-1-1675206000000@zodios.org",
+        "request-2-1675206000000@zodios.org",
+      ]);
+
+      body.forEach((request, contentId) => {
+        expect(request).toBe(body.getRequest(contentId));
+      });
+
+      expect(body.getRequestId(getUser1)).toBe(
+        "request-1-1675206000000@zodios.org"
+      );
+      expect(body.getRequestId(renameUser2)).toBe(
+        "request-2-1675206000000@zodios.org"
+      );
+
+      expect(body.boundary).toBe("batch__1675206000000__batch");
+    });
+
+    it("should be able to get request by content id", async () => {
+      const getUser1 = getUser1Req(port);
+      const renameUser2 = renameUser2Req(port);
+
+      const body = make();
+      body.addRequest(getUser1);
+      body.addRequest(renameUser2);
+
+      expect(
+        body.getRequest("response-request-1-1675206000000@zodios.org")
+      ).toBe(getUser1);
+      expect(
+        body.getRequest("response-request-2-1675206000000@zodios.org")
+      ).toBe(renameUser2);
+    });
+  }
+);

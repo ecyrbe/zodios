@@ -94,7 +94,7 @@ describe.each([
     batch: "/batch-stream",
   },
 ])(
-  `BatchRequest $make.name with endpoint '$batch'`,
+  `BatchRequest $makeBatchedData.name $makeBatchedData.name with endpoint '$batch'`,
   ({ makeBatchedResponse, makeBatchedData, batch }) => {
     let app: express.Express;
     let server: ReturnType<typeof app.listen>;
