@@ -23,7 +23,7 @@ This allows to batch automatically all requests made within the same tick (aka t
     },
     {
       makeBatchData: () => new BatchData(),
-      makeBatchResponse: (response) => new BatchStreamResponse(response))
+      makeBatchResponse: (response) => new BatchResponse(response))
     });
 
     const [user1, user2] = await Promise.all([
@@ -47,7 +47,7 @@ If you want to always use the batch endpoint, you can use the `alwaysBatch` opti
 ```ts
     const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, {
       makeBatchData: () => new BatchData(),
-      makeBatchResponse: (response) => new BatchStreamResponse(response)),
+      makeBatchResponse: (response) => new BatchResponse(response)),
       alwaysBatch: true 
     });
 ```
@@ -71,7 +71,7 @@ All of which are part of the standard fetch API.
 ```ts
     const client = new BatchRequest({input: `/batch`, init: { method: "POST" }}, {
       makeBatchData: () => new BatchData(),
-      makeBatchResponse: (response) => new BatchStreamResponse(response)),
+      makeBatchResponse: (response) => new BatchResponse(response)),
       fetch: myFetch 
     });
 ```
