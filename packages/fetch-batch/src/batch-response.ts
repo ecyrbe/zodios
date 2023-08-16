@@ -88,7 +88,7 @@ export class BatchResponse implements AsyncIterable<[string, Response]> {
    * @returns an async iterator that yields a response for each request
    */
   async *[Symbol.asyncIterator]() {
-    const boundary = parseBoundary(this.#response);
+    const boundary = parseBoundary(this.#response.headers);
     const buffers = await this.#readChuncks();
     const data = concat(buffers);
     const searchBoundary = new SearchArray(

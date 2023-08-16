@@ -435,7 +435,7 @@ export class BatchStreamResponse implements AsyncIterable<[string, Response]> {
    * @returns an async iterator that yields a response for each request
    */
   async *[Symbol.asyncIterator]() {
-    const boundary = parseBoundary(this.#response);
+    const boundary = parseBoundary(this.#response.headers);
     ensureBody(this.#response.body);
     const stream = this.#response.body.pipeThrough(
       new TransformStream(new HttpBatchTansformer(boundary, this.#options))

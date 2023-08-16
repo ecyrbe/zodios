@@ -9,8 +9,8 @@ const boundaryRegExp = /boundary="?([^";]+)"?;?/;
  * @returns the boundary
  * @throws if the response is not multipart/mixed or if the boundary is not found or if there is no response body
  */
-export function parseBoundary(response: Response) {
-  const contentType = response.headers.get("content-type");
+export function parseBoundary(headers: Headers) {
+  const contentType = headers.get("content-type");
   if (!contentType?.startsWith("multipart/mixed")) {
     throw new Error(
       "BatchResponse: Invalid content type, expected multipart/mixed"
