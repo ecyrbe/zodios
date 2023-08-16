@@ -85,11 +85,10 @@ export class ReactNativeBatchData implements IBatchData {
 
   async #formatRequest(request: Request) {
     const url = new URL(request.url);
-    return (
-      `${request.method} ${url.pathname}${url.search}${url.hash} HTTP/1.1\r\n` +
-      this.#formatHeaders(request.headers) +
-      (await request.text())
-    );
+    let result = `${request.method} ${url.pathname}${url.search}${url.hash} HTTP/1.1\r\n`;
+    result += this.#formatHeaders(request.headers);
+    result += await request.text();
+    return result;
   }
 
   async #format() {
