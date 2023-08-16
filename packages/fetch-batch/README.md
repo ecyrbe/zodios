@@ -171,7 +171,7 @@ Each part is separated by a boundary. And each part starts with a Content-ID hea
       headers: body.getHeaders({
         'x-custom-header': 'custom value'
       }),
-      body: body.stream(),
+      body: body.body(),
     }).then((response) => new BatchResponse(response));
 
     // you can iterate over the responses
