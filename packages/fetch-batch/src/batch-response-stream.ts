@@ -31,7 +31,7 @@ export interface HttpBatchTansformerOptions {
    * max status line size
    * protect against status line overflow attacks, default to 1kb
    */
-  masStatusLineSize?: number;
+  maxStatusLineSize?: number;
   /**
    * max header size
    * protect against header overflow attacks, default to 16kb
@@ -100,7 +100,7 @@ export class HttpBatchTansformer
       this.#encoder.encode(`\r\n--${this.#boundary}--\r\n`)
     );
     this.#maxDiscardSize = options?.maxDiscardSize ?? 16 * 1024;
-    this.#maxStatusLineSize = options?.masStatusLineSize ?? 1 * 1024;
+    this.#maxStatusLineSize = options?.maxStatusLineSize ?? 1 * 1024;
     this.#maxHeaderSize = options?.maxHeaderSize ?? 16 * 1024;
     this.#maxChunkBodySize = options?.maxChunkBodySize ?? 1 * 1024 * 1024;
   }
