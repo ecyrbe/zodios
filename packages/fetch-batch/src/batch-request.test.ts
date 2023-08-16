@@ -18,7 +18,8 @@ ETag: "etag/pony"
 
 `,
   `{
-  "id": 1,
+  "id": 1,`,
+  `
   "name": "john doe"
 }
 `,
@@ -28,13 +29,15 @@ Content-ID: <response-PLACEHOLDER2>
 
 `,
   `HTTP/1.1 200 OK
-Content-Type: application/json;
+Content-Type: application/json;`,
+  `
   charset=UTF-8
 ETag: "etag/sheep"
 
 `,
   `{
-  "id": 2,
+  "id": 2,`,
+  `
   "name": "jane doe"
 }
 `,
