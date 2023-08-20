@@ -13,6 +13,7 @@ import type {
   IfEquals,
   RequiredKeys,
   UndefinedIfNever,
+  Simplify,
 } from "./utils.types";
 import z from "zod";
 
@@ -347,14 +348,22 @@ export type ZodiosPathParams<Path extends string> = NeverIfEmpty<
 export type ZodiosPathParamsForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
   Frontend extends boolean = true,
-  PathParameters = MapSchemaParameters<
-    FilterArrayByValue<Endpoint["parameters"], { type: "Path" }>,
-    Frontend
+  PathParameters = UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<Endpoint["parameters"], { type: "Path" }>,
+      Frontend
+    >
   >
 > = NeverIfEmpty<
-  {
-    [K in PathParamNames<Endpoint["path"]>]: string | number;
-  } & PathParameters
+  Simplify<
+    Omit<
+      {
+        [K in PathParamNames<Endpoint["path"]>]: string | number | boolean;
+      },
+      keyof PathParameters
+    > &
+      PathParameters
+  >
 >;
 
 /**
@@ -365,18 +374,26 @@ export type ZodiosPathParamsByPath<
   M extends Method,
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true,
-  PathParameters = MapSchemaParameters<
-    FilterArrayByValue<
-      ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
-      { type: "Path" }
-    >,
-    Frontend
+  PathParameters = UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<
+        ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["parameters"],
+        { type: "Path" }
+      >,
+      Frontend
+    >
   >,
   $PathParamNames extends string = PathParamNames<Path>
 > = NeverIfEmpty<
-  {
-    [K in $PathParamNames]: string | number | boolean;
-  } & PathParameters
+  Simplify<
+    Omit<
+      {
+        [K in $PathParamNames]: string | number | boolean;
+      },
+      keyof PathParameters
+    > &
+      PathParameters
+  >
 >;
 
 /**
@@ -391,15 +408,23 @@ export type ZodiosPathParamByAlias<
     Alias
   >[number],
   Path = EndpointDefinition["path"],
-  PathParameters = MapSchemaParameters<
-    FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
-    Frontend
+  PathParameters = UndefinedToOptional<
+    MapSchemaParameters<
+      FilterArrayByValue<EndpointDefinition["parameters"], { type: "Path" }>,
+      Frontend
+    >
   >,
   $PathParamNames extends string = PathParamNames<Path>
 > = NeverIfEmpty<
-  {
-    [K in $PathParamNames]: string | number | boolean;
-  } & PathParameters
+  Simplify<
+    Omit<
+      {
+        [K in $PathParamNames]: string | number | boolean;
+      },
+      keyof PathParameters
+    > &
+      PathParameters
+  >
 >;
 
 export type ZodiosHeaderParamsForEndpoint<
