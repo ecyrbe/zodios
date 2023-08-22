@@ -7,6 +7,7 @@ import {
   mergeApis,
   Zodios,
   parametersBuilder,
+  apiBuilder,
 } from "./index";
 import { Assert } from "./utils.types";
 
@@ -14,6 +15,8 @@ const userSchema = z.object({
   id: z.number(),
   name: z.string(),
 });
+
+const usersSchema = z.array(userSchema);
 
 describe("makeApi", () => {
   it("should throw on duplicate path", () => {
@@ -215,7 +218,7 @@ describe("parametersBuilder", () => {
       .build();
 
     const test: Assert<
-      typeof parameters[number],
+      (typeof parameters)[number],
       | {
           name: "id";
           type: "Path";
@@ -304,7 +307,7 @@ describe("makeCrudApi", () => {
     };
 
     // check narrowing works
-    const testGet: Assert<typeof api[0], ExpectedGetEndpoint> = true;
+    const testGet: Assert<(typeof api)[0], ExpectedGetEndpoint> = true;
 
     expect(JSON.stringify(api)).toEqual(
       JSON.stringify([
@@ -490,5 +493,131 @@ describe("mergeApis", () => {
         }
       ]
     > = true;
+  });
+});
+
+describe("apiBuilder", () => {
+  it("should build an empty api", () => {
+    const api = apiBuilder().build();
+    const test: Assert<typeof api, []> = true;
+    expect(api).toEqual([]);
+  });
+
+  it("should build an api with one endpoint and empty first endpoint", () => {
+    const api = apiBuilder()
+      .addEndpoint({
+        method: "get",
+        path: "/users",
+        alias: "getUsers",
+        description: "Get all users",
+        response: usersSchema,
+      })
+      .build();
+    const test: Assert<
+      typeof api,
+      [
+        {
+          method: "get";
+          path: "/users";
+          alias: "getUsers";
+          description: "Get all users";
+          response: typeof usersSchema;
+        }
+      ]
+    > = true;
+    expect(api).toEqual([
+      {
+        method: "get",
+        path: "/users",
+        alias: "getUsers",
+        description: "Get all users",
+        response: usersSchema,
+      },
+    ]);
+  });
+
+  it("should build an api with two endpoint and empty first endpoint", () => {
+    const api = apiBuilder()
+      .addEndpoint({
+        method: "get",
+        path: "/users",
+        alias: "getUsers",
+        description: "Get all users",
+        response: usersSchema,
+      })
+      .addEndpoint({
+        method: "get",
+        path: "/users/:id",
+        alias: "getUser",
+        description: "Get a user",
+        response: userSchema,
+      })
+      .build();
+    const test: Assert<
+      typeof api,
+      [
+        {
+          method: "get";
+          path: "/users";
+          alias: "getUsers";
+          description: "Get all users";
+          response: typeof usersSchema;
+        },
+        {
+          method: "get";
+          path: "/users/:id";
+          alias: "getUser";
+          description: "Get a user";
+          response: typeof userSchema;
+        }
+      ]
+    > = true;
+    expect(api).toEqual([
+      {
+        method: "get",
+        path: "/users",
+        alias: "getUsers",
+        description: "Get all users",
+        response: usersSchema,
+      },
+      {
+        method: "get",
+        path: "/users/:id",
+        alias: "getUser",
+        description: "Get a user",
+        response: userSchema,
+      },
+    ]);
+  });
+
+  it("should build an api with one endpoint", () => {
+    const api = apiBuilder({
+      method: "get",
+      path: "/users",
+      alias: "getUsers",
+      description: "Get all users",
+      response: usersSchema,
+    }).build();
+    const test: Assert<
+      typeof api,
+      [
+        {
+          method: "get";
+          path: "/users";
+          alias: "getUsers";
+          description: "Get all users";
+          response: typeof usersSchema;
+        }
+      ]
+    > = true;
+    expect(api).toEqual([
+      {
+        method: "get",
+        path: "/users",
+        alias: "getUsers",
+        description: "Get all users",
+        response: usersSchema,
+      },
+    ]);
   });
 });

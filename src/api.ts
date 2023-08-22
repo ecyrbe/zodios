@@ -207,12 +207,19 @@ export function makeEndpoint<T extends ZodiosEndpointDefinition<any>>(
 }
 export class Builder<T extends ZodiosEndpointDefinitions> {
   constructor(private api: T) {}
-  addEndpoint<E extends ZodiosEndpointDefinition>(endpoint: Narrow<E>) {
-    return new Builder<[...T, E]>([...this.api, endpoint] as [...T, E]);
+  addEndpoint<E extends ZodiosEndpointDefinition>(
+    endpoint: Narrow<E>
+  ): Builder<[...T, E]> {
+    if (this.api.length === 0) {
+      this.api = [endpoint] as T;
+      return this as any;
+    }
+    this.api = [...this.api, endpoint] as any;
+    return this as any;
   }
   build(): T {
-    checkApi(this.api);
-    return this.api;
+    checkApi(this.api!);
+    return this.api!;
   }
 }
 
@@ -222,10 +229,13 @@ export class Builder<T extends ZodiosEndpointDefinitions> {
  * @param endpoint
  * @returns - a builder to build your api definitions
  */
+export function apiBuilder(): Builder<[]>;
 export function apiBuilder<T extends ZodiosEndpointDefinition<any>>(
   endpoint: Narrow<T>
-): Builder<[T]> {
-  return new Builder([endpoint] as [T]);
+): Builder<[T]>;
+export function apiBuilder(endpoint?: any) {
+  if (!endpoint) return new Builder([]);
+  return new Builder([endpoint]);
 }
 
 /**
