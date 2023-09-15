@@ -71,6 +71,22 @@ For example, you can override internal 'zod-validation' plugin with your own val
   });
 ```
 
+Some Zodios plugins are registered per-endpoint. For example, you cannot override `formDataPlugin` globally. Instead, you should do:
+
+```typescript
+  import { formDataPlugin } from '@zodios/core';
+  import { myFormDataPlugin } from './my-custom-formdata';
+ 
+  for(const endpoint of apiClient.api) {
+    if(endpoint.requestFormat === 'form-data') {
+      apiClient.use(endpoint.alias, {
+        name: formDataPlugin().name, // using the same name as an already existing plugin will override it
+        request: myFormDataPlugin
+      })
+    }
+  }
+```
+
 ## Plugin execution order
 
 Zodios plugins that are not attached to an endpoint are executed first.
