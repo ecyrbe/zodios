@@ -57,6 +57,7 @@ export {
   parametersBuilder,
   makeParameters,
   makeEndpoint,
+  errorsBuilder,
   makeErrors,
   checkApi,
   prefixApi,

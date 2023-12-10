@@ -393,6 +393,69 @@ const api = apiBuilder({
   .build();
 ```
 
+## errorsBuilder
+
+`errorsBuilder` is a helper to build error definitions with better type autocompletion.
+
+```ts
+function errorsBuilder(): ErrorsBuilder;
+```
+
+### ErrorsBuilder methods
+
+ErrorsBuilder is a helper to build error definitions with better type autocompletion.
+
+| methods         | parameters                                                | return               | Description                        |
+| --------------- | --------------------------------------------------------- | -------------------- | ---------------------------------- |
+| addError        | status: Status, schema: Schema, description?: Description | ErrorsBuilder        | Add an error to the API            |
+| addDefaultError | schema: Schema, description?: Description                 | ErrorsBuilder        | Add a default error to the API     |
+| build           | none                                                      | ZodiosEndpointErrors | Build the errors                   |
+
+**Example**
+
+```ts
+const schema = z.object({
+  error: z.object({
+    userId: z.number(),
+    code: z.string(),
+    message: z.string(),
+  }),
+});
+
+const defaultSchema = z.object({
+  error: z.object({
+    code: z.string(),
+    message: z.string(),
+  }),
+});
+```
+
+```ts
+import { errorsBuilder } from "@zodios/core";
+
+const errors = errorsBuilder()
+  .addError(404, schema, "User not found")
+  .addDefaultError(defaultSchema, "Default error")
+  .build();
+```
+
+is equivalent to
+
+```ts
+const errors = makeErrors([
+  {
+    status: 404,
+    description: "User not found",
+    schema,
+  },
+  {
+    status: "default",
+    description: "Default error",
+    schema: defaultSchema,
+  },
+]);
+```
+
 ## mergeApis
 
 `mergeApis` is a helper to merge multiple API definitions in a router friendly way.

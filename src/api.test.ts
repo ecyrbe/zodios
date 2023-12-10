@@ -8,6 +8,7 @@ import {
   Zodios,
   parametersBuilder,
   apiBuilder,
+  errorsBuilder,
 } from "./index";
 import { Assert } from "./utils.types";
 
@@ -254,6 +255,40 @@ describe("parametersBuilder", () => {
           type: "Header";
           description?: string;
           schema: z.ZodString;
+        }
+    > = true;
+  });
+});
+
+describe("errorsBuilder", () => {
+  it("should build errors", () => {
+    const errors = errorsBuilder()
+      .addError(
+        404,
+        z.object({
+          code: z.number(),
+          id: z.string(),
+        })
+      )
+      .addDefaultError(
+        z.object({
+          code: z.number(),
+        }),
+        "Default"
+      )
+      .build();
+
+    const test: Assert<
+      (typeof errors)[number],
+      | {
+          status: 404;
+          description?: string;
+          schema: z.ZodType<unknown>;
+        }
+      | {
+          status: "default";
+          description?: "Default";
+          schema: z.ZodType<unknown>;
         }
     > = true;
   });

@@ -7,7 +7,7 @@ import {
   ZodiosEndpointDefinitions,
   ZodiosEndpointError,
 } from "./zodios.types";
-import z, { ZodRawShape } from "zod";
+import z from "zod";
 import { capitalize } from "./utils";
 import { Narrow, TupleFlat, UnionToTuple } from "./utils.types";
 
@@ -191,6 +191,42 @@ export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
   errors: Narrow<ErrorDescription>
 ): ErrorDescription {
   return errors as ErrorDescription;
+}
+
+export function errorsBuilder() {
+  return new ErrorsBuilder<[]>([]);
+}
+
+class ErrorsBuilder<T extends ZodiosEndpointError[]> {
+  constructor(private params: T) {}
+
+  addError<
+    Status extends ZodiosEndpointError["status"],
+    Schema extends ZodiosEndpointError["schema"],
+    Description extends ZodiosEndpointError["description"]
+  >(status: Status, schema: Schema, description?: Description) {
+    return new ErrorsBuilder<
+      [
+        ...T,
+        {
+          status: Status;
+          description?: Description;
+          schema: ZodiosEndpointError["schema"];
+        }
+      ]
+    >([...this.params, { status, description, schema }]);
+  }
+
+  addDefaultError<
+    Schema extends ZodiosEndpointError["schema"],
+    Description extends ZodiosEndpointError["description"]
+  >(schema: Schema, description?: Description) {
+    return this.addError("default", schema, description);
+  }
+
+  build() {
+    return this.params;
+  }
 }
 
 /**
