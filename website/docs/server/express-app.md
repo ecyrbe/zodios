@@ -136,14 +136,14 @@ const userApi = makeApi([
     errors: [
       {
         status: 404,
-        response: z.object({
+        schema: z.object({
           code: z.string(),
           message: z.string(),
           id: z.number(),
         }),
       }, {
         status: 'default', // default status code will be used if error is not 404
-        response: z.object({
+        schema: z.object({
           code: z.string(),
           message: z.string(),
         }),
