@@ -18,6 +18,18 @@ const client = new Zodios(myApiDefinition);
 
 type MyApi = ApiOf<typeof client>;
 ```
+
+## `ZodiosPathsByMethod`
+
+`ZodiosPathsByMethod` is a type helper that extracts a union type of every path by method from your api definition.
+
+```ts
+import { ZodiosPathsByMethod } from '@zodios/core';
+import { MyApi } from './my-api';
+
+type GetPaths = ZodiosPathsByMethod<MyApi,'get'>;
+```
+
 ## `ZodiosBodyByPath`
 
 `ZodiosBodyByPath` is a type helper that extracts the body type of a request from your api definition.
