@@ -93,6 +93,11 @@ export function zodValidationPlugin({
               `No endpoint found for ${config.method} ${config.url}`
             );
           }
+          if (!response) {
+              throw new ZodiosError(
+                `Zodios: Invalid response from endpoint '${endpoint.method} ${endpoint.path}': undefined`
+              )
+          }
           if (
             response.headers?.["content-type"]?.includes("application/json") ||
             response.headers?.["content-type"]?.includes(
