@@ -30,7 +30,9 @@ describe("zodValidationPlugin", () => {
     it("should throw if endpoint is not found", async () => {
       await expect(
         plugin.request!(api, notExistingConfig)
-      ).rejects.toThrowError("No endpoint found for get /notExisting");
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"No endpoint found for get /notExisting"`
+      );
     });
 
     it("should verify parameters", async () => {
@@ -143,9 +145,18 @@ describe("zodValidationPlugin", () => {
         sampleQueryParam: 123,
       };
 
-      await expect(plugin.request!(api, badConfig)).rejects.toThrowError(
-        "Zodios: Invalid Query parameter 'sampleQueryParam'"
-      );
+      await expect(plugin.request!(api, badConfig)).rejects
+        .toThrowErrorMatchingInlineSnapshot(`
+"Zodios: Invalid Query parameter 'sampleQueryParam'
+Cause: [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [],
+    "message": "Invalid input: expected string, received number"
+  }
+]"
+`);
     });
   });
 
@@ -157,7 +168,9 @@ describe("zodValidationPlugin", () => {
     it("should throw if endpoint is not found", async () => {
       await expect(
         plugin.response!(api, notExistingConfig, createSampleResponse())
-      ).rejects.toThrowError("No endpoint found for get /notExisting");
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"No endpoint found for get /notExisting"`
+      );
     });
 
     it("should verify body", async () => {
@@ -248,26 +261,36 @@ describe("zodValidationPlugin", () => {
 
       await expect(
         plugin.response!(api, createSampleConfig("/parse"), badResponse)
-      ).rejects
-        .toThrowError(`Zodios: Invalid response from endpoint 'post /parse'
+      ).rejects.toThrowErrorMatchingInlineSnapshot(`
+"Zodios: Invalid response from endpoint 'post /parse'
 status: 200 OK
 cause:
 [
   {
-    "code": "invalid_type",
     "expected": "string",
-    "received": "number",
+    "code": "invalid_type",
     "path": [
       "first"
     ],
-    "message": "Expected string, received number"
+    "message": "Invalid input: expected string, received number"
   }
 ]
 received:
 {
   "first": 123,
   "second": 111
-}`);
+}
+Cause: [
+  {
+    "expected": "string",
+    "code": "invalid_type",
+    "path": [
+      "first"
+    ],
+    "message": "Invalid input: expected string, received number"
+  }
+]"
+`);
     });
   });
 

@@ -282,7 +282,7 @@ export function makeCrudApi<
           name: "body",
           type: "Body",
           description: "The object to create",
-          schema: schema.partial() as z.Schema<Partial<Schema>>,
+          schema: schema.partial(),
         },
       ],
       // @ts-expect-error
@@ -319,7 +319,7 @@ export function makeCrudApi<
           name: "body",
           type: "Body",
           description: "The object to patch",
-          schema: schema.partial() as z.Schema<Partial<Schema>>,
+          schema: schema.partial(),
         },
       ],
       // @ts-expect-error

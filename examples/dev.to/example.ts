@@ -6,7 +6,7 @@ import { followersApi } from "./followers";
 import { userApi } from "./users";
 import { pluginApiKey } from "./api-key-plugin";
 
-export const devTo = new Zodios("https://dev.to/api", [
+const devTo = new Zodios("https://dev.to/api", [
   ...articlesApi,
   ...commentsApi,
   ...followsApi,
@@ -14,12 +14,18 @@ export const devTo = new Zodios("https://dev.to/api", [
   ...userApi,
 ]);
 
-devTo.use(
-  pluginApiKey({
-    getApiKey: async () => "<your dev.to api key>",
-  })
-);
+(async () => {
+  
+  devTo.use(
+    pluginApiKey({
+      getApiKey: async () => "<your dev.to api key>",
+    })
+  );
+  
+  const result = await devTo.get("/articles/:id", {
+    params: { id: 194541 },
+  });
 
-const result = devTo.get("/articles/:id", {
-  params: { id: 123 },
-});
+  console.log(`result`, result);
+})()
+

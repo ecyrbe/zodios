@@ -94,19 +94,23 @@ describe("Zodios", () => {
 
   it("should throw if baseUrl is not provided", () => {
     // @ts-ignore
-    expect(() => new Zodios(undefined, [])).toThrowError(
-      "Zodios: missing base url"
+    expect(() => new Zodios(undefined, [])).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: missing base url"`
     );
   });
 
   it("should throw if api is not provided", () => {
     // @ts-ignore
-    expect(() => new Zodios()).toThrowError("Zodios: missing api description");
+    expect(() => new Zodios()).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: missing api description"`
+    );
   });
 
   it("should throw if api is not an array", () => {
     // @ts-ignore
-    expect(() => new Zodios({})).toThrowError("Zodios: api must be an array");
+    expect(() => new Zodios({})).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: api must be an array"`
+    );
   });
 
   it("should return the underlying axios instance", () => {
@@ -152,7 +156,7 @@ describe("Zodios", () => {
             }),
           },
         ])
-    ).toThrowError("Zodios: Duplicate path 'get /:id'");
+    ).toThrowErrorMatchingInlineSnapshot(`"Zodios: Duplicate path 'get /:id'"`);
   });
 
   it("should get base url", () => {
@@ -229,7 +233,9 @@ describe("Zodios", () => {
   it("should throw if invalid parameters when registering a plugin", () => {
     const zodios = new Zodios(`http://localhost:${port}`, []);
     // @ts-ignore
-    expect(() => zodios.use(0)).toThrowError("Zodios: invalid plugin");
+    expect(() => zodios.use(0)).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: invalid plugin registration"`
+    );
   });
 
   it("should throw if invalid alias when registering a plugin", () => {
@@ -250,7 +256,9 @@ describe("Zodios", () => {
         // @ts-ignore
         request: async (_, config) => config,
       })
-    ).toThrowError("Zodios: no alias 'tests' found to register plugin");
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: no alias 'tests' found to register plugin"`
+    );
   });
 
   it("should throw if invalid endpoint when registering a plugin", () => {
@@ -270,8 +278,8 @@ describe("Zodios", () => {
         // @ts-ignore
         request: async (_, config) => config,
       })
-    ).toThrowError(
-      "Zodios: no endpoint 'get /test/:id' found to register plugin"
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: no endpoint 'get /test/:id' found to register plugin"`
     );
   });
 
@@ -791,13 +799,12 @@ status: 200 OK
 cause:
 [
   {
-    "code": "invalid_type",
     "expected": "string",
-    "received": "undefined",
+    "code": "invalid_type",
     "path": [
       "more"
     ],
-    "message": "Required"
+    "message": "Invalid input: expected string, received undefined"
   }
 ]
 received:

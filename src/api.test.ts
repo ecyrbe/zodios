@@ -37,7 +37,9 @@ describe("makeApi", () => {
           response: z.array(userSchema),
         },
       ])
-    ).toThrowError("Zodios: Duplicate path 'get /users'");
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: Duplicate path 'get /users'"`
+    );
   });
 
   it("should throw on duplicate alias", () => {
@@ -58,7 +60,9 @@ describe("makeApi", () => {
           response: z.array(userSchema),
         },
       ])
-    ).toThrowError("Zodios: Duplicate alias 'getUsers'");
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: Duplicate alias 'getUsers'"`
+    );
   });
 
   it("should throw on duplicate Body", () => {
@@ -83,10 +87,13 @@ describe("makeApi", () => {
               schema: userSchema.partial(),
             },
           ],
+
           response: userSchema,
         },
       ])
-    ).toThrowError("Zodios: Multiple body parameters in endpoint '/users'");
+    ).toThrowErrorMatchingInlineSnapshot(
+      `"Zodios: Multiple body parameters in endpoint '/users'"`
+    );
   });
 
   it("should build with parameters (Path,Query,Body,Header)", () => {

@@ -33,7 +33,7 @@ const errors = makeErrors([
     status: 500,
     schema: z.object({
       message: z.string(),
-      cause: z.record(z.string()),
+      cause: z.record(z.string(), z.string()),
     }),
   },
 ]);
