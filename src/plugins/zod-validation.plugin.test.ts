@@ -269,6 +269,14 @@ received:
   "second": 111
 }`);
     });
+
+    it("should handle 204 No Content with empty string body", async () => {
+      const response204 = createEmptyResponse204();
+
+      await expect(
+        plugin.response!(api, createSampleConfig("/delete"), response204),
+      ).resolves.not.toThrow();
+    });
   });
 
   const notExistingConfig: ReadonlyDeep<AnyZodiosRequestOptions> = {
@@ -320,6 +328,18 @@ received:
       config: {},
       statusText: "OK",
     } as unknown as AxiosResponse);
+
+  const createEmptyResponse204 = (
+    overrides?: Partial<AxiosResponse>,
+  ): AxiosResponse =>
+    ({
+      data: "",
+      status: 204,
+      headers: {},
+      config: {},
+      statusText: "No Content",
+      ...overrides,
+    }) as unknown as AxiosResponse;
 
   const api = apiBuilder({
     path: "/parse",

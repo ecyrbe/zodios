@@ -93,15 +93,21 @@ export function zodValidationPlugin({
               `No endpoint found for ${config.method} ${config.url}`
             );
           }
+
+          let parseData = response.data;
+
+          // Handle 204 No Content responses with empty body
+          if (response.status === 204 && !Boolean(response.data)) {
+            parseData = undefined;
+          }
+
           if (
             response.headers?.["content-type"]?.includes("application/json") ||
             response.headers?.["content-type"]?.includes(
               "application/vnd.api+json"
             )
           ) {
-            const parsed = await endpoint.response.safeParseAsync(
-              response.data
-            );
+            const parsed = await endpoint.response.safeParseAsync(parseData);
             if (!parsed.success) {
               throw new ZodiosError(
                 `Zodios: Invalid response from endpoint '${endpoint.method} ${
