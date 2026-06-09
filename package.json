@@ -26,6 +26,9 @@
     "email": "ecyrbe@gmail.com"
   },
   "homepage": "https://github.com/ecyrbe/zodios",
+  "bugs": {
+    "url": "https://github.com/ecyrbe/zodios/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/ecyrbe/zodios.git"
